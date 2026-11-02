@@ -93,6 +93,7 @@ textarea.input{min-height:132px;display:block}
 .verdict .pct{font-variant-numeric:tabular-nums}
 .culprits{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .culprits span{background:rgba(255,255,255,.22);border-radius:999px;padding:4px 11px;font-weight:700;font-size:14.5px}
+.culprits.marks span{background:transparent;border:1.5px solid rgba(255,255,255,.55);font-weight:600}
 
 .disclosure{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;border:0;background:var(--surface);border-radius:var(--r-md);padding:14px 16px;font-weight:800;font-size:16px;text-align:left}
 .disclosure .count{color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
@@ -951,6 +952,28 @@ function classifyTerm(raw){
    OPEN FOOD FACTS -TAKSONOMIA (ladataan erillisestä tiedostosta) + SUMEA HAKU
    Oma tietokanta on ensisijainen; OFF täydentää puuttuvat termit.
    ===================================================================== */
+/* Open Food Factsin epävarmoille ainesosille todennäköisyys nimen perusteella (oma arvio nykykäytännöstä) */
+const OFF_U_RULES=[
+  [/(aromi|aroma|flavou?r|arôme|smak).*(kana|chicken|poulet|liha|meat|pork|porc|bacon|pekoni|juusto|cheese|cheddar|fromage|parmesan|kerma|cream|crème|milk|maito|lait|butter|voi\b|beurre|honey|hunaja|miel|egg|muna|oeuf|rapu|crab|lobster|shrimp|katkarapu|äyriäi|crustace|osteri|oyster|kala|fish|poisson|anjovis|anchov|beef|naudan)|(kana|chicken|liha|meat|pork|bacon|pekoni|juusto|cheese|cheddar|kerma|cream|milk|maito|butter|honey|hunaja|egg|rapu|crab|lobster|shrimp|katkarapu|äyriäis|oyster|kala|fish|beef).*(aromi|aroma|flavou?r|arôme)/i,0.4,'Voi olla valmistettu eläinperäisestä raaka-aineesta tai synteettisesti'],
+  [/(aromi|aroma|flavou?r|arôme|essence|aromivalmiste)/i,0.85,'Kasvi- tai synteettinen (yleisin); eläinperäinen harvoin'],
+  [/(likööri|liqueur|liquore|crème de|amaretto|limoncello|cointreau|baileys)/i,0.75,'Voi sisältää kermaa, hunajaa tai karmiinia; kirkastus'],
+  [/(viini|wine|vin\b|vino|sherry|port\b|portviini|madeira|marsala|sake|sauternes|champagne|samppanja|cava|prosecco|vermouth|vermutti)/i,0.6,'Kirkastuksessa voidaan käyttää liivatetta, kalaliimaa, kaseiinia tai munanvalkuaista'],
+  [/(olut|beer|bière|ale\b|lager|stout|porter|siideri|cider|cidre)/i,0.85,'Kirkastuksessa voidaan käyttää kalaliimaa'],
+  [/(vodka|rommi|rum\b|rhum|viski|whisk|brandy|konjakki|cognac|gin\b|rakia|arrack|eau de vie|pelinkovac|grappa|alkoholi|alcohol|alcool|tequila|calvados|armagnac|snapsi|akvaviitti|kirsch)/i,0.9,'Tislattu; harvoin eläinperäisiä lisäaineita'],
+  [/(lactobacill|lacticaseibacill|lactiplantibacill|bifido|streptococc|lactococc|ferment|bakteeri|viljelmä|hapate|käyte|kultur|culture|probio|maitohappo|starter|juuri\b|taikinanjuuri)/i,0.85,'Mikrobit; kasvatusalusta voi olla maitopohjainen'],
+  [/(lipaasi|lipase)/i,0.7,'Mikrobit; eläimen haima'],
+  [/(entsyym|enzym|aasi\b|ase\b|transglutamin|lysotsyym|lysozym)/i,0.85,'Mikrobit tai kasvit (yleisin); eläinperäiset harvoin'],
+  [/(ruokosokeri|cane sugar|cane syrup|raaka.?sokeri|raw sugar|sucre de canne|muscovado|demerara|panela|jaggery|rapadura)/i,0.9,'Sokeriruoko; osa raffinoidaan luuhiilellä'],
+  [/(kasvi|vegetable|végétal|plant|soy|soija|palm|palmu|rapsi|rypsi|rapeseed|sunflower|auringonkukka|corn|maissi|cottonseed|kookos|coconut|oliivi|olive)/i,0.95,'Kasviperäinen (yleisin)'],
+  [/(shortening|rasva|fat|graisse|margariini|margarine|levite|öljy|oil|huile)/i,0.75,'Kasvi- tai eläinrasva'],
+  [/(suklaa|chocolate|chocolat|kaakao|cocoa|kuorrute|coating|enrobage|täyte|filling|fourrage|kreemi|cream filling|nougat|praliini|praline|karamelli|caramel|toffee|fudge)/i,0.65,'Voi sisältää maitoa, voita tai kermaa'],
+  [/(leipä|bread|pain\b|tortilla|keksi|biscuit|cookie|kakku|cake|croissant|brioche|pulla|wafer|vohveli|korppu|crouton)/i,0.75,'Jauhot ja hiiva; voi sisältää maitoa, voita tai kananmunaa'],
+  [/(pasta|makaroni|macaroni|spagetti|spaghetti|nuudeli|noodle|nouilles|lasagne|tagliatelle)/i,0.85,'Durumvehnä; jotkin sisältävät kananmunaa'],
+  [/(mauste|seasoning|assaisonnement|spice mix|kastike|sauce|dressing|marinadi|marinade|liemi|stock|bouillon|fond)/i,0.7,'Voi sisältää maitoa, juustoa, lihaa tai kalaa'],
+  [/(stearaatti|stearate|glyseridi|glyceride|lactylat|laktylaat|e4[3-9]\d|e570|sorbitaani|sorbitan|polysorb)/i,0.8,'Kasviöljyt (yleisin) tai eläinrasva'],
+  [/(vitamiini|vitamin|d3|kolekalsiferoli|retinol|omega)/i,0.5,'Synteettinen, kasvi tai eläinperäinen'],
+];
+function offUncertain(name){ for(const [re,p,o] of OFF_U_RULES) if(re.test(name)) return {p:{default:p},origins:o+' (Open Food Facts -termi, todennäköisyys Veganin oma arvio)'}; return {p:{default:0.7},origins:'Voi olla kasvi- tai eläinperäinen (Open Food Facts)'}; }
 let offLoaded=false;
 async function loadOffTaxonomy(){
   try{
@@ -962,13 +985,12 @@ async function loadOffTaxonomy(){
       if(MAP.has(term)||collides(term,d.entries[idx][1])) continue;
       let e=made[idx];
       if(!e){ const [name,cls,nameSv]=d.entries[idx];
-        e=made[idx]={name,nameSv,cls,terms:[],source:'Open Food Facts',off:true,rk:'',
-          p:cls==='U'?{default:0.7}:undefined,
-          origins:cls==='U'?'Voi olla kasvi- tai eläinperäinen (Open Food Facts)':undefined};
+        e=made[idx]={name,nameSv,cls,terms:[],source:'Open Food Facts',off:true,rk:''};
+        if(cls==='U') Object.assign(e,offUncertain(name));
         e.id=ENTRIES.length; ENTRIES.push(e); }
       e.terms.push(term); MAP.set(term,e);
     }
-    const mk=idx=>{ let e=made[idx]; if(!e){ const [name,cls,nameSv]=d.entries[idx]; e=made[idx]={name,nameSv,cls,terms:[],source:'Open Food Facts',off:true,rk:'',p:cls==='U'?{default:0.7}:undefined,origins:cls==='U'?'Voi olla kasvi- tai eläinperäinen (Open Food Facts)':undefined}; e.id=ENTRIES.length; ENTRIES.push(e); } else if(!e.nameSv) e.nameSv=d.entries[idx][2]; return e; };
+    const mk=idx=>{ let e=made[idx]; if(!e){ const [name,cls,nameSv]=d.entries[idx]; e=made[idx]={name,nameSv,cls,terms:[],source:'Open Food Facts',off:true,rk:''}; if(cls==='U') Object.assign(e,offUncertain(name)); e.id=ENTRIES.length; ENTRIES.push(e); } else if(!e.nameSv) e.nameSv=d.entries[idx][2]; return e; };
     for(const [term,idx] of Object.entries(d.terms_sv||{})){ if(SVMAP.has(term)) continue; SVMAP.set(term,mk(idx)); }
     rebuildSingles();
     FUZZ=null; FUZZ_SV=null; offLoaded=true; return true;
@@ -1189,7 +1211,10 @@ function analyzeCore(text){
     verdict='warn';
     if(uncertain.length) prob=combineP(uncertain.map(i=>pFor(i.entry,group)));
   }
-  return {items:uniq, animals, uncertain, unknown, verdict, prob, group};
+  const marks=[];
+  if(/(leaping bunny|cruelty[- ]free|not tested on animals|ei testattu eläimillä|eläinkokeeton|ej testad på djur|djurförsöksfri)/i.test(text||'')) marks.push('Ei eläinkokeita (pakkausmerkintä)');
+  if(/(vegan society|certified vegan|v-label|sertifioitu vegaaninen|vegaanimerkki|veganskt certifierad)/i.test(text||'')) marks.push('Vegaanimerkintä pakkauksessa');
+  return {items:uniq, animals, uncertain, unknown, verdict, prob, group, marks};
 }
 
 /* =====================================================================
@@ -1214,7 +1239,8 @@ function verdictHTML(a){
     const list=[...a.uncertain,...a.unknown];
     chips=list.map(i=>`<span>${esc(cap(i.label))}</span>`).join('');
   }
-  return `<div class="verdict ${a.verdict}" role="status"><div class="word">${ICON[a.verdict]}${WORD[a.verdict]}</div>${sub}${chips?`<div class="culprits">${chips}</div>`:''}</div>`;
+  const marks=(a.marks||[]).map(m=>`<span class="mark">${esc(m)}</span>`).join('');
+  return `<div class="verdict ${a.verdict}" role="status"><div class="word">${ICON[a.verdict]}${WORD[a.verdict]}</div>${sub}${chips?`<div class="culprits">${chips}</div>`:''}${marks?`<div class="culprits marks">${marks}</div>`:''}</div>`;
 }
 let openState=false;
 function renderAnalysis(el,a,key){
