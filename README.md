@@ -19,6 +19,13 @@ Ainesosaluettelosta ei voi nähdä valmistuksen apuaineita (esim. viinin kirkast
 - **Skannaa** – viivakoodi suoraan kamerakuvasta (EAN-13, EAN-8, UPC-A, UPC-E). Tuotetiedot haetaan Open Food, Beauty, Products ja Pet Food Factsista, vegaanisuus arvioidaan aina sovelluksen omalla tietokannalla. Puuttuva ainesosaluettelo kuvataan ja tallennetaan laitteelle viivakoodin kanssa.
 - **Resepti** – sääntöpohjainen muunnos: ainesosan rooli päätellään reseptistä, määrät skaalautuvat annosten mukaan ja ohjeet päivittyvät.
 
+## Tekstintunnistus
+- Kuvan laatu tarkistetaan ensin (epätarkkuus, heijastukset, pieni teksti).
+- Teksti luetaan 2–3 kierroksella eri kuvankäsittelyillä; kierrokset äänestävät sanoista.
+- Tunnistettu teksti korjataan sanakirjaan tunnistukselle tyypillisillä sekaannuksilla (rn↔m, l↔1, 0↔o, ä↔a …) ja E-koodit korjataan (E47l → E471).
+- Jos korjaus ei ole yksiselitteinen ja vaihtoehdot johtaisivat eri tulokseen, sana korostetaan ja vahvistetaan napautuksella. Vihreää tulosta ei näytetä ennen vahvistusta.
+- iPhonen oma tekstintunnistus: tekstikentän *Skannaa teksti* -toiminto tai pikakomento, joka avaa osoitteen `…/Vegan/?t=<teksti>`. Molemmat kulkevat saman korjauksen läpi.
+
 ## Kielet
 Suomi, ruotsi ja englanti. Sovellus tunnistaa ainesosaluettelon tai reseptin kielen ja käyttää sen kielen sanastoa, jotta samannäköiset sanat eivät sekoitu (esim. ruotsin *kola* = kinuski, suomen *kola* = virvoitusjuoma). Ruotsinkieliset reseptit muunnetaan ruotsiksi.
 
