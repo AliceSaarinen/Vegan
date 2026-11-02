@@ -200,6 +200,10 @@ textarea.input{min-height:132px;display:block}
 .cam .close svg{width:22px;height:22px}
 .cam .hint{position:absolute;left:0;right:0;bottom:calc(36px + env(safe-area-inset-bottom,0px));text-align:center;color:#fff;font-weight:800;font-size:18px}
 .src{font-size:12.5px;color:var(--muted)}
+.thumbs{display:flex;gap:8px;align-items:center;overflow-x:auto;padding:2px}
+.thumb{flex:none;width:58px;height:58px;border-radius:12px;overflow:hidden;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumbclear{flex:none;width:36px;height:36px;border-radius:50%;border:0;background:var(--navy-soft);color:var(--navy);font-size:22px;font-weight:800;line-height:1}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -241,10 +245,16 @@ textarea.input{min-height:132px;display:block}
       <label class="btn ghost filebtn" id="ocrBtn" hidden>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 0 1 2-2h1.5l1.4-2h6.2l1.4 2H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><circle cx="12" cy="12.5" r="3.5"/></svg>
         Kuvaa pakkaus
-        <input type="file" accept="image/*" capture="environment" id="ocrInput">
+        <input type="file" accept="image/*" multiple id="ocrInput">
+      </label>
+      <label class="btn ghost filebtn" id="ocrAdd" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Lisää kuva
+        <input type="file" accept="image/*" multiple id="ocrAddInput">
       </label>
       <button class="btn ghost" id="clearIng">Tyhjennä</button>
     </div>
+    <div class="thumbs" id="ocrThumbs" hidden></div>
     <div id="ocrStatus"></div>
     <div id="checkOut" class="view"></div>
   </section>
@@ -272,7 +282,6 @@ textarea.input{min-height:132px;display:block}
 <div class="cam" id="cam" hidden>
   <video id="camVideo" playsinline muted autoplay></video>
   <div class="frame"></div>
-  <div class="hint">Kohdista viivakoodi kehykseen</div>
   <button class="close" id="camClose" aria-label="Sulje kamera"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
 </div>
 
@@ -410,7 +419,7 @@ kasvisnakki;kasvismakkara;vegaaninen;vegaaniset;vegan;kasvipohjainen;plant-based
 const E_V = `100 101 102 104 110 122 123 124 127 129 131 132 133 140 141 142 150a 150b 150c 150d 151 155 160a 160b 160c 160d 160e 161b 161g 162 163 170 171 172 173 174 175 180 200 202 203 210 211 212 213 214 215 218 219 220 221 222 223 224 226 227 228 234 235 239 242 249 250 251 252 260 261 262 263 270 280 281 282 283 284 285 290 296 297 300 301 302 304 306 307 308 309 310 315 316 319 320 321 325 326 327 330 331 332 333 334 335 336 337 338 339 340 341 343 350 351 352 353 354 355 356 357 363 380 385 386 387 388 392 400 401 402 403 404 405 406 407 407a 410 412 413 414 415 416 417 418 420 421 425 426 427 431 440 442 444 445 450 451 452 459 460 461 462 463 464 465 466 468 469 476 499 500 501 503 504 507 508 509 511 512 513 514 515 516 517 520 521 522 523 524 525 526 527 528 529 530 535 536 538 541 551 552 553a 553b 554 555 556 558 559 574 575 576 577 578 579 585 586 598 599 620 621 622 623 624 625 640 650 900 902 903 905 907 914 927b 938 939 941 942 943a 943b 944 948 949 950 951 952 953 954 955 957 959 960 960a 961 962 964 965 967 968 969 999 1103 1200 1201 1202 1203 1204 1404 1410 1412 1413 1414 1420 1422 1440 1442 1450 1451 1452 1505 1517 1518 1519 1520 1521`;
 
 const E_NAMES = {
- e100:'kurkumiini',e101:'riboflaviini',e102:'tartratsiini',e104:'kinoliinikeltainen',e110:'paraoranssi',e122:'atsorubiini',e124:'uusikokkiini',e129:'alluranpunainen',e131:'patenttisininen',e132:'indigokarmiini',e133:'briljanttisininen',e140:'klorofylli',e141:'kuparikompleksit',e150a:'sokeriväri',e150b:'sokeriväri',e150c:'sokeriväri',e150d:'sokeriväri',e153:'kasvihiili',e160a:'karoteenit',e160b:'annatto',e160c:'paprikauute',e160d:'lykopeeni',e160e:'beeta-apo-8′-karotenaali',e161b:'luteiini',e162:'punajuuriväri',e163:'antosyaanit',e170:'kalsiumkarbonaatti',e171:'titaanidioksidi',e172:'rautaoksidit',e200:'sorbiinihappo',e202:'kaliumsorbaatti',e210:'bentsoehappo',e211:'natriumbentsoaatti',e220:'rikkidioksidi',e223:'natriumdisulfiitti',e224:'kaliumdisulfiitti',e250:'natriumnitriitti',e251:'natriumnitraatti',e260:'etikkahappo',e262:'natriumasetaatit',e270:'maitohappo',e280:'propionihappo',e282:'kalsiumpropionaatti',e290:'hiilidioksidi',e296:'omenahappo',e300:'askorbiinihappo',e301:'natriumaskorbaatti',e306:'tokoferolipitoinen uute',e307:'alfatokoferoli',e322:'lesitiinit',e325:'natriumlaktaatti',e326:'kaliumlaktaatti',e327:'kalsiumlaktaatti',e330:'sitruunahappo',e331:'natriumsitraatit',e332:'kaliumsitraatit',e333:'kalsiumsitraatit',e334:'viinihappo',e338:'fosforihappo',e339:'natriumfosfaatit',e340:'kaliumfosfaatit',e341:'kalsiumfosfaatit',e392:'rosmariiniuute',e400:'algiinihappo',e401:'natriumalginaatti',e406:'agar',e407:'karrageeni',e410:'johanneksenleipäpuujauhe',e412:'guarkumi',e414:'arabikumi',e415:'ksantaanikumi',e418:'gellaanikumi',e420:'sorbitoli',e422:'glyseroli',e440:'pektiinit',e450:'difosfaatit',e451:'trifosfaatit',e452:'polyfosfaatit',e460:'selluloosa',e461:'metyyliselluloosa',e464:'hydroksipropyylimetyyliselluloosa',e466:'karboksimetyyliselluloosa',e471:'rasvahappojen mono- ja diglyseridit',e472a:'mono- ja diglyseridien etikkahappoesterit',e472b:'mono- ja diglyseridien maitohappoesterit',e472c:'mono- ja diglyseridien sitruunahappoesterit',e472d:'mono- ja diglyseridien viinihappoesterit',e472e:'mono- ja diglyseridien mono- ja diasetyyliviinihappoesterit',e472f:'mono- ja diglyseridien etikka- ja viinihappoesterit',e473:'rasvahappojen sakkaroosiesterit',e475:'rasvahappojen polyglyseroliesterit',e476:'polyglyserolipolyrisinoleaatti',e477:'rasvahappojen propaani-1,2-dioliesterit',e481:'natriumstearoyyli-2-laktylaatti',e482:'kalsiumstearoyyli-2-laktylaatti',e491:'sorbitaanimonostearaatti',e500:'natriumkarbonaatit',e501:'kaliumkarbonaatit',e503:'ammoniumkarbonaatit',e504:'magnesiumkarbonaatit',e508:'kaliumkloridi',e509:'kalsiumkloridi',e516:'kalsiumsulfaatti',e524:'natriumhydroksidi',e551:'piidioksidi',e570:'rasvahapot',e575:'glukono-delta-laktoni',e621:'natriumglutamaatti',e627:'dinatriumguanylaatti',e631:'dinatriuminosinaatti',e635:'dinatrium-5′-ribonukleotidit',e640:'glysiini',e901:'mehiläisvaha',e903:'karnaubavaha',e904:'sellakka',e913:'lanoliini',e920:'L-kysteiini',e941:'typpi',e948:'happi',e950:'asesulfaami K',e951:'aspartaami',e952:'syklamaatit',e954:'sakariini',e955:'sukraloosi',e960:'steviolglykosidit',e965:'maltitolit',e966:'laktitoli',e967:'ksylitoli',e968:'erytritoli',e1105:'lysotsyymi',e1422:'asetyloitu diamyloosiadipaatti',e1442:'hydroksipropyylidiamyloosifosfaatti',e1412:'diamyloosifosfaatti',e1414:'asetyloitu diamyloosifosfaatti',e1420:'asetyloitu tärkkelys',e1450:'tärkkelysnatriumoktenyylisukkinaatti',e1520:'propaani-1,2-dioli',e1100:'amylaasi',e1101:'proteaasit',e1104:'lipaasit'
+ e100:'kurkumiini',e101:'riboflaviini',e102:'tartratsiini',e104:'kinoliinikeltainen',e110:'paraoranssi',e122:'atsorubiini',e124:'uusikokkiini',e129:'alluranpunainen',e131:'patenttisininen',e132:'indigokarmiini',e133:'briljanttisininen',e140:'klorofylli',e141:'kuparikompleksit',e150a:'sokeriväri',e150b:'sokeriväri',e150c:'sokeriväri',e150d:'sokeriväri',e153:'kasvihiili',e160a:'karoteenit',e160b:'annatto',e160c:'paprikauute',e160d:'lykopeeni',e160e:'beeta-apo-8′-karotenaali',e161b:'luteiini',e162:'punajuuriväri',e163:'antosyaanit',e170:'kalsiumkarbonaatti',e171:'titaanidioksidi',e172:'rautaoksidit',e200:'sorbiinihappo',e202:'kaliumsorbaatti',e210:'bentsoehappo',e211:'natriumbentsoaatti',e220:'rikkidioksidi',e223:'natriumdisulfiitti',e224:'kaliumdisulfiitti',e250:'natriumnitriitti',e251:'natriumnitraatti',e260:'etikkahappo',e262:'natriumasetaatit',e270:'maitohappo',e280:'propionihappo',e282:'kalsiumpropionaatti',e290:'hiilidioksidi',e296:'omenahappo',e300:'askorbiinihappo',e301:'natriumaskorbaatti',e306:'tokoferolipitoinen uute',e307:'alfatokoferoli',e322:'lesitiinit',e325:'natriumlaktaatti',e326:'kaliumlaktaatti',e327:'kalsiumlaktaatti',e330:'sitruunahappo',e331:'natriumsitraatit',e332:'kaliumsitraatit',e333:'kalsiumsitraatit',e334:'viinihappo',e338:'fosforihappo',e339:'natriumfosfaatit',e340:'kaliumfosfaatit',e341:'kalsiumfosfaatit',e392:'rosmariiniuute',e400:'algiinihappo',e401:'natriumalginaatti',e406:'agar',e407:'karrageeni',e410:'johanneksenleipäpuujauhe',e412:'guarkumi',e414:'arabikumi',e415:'ksantaanikumi',e418:'gellaanikumi',e420:'sorbitoli',e422:'glyseroli',e440:'pektiinit',e450:'difosfaatit',e451:'trifosfaatit',e452:'polyfosfaatit',e460:'selluloosa',e461:'metyyliselluloosa',e464:'hydroksipropyylimetyyliselluloosa',e466:'karboksimetyyliselluloosa',e471:'rasvahappojen mono- ja diglyseridit',e472a:'mono- ja diglyseridien etikkahappoesterit',e472b:'mono- ja diglyseridien maitohappoesterit',e472c:'mono- ja diglyseridien sitruunahappoesterit',e472d:'mono- ja diglyseridien viinihappoesterit',e472e:'mono- ja diglyseridien mono- ja diasetyyliviinihappoesterit',e472f:'mono- ja diglyseridien etikka- ja viinihappoesterit',e473:'rasvahappojen sakkaroosiesterit',e475:'rasvahappojen polyglyseroliesterit',e476:'polyglyserolipolyrisinoleaatti',e477:'rasvahappojen propaani-1,2-dioliesterit',e481:'natriumstearoyyli-2-laktylaatti',e482:'kalsiumstearoyyli-2-laktylaatti',e491:'sorbitaanimonostearaatti',e500:'natriumkarbonaatit',e501:'kaliumkarbonaatit',e503:'ammoniumkarbonaatit',e504:'magnesiumkarbonaatit',e508:'kaliumkloridi',e509:'kalsiumkloridi',e516:'kalsiumsulfaatti',e524:'natriumhydroksidi',e551:'piidioksidi',e570:'rasvahapot',e575:'glukono-delta-laktoni',e621:'natriumglutamaatti',e627:'dinatriumguanylaatti',e631:'dinatriuminosinaatti',e635:'dinatrium-5′-ribonukleotidit',e640:'glysiini',e901:'mehiläisvaha',e903:'karnaubavaha',e904:'sellakka',e913:'lanoliini',e920:'L-kysteiini',e941:'typpi',e948:'happi',e950:'asesulfaami K',e951:'aspartaami',e952:'syklamaatit',e954:'sakariini',e955:'sukraloosi',e960:'steviolglykosidit',e965:'maltitolit',e966:'laktitoli',e967:'ksylitoli',e968:'erytritoli',e1105:'lysotsyymi',e470a:'rasvahappojen natrium-, kalium- ja kalsiumsuolat',e470b:'rasvahappojen magnesiumsuolat',e474:'sokeriglyseridit',e478:'rasvahappojen laktyloidut glyseroli- ja propaani-1,2-dioliesterit',e483:'stearyylitartraatti',e492:'sorbitaanitristearaatti',e511:'magnesiumkloridi',e1442x:'x',e1422:'asetyloitu diamyloosiadipaatti',e1442:'hydroksipropyylidiamyloosifosfaatti',e1412:'diamyloosifosfaatti',e1414:'asetyloitu diamyloosifosfaatti',e1420:'asetyloitu tärkkelys',e1450:'tärkkelysnatriumoktenyylisukkinaatti',e1520:'propaani-1,2-dioli',e1100:'amylaasi',e1101:'proteaasit',e1104:'lipaasit'
 };
 
 const E_A = [
@@ -497,7 +506,7 @@ for(const [c,src,rk,syn] of E_A){
 for(const [c,p,orig,syn] of E_U){
   const nm=E_NAMES[c]; addEntry({name:(nm?cap(nm)+' ':'')+'('+c.toUpperCase()+')',cls:'U',p:parseP(p),origins:orig,rk:'',terms:[c,...(nm?[nm]:[]),...(syn?syn.split(';'):[])],ecode:c});
 }
-const SINGLE_TERMS=[...MAP.keys()].filter(k=>!k.includes(' ')&&k.length>=3);
+let SINGLE_TERMS=[...MAP.keys()].filter(k=>!k.includes(' ')&&k.length>=3);
 const PLANT_PRE=['kaura','soija','kookos','mantelin','manteli','riisi','kasvis','kasvi','herne','pähkinä','maapähkinä','cashew','kaakao','shea','hamppu','härkäpapu','vegaani','vegaaninen','oat','soy','soya','almond','coconut','rice','cocoa','peanut','vegan','pea','hemp'];
 const DAIRY_HEAD=['maito','juoma','kerma','jogurtti','juusto','rahka','voi','levite','jäätelö','fraiche','majoneesi','milk','cream','butter','drink','yoghurt','yogurt','cheese','mayo','jauheliha','makkara','nakki','pihvi','suikale','suikaleet'];
 const PLANT_ENTRY={name:'Kasvipohjainen tuote',cls:'V',terms:[]};
@@ -518,10 +527,21 @@ function lookupVariants(n){
   for(const s of SUFFIXES){ if(n.length>s.length+3&&n.endsWith(s)){ e=MAP.get(n.slice(0,-s.length)); if(e) return e; } }
   return null;
 }
-function classifyWord(w){
+function classifyWordNoNeutral(w){ return classifyWordCore(w,false); }
+function classifyWord(w){ return classifyWordCore(w,true); }
+function classifyWordCore(w,useNeutral){
   let e=lookupVariants(w); if(e) return e;
   for(const p of PLANT_PRE){ if(w.startsWith(p)&&w.length>p.length+2){ const rest=w.slice(p.length).replace(/^[-n]/,''); if(DAIRY_HEAD.some(h=>rest.startsWith(h))) return PLANT_ENTRY; } }
+  { const ch=chemClass(w); if(ch) return ch; }
   if(w.length<6) return null;
+  // Yhdyssana: tunnettu alkuosa + neutraali loppuosa (tomaattijauhe, sipuliuute)
+  if(useNeutral) for(const h of NEUTRAL_HEADS){
+    if(w.length>h.length+2&&w.endsWith(h)){
+      const root=w.slice(0,-h.length).replace(/-$/,'');
+      const er=lookupVariants(root)||(root.endsWith('n')?lookupVariants(root.slice(0,-1)):null)||(root.length>=5?classifyWordNoNeutral(root):null);
+      if(er) return er;
+    }
+  }
   // Yhdyssana: kaksi tunnettua osaa
   for(let i=3;i<=w.length-3;i++){
     const a=w.slice(0,i), b=w.slice(i);
@@ -544,10 +564,36 @@ function classifyWord(w){
   const res=[]; if(head) res.push(MAP.get(head)); if(mod) res.push(MAP.get(mod));
   return res.length?worst(res):null;
 }
+/* Kemialliset nimet: mineraalisuolat, vitamiinien muodot ja aminohapot tunnistetaan rakenteesta,
+   jotta jokaista yhdistelmää ei tarvitse luetella erikseen. */
+const CAT_FI='(?:mono|di|tri|tetra|penta|heksa)?(?:natrium|kalium|kalsium|magnesium|ammonium|rauta|ferro|ferri|sinkki|kupari|mangaani|seleeni|kromi|molybdeeni|fluori|alumiini|nikkeli|koboltti|litium|strontium|vety|natriumvety|kaliumvety|kalsiumvety)';
+const AN_FI='(?:kloridi|karbonaatti|vetykarbonaatti|bikarbonaatti|sulfaatti|vetysulfaatti|sulfiitti|bisulfiitti|disulfiitti|fosfaatti|vetyfosfaatti|divetyfosfaatti|ortofosfaatti|difosfaatti|trifosfaatti|pyrofosfaatti|polyfosfaatti|metafosfaatti|sitraatti|asetaatti|diasetaatti|tartraatti|malaatti|fumaraatti|glukonaatti|oksidi|hydroksidi|peroksidi|jodidi|jodaatti|seleniitti|selenaatti|molybdaatti|fluoridi|nitraatti|nitriitti|sukkinaatti|bisglysinaatti|glysinaatti|pikolinaatti|silikaatti|aluminosilikaatti|laktaatti|laktobionaatti|propionaatti|sorbaatti|bentsoaatti|alginaatti|askorbaatti|erytorbaatti|ferrosyanidi|glutamaatti|glyserofosfaatti|pantotenaatti|aspartaatti|orotaatti|sakkarinaatti|syklamaatti|adipaatti|stannaatti|sulfidi|bromidi|hypokloriitti)';
+const MINERAL_FI=new RegExp('^'+CAT_FI+'(?:[- ]?'+CAT_FI+')*[- ]?(?:\\(?[ivx]+\\)?[- ]?)?'+AN_FI+'(?:t)?$');
+const MINERAL_EN=/^(?:mono|di|tri|tetra)?(?:sodium|potassium|calcium|magnesium|ammonium|ferrous|ferric|iron|zinc|cupric|copper|manganese|selenium|chromium|chromic|molybdenum|aluminium|aluminum|nickel|cobalt|lithium|strontium|hydrogen)(?: (?:mono|di|tri|tetra)?(?:sodium|potassium|calcium|magnesium|hydrogen|iron|ammonium))*(?: \(?(?:i{1,3}|iv)\)?)? (?:chloride|carbonate|hydrogen carbonate|bicarbonate|sulphate|sulfate|sulphite|sulfite|bisulphite|metabisulphite|metabisulfite|phosphate|diphosphate|triphosphate|pyrophosphate|polyphosphate|orthophosphate|citrate|acetate|diacetate|tartrate|malate|fumarate|gluconate|oxide|hydroxide|iodide|iodate|selenite|selenate|molybdate|fluoride|nitrate|nitrite|succinate|bisglycinate|glycinate|picolinate|silicate|aluminosilicate|lactate|propionate|sorbate|benzoate|alginate|ascorbate|erythorbate|ferrocyanide|glutamate|glycerophosphate|pantothenate|aspartate|saccharin|cyclamate|adipate|sulfide|bromide)s?$/;
+const VITAMIN_V=/^(?:d-?)?(?:alfa|alpha|dl-alfa|dl-alpha|d-alfa|d-alpha)?-?(?:tokoferyyli|tocopheryl)[- ]?(?:asetaatti|acetate|sukkinaatti|succinate)$|^(?:pyridoksiini|pyridoxine|tiamiini|thiamine?|riboflaviini|riboflavin)[- ]?(?:hydrokloridi|hydrochloride|mononitraatti|mononitrate|5'?-?fosfaatti|5'?-?phosphate|natriumfosfaatti|sodium phosphate)?$|^(?:nikotiiniamidi|nicotinamide|nikotiinihappo|nicotinic acid|syanokobalamiini|cyanocobalamin|metyylikobalamiini|methylcobalamin|hydroksokobalamiini|hydroxocobalamin|adenosyylikobalamiini|fyllokinoni|phylloquinone|fytomenadioni|phytomenadione|menakinoni|menaquinone|mk-7|foolihappo|folic acid|pteroyylimonoglutamiinihappo|kalsium-l-metyylifolaatti|l-metyylifolaatti|biotiini|biotin|d-biotiini|d-biotin|kalsium-d-pantotenaatti|calcium d-pantothenate|dekspantenoli|dexpanthenol|l-askorbiinihappo|l-ascorbic acid|askorbyylipalmitaatti|ascorbyl palmitate|beetakaroteeni|beta-carotene|ergokalsiferoli|ergocalciferol|koliini|choline|kolinikloridi|inositoli|inositol|b1-vitamiini|b2-vitamiini|b3-vitamiini|b5-vitamiini|b6-vitamiini|b7-vitamiini|b9-vitamiini|c-vitamiini|e-vitamiini|k-vitamiini|k1-vitamiini|k2-vitamiini|vitamin b1|vitamin b2|vitamin b3|vitamin b5|vitamin b6|vitamin b7|vitamin b9|vitamin e|vitamin k|vitamin k1|vitamin k2)$/;
+const AMINO_V=/^(?:l-|d-|dl-)?(?:leusiini|leucine|isoleusiini|isoleucine|valiini|valine|lysiini|lysine|lysiinihydrokloridi|lysine hydrochloride|metioniini|methionine|treoniini|threonine|tryptofaani|tryptophan|fenyylialaniini|phenylalanine|arginiini|arginine|glutamiini|glutamine|glutamiinihappo|glutamic acid|histidiini|histidine|tyrosiini|tyrosine|alaniini|alanine|glysiini|glycine|seriini|serine|proliini|proline|asparagiini|asparagine|asparagiinihappo|aspartic acid|karnitiini|carnitine|tauriini|taurine|sitrulliini|citrulline|ornitiini|ornithine|beeta-alaniini|beta-alanine|kreatiini|creatine|kreatiinimonohydraatti|creatine monohydrate)$/;
+const CHEM_U=/(stearaatti|stearate|stearoyyli|stearoyl|palmitaatti(?!.*askorbyyli)|oleaatti|oleate|inosinaatti|inosinate|guanylaatti|guanylate|ribonukleotid|kysteiini|cysteine|kystiini|cystine)/;
+const MINERAL_ENTRY={name:'Mineraaliyhdiste',cls:'V',terms:[]};
+const VITAMIN_ENTRY={name:'Vitamiini',cls:'V',terms:[]};
+const AMINO_ENTRY={name:'Aminohappo',cls:'V',terms:[]};
+const CHEM_U_ENTRY={name:'Rasvahappo- tai nukleotidiyhdiste',cls:'U',p:{default:0.7},origins:'Kasviöljyt tai käyminen; voi olla eläinrasvasta, lihasta tai kalasta',rk:'',terms:[]};
+function chemClass(n){
+  const t=n.replace(/\s+/g,' ').trim();
+  if(CHEM_U.test(t)) return CHEM_U_ENTRY;
+  if(MINERAL_FI.test(t.replace(/\s+/g,''))||MINERAL_FI.test(t)||MINERAL_EN.test(t)) return MINERAL_ENTRY;
+  if(VITAMIN_V.test(t)) return VITAMIN_ENTRY;
+  if(AMINO_V.test(t)) return AMINO_ENTRY;
+  return null;
+}
+/* Yhdyssanan "neutraali" loppuosa: jauhe, uute, tiiviste… saa alkuosan luokan (tomaattijauhe → tomaatti) */
+const NEUTRAL_HEADS=['jauhe','jauheet','jauho','uute','uutteet','tiiviste','tiivisteet','konsentraatti','mehu','mehutiiviste','sose','pyree','hiutale','hiutaleet','rouhe','murska','murskat','muru','pala','palat','paloja','paloina','kuutio','kuutiot','suikale','suikaleet','viipale','viipaleet','raaste','öljy','rasva','rae','rakeet','kide','kiteet','siirappi','kuitu','tärkkelys','proteiini','proteiinit','isolaatti','hydrolysaatti','valmiste','seos','massa','tahna','pasta','aromi','väri','kuori','kuoret','siemen','siemenet','lehti','lehdet','jyvä','jyvät','juuri','varsi','kukka','kukat','marja','marjat','hedelmä','vesi','liemi','kastike','juoma','kerros','kuorrute','täyte','paahto','rouheet','flakes','powder','extract','juice','puree','oil','fat','flour','starch','fibre','fiber','syrup','paste','concentrate','pieces','chunks','bits'];
+const NEUTRAL_SET=new Set(NEUTRAL_HEADS);
+
 function classifyTerm(raw){
   const n=normTerm(raw); if(!n) return null;
   if(/^(vegaani|vegaaninen|vegan|kasvipohjainen|plant-based|plant based|maidoton|dairy-free|munaton|egg-free)\b/.test(n)) return PLANT_ENTRY;
   let e=lookupVariants(n); if(e) return e;
+  { const ch=chemClass(n); if(ch) return ch; }
   if(/^e\d{3,4}[a-f]?$/.test(n)){ e=MAP.get(n.replace(/[a-f]$/,'')); return e||null; }
   const words=n.split(/[\s\/]+/).filter(Boolean);
   if(words.length>1){
@@ -566,6 +612,58 @@ function classifyTerm(raw){
     return found.length?worst(found):null;
   }
   return classifyWord(n);
+}
+
+/* =====================================================================
+   OPEN FOOD FACTS -TAKSONOMIA (ladataan erillisestä tiedostosta) + SUMEA HAKU
+   Oma tietokanta on ensisijainen; OFF täydentää puuttuvat termit.
+   ===================================================================== */
+let offLoaded=false;
+async function loadOffTaxonomy(){
+  try{
+    const r=await fetch('off-taxonomy.json'); if(!r.ok) return false;
+    const d=await r.json(); const made=new Array(d.entries.length);
+    for(const [term,idx] of Object.entries(d.terms)){
+      if(MAP.has(term)) continue;
+      let e=made[idx];
+      if(!e){ const [name,cls]=d.entries[idx];
+        e=made[idx]={name,cls,terms:[],source:'Open Food Facts',off:true,rk:'',
+          p:cls==='U'?{default:0.7}:undefined,
+          origins:cls==='U'?'Voi olla kasvi- tai eläinperäinen (Open Food Facts)':undefined};
+        e.id=ENTRIES.length; ENTRIES.push(e); }
+      e.terms.push(term); MAP.set(term,e);
+    }
+    SINGLE_TERMS=[...MAP.keys()].filter(k=>!k.includes(' ')&&k.length>=3);
+    FUZZ=null; offLoaded=true; return true;
+  }catch{ return false; }
+}
+let FUZZ=null;
+function buildFuzz(){ FUZZ=new Map(); for(const k of MAP.keys()){ if(k.length<5||k.length>32) continue; const b=k[0]; if(!FUZZ.has(b)) FUZZ.set(b,[]); FUZZ.get(b).push(k); } }
+function lev(a,b,max){
+  if(Math.abs(a.length-b.length)>max) return max+1;
+  let prev=new Array(b.length+1); for(let j=0;j<=b.length;j++) prev[j]=j;
+  for(let i=1;i<=a.length;i++){
+    const cur=[i]; let rowMin=i;
+    for(let j=1;j<=b.length;j++){ const c=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1)); cur.push(c); if(c<rowMin) rowMin=c; }
+    if(rowMin>max) return max+1; prev=cur;
+  }
+  return prev[b.length];
+}
+function fuzzyLookup(n){
+  if(!n||n.length<5) return null;
+  if(!FUZZ) buildFuzz();
+  const max=n.length>=10?2:1; let best=null,bd=max+1;
+  const cands=(FUZZ.get(n[0])||[]).concat(n.length>=8?(FUZZ.get(n[1])||[]).filter(k=>k.length>=n.length-1):[]);
+  for(const k of cands){ if(Math.abs(k.length-n.length)>max) continue; const d=lev(n,k,max); if(d<bd){ bd=d; best=k; if(d===0) break; } }
+  return best&&bd<=max? {entry:MAP.get(best),term:best} : null;
+}
+function fuzzyClassify(label){
+  const n=normTerm(label); if(!n) return null;
+  const whole=fuzzyLookup(n); if(whole) return whole;
+  const words=n.split(/[\s\/]+/).filter(w=>w.length>=5); const hits=[];
+  for(const w of words){ const f=fuzzyLookup(w)||null; if(f) hits.push(f); }
+  if(!hits.length) return null;
+  const e=worst(hits.map(h=>h.entry)); return {entry:e,term:hits.find(h=>h.entry===e).term};
 }
 
 /* =====================================================================
@@ -648,6 +746,7 @@ function analyze(text){
   const group=detectGroup(uniq.map(i=>normTerm(i.label)));
   const animals=uniq.filter(i=>i.entry&&i.entry.cls==='A');
   const uncertain=uniq.filter(i=>i.entry&&i.entry.cls==='U');
+  for(const it of uniq){ if(!it.entry){ const f=fuzzyClassify(it.label); if(f){ it.entry=f.entry; it.fuzzy=f.term; } } }
   const unknown=uniq.filter(i=>!i.entry);
   let verdict='ok', prob=null;
   if(!uniq.length) verdict='none';
@@ -702,7 +801,7 @@ function rowHTML(it,a,key){
   if(cls==='A'){ det=`<div><b>Lähde:</b> ${esc(e.source||'Eläin')}</div>${e.rk&&RULE_NAME[e.rk]?`<div><b>Korvike:</b> ${esc(RULE_NAME[e.rk])}</div>`:''}`; }
   else if(cls==='U'){ det=`<div><b>${pct(pFor(e,a.group))}</b> todennäköisesti vegaaninen</div><div><b>Mahdolliset alkuperät:</b> ${esc(e.origins)}</div>`; }
   else if(cls==='X'){ det=`<div>Ei tietokannassa. Ei vaikuta tulokseen vegaanisena.</div>`; }
-  const matched = e&&e!==PLANT_ENTRY&&normTerm(e.name)!==normTerm(it.label) ? `<div><b>Tunnistettu:</b> ${esc(e.name)}</div>`:'';
+  const matched = it.fuzzy ? `<div><b>Tulkittu:</b> ${esc(e.name)} (lähin vastine sanalle “${esc(it.label)}”)</div>` : (e&&e!==PLANT_ENTRY&&normTerm(e.name)!==normTerm(it.label) ? `<div><b>Tunnistettu:</b> ${esc(e.name)}</div>`:'');
   const hasDet = cls!=='V' || matched;
   return `<li><button class="irow ${cls}" ${hasDet?'aria-expanded="false"':''}><span class="dot"></span><span class="nm">${esc(cap(it.label))}</span><span class="tag">${tag}</span></button>${hasDet?`<div class="detail" hidden>${matched}${det}</div>`:''}</li>`;
 }
@@ -1096,37 +1195,234 @@ ingInput.value=store.get('vegan.ingDraft',SAMPLE_ING);
 let ingT=null;
 function runCheck(){ const a=analyze(ingInput.value); renderAnalysis($('#checkOut'),a,'c'); store.set('vegan.ingDraft',ingInput.value); }
 ingInput.addEventListener('input',()=>{ clearTimeout(ingT); ingT=setTimeout(runCheck,120); });
-$('#clearIng').onclick=()=>{ ingInput.value=''; runCheck(); ingInput.focus(); };
+$('#clearIng').onclick=()=>{ ingInput.value=''; runCheck(); if(window.ingFlowRef) window.ingFlowRef.reset(); ingInput.focus(); };
 runCheck();
+loadOffTaxonomy().then(ok=>{ if(ok){ runCheck(); renderRecent(); } });
 
 // --- Claude (kuvan lukeminen)
 let samplePromise=null;
 function getSample(){ if(!samplePromise) samplePromise=(async()=>{ try{ if(!window.claude||!window.claude.use) return null; const s=await window.claude.use('sample'); if(!s) return null; const lim=await s.limits().catch(()=>null); return lim&&lim.images? s : null; }catch{ return null; } })(); return samplePromise; }
 getSample().then(s=>{ if(s||STANDALONE){ $('#ocrBtn').hidden=false; } });
-const OCR_PROMPT=`Kuvassa on elintarvikkeen pakkaus. Lue siitä tuotteen nimi ja ainesosaluettelo täsmälleen sellaisena kuin se on painettu, myös sulut, E-koodit ja prosentit. Jos luettelo on usealla kielellä, palauta suomenkielinen, muuten englanninkielinen. Älä tiivistä, korjaa tai arvioi mitään. Jos kuvassa näkyy viivakoodin numerosarja, palauta se. Vastaa pelkkänä JSON-oliona: {"name": string|null, "ingredients": string|null, "ean": string|null}`;
 const STANDALONE=!window.claude;
+/* =====================================================================
+   AINESOSALUETTELON KUVAAMINEN
+   1) Esikäsittely: kontrastikanavan valinta, venytys, napaisuuden tunnistus
+      (vaalea teksti tummalla), paikallinen kynnystys (kaarevan pinnan varjot ja
+      kiillot, kirjava tausta). 2) Tekstintunnistus (Tesseract fin+eng, automaattinen
+      kierto). 3) Useat kuvat yhdistetään: alekkain tai rinnakkain otetut osat ja
+      päällekkäisyydet tunnistetaan. 4) Ainesosaluettelo erotetaan muusta tekstistä
+      otsikon, sisällön ja lopetusmerkkien perusteella.
+   ===================================================================== */
+const OCR_PROMPT=n=>`Kuvissa (${n} kpl, kuvausjärjestyksessä) on elintarvikkeen pakkaus. Ainesosaluettelo voi jatkua kuvasta toiseen alaspäin tai sivusuunnassa, ja kuvat voivat olla osittain päällekkäin. Pakkaus voi olla kaareva, kiiltävä tai kirjava, ja teksti voi olla millä tahansa fontilla, värillä tai taustalla.
+Tehtävä: poimi VAIN ainesosaluettelo (tavallisesti otsikon Ainesosat, Ainekset, Raaka-aineet tai Ingredients jälkeen) ja jätä pois kaikki muu pakkauksen teksti: tuotenimi, markkinointi, ravintosisältö, säilytys- ja valmistusohjeet, valmistajan ja maahantuojan tiedot, osoitteet, päiväykset ja viivakoodit. Jos luettelo on usealla kielellä, palauta vain suomenkielinen, muuten englanninkielinen. Yhdistä osat yhdeksi luetteloksi ja poista toistuvat kohdat. Kopioi teksti sanatarkasti sulkuineen, E-koodeineen ja prosentteineen; älä korjaa, tiivistä tai arvioi. Allergeenimerkinnät (voi sisältää…) saa jättää mukaan.
+Palauta myös tuotteen nimi, jos se näkyy, ja viivakoodin numerot, jos ne näkyvät.
+Vastaa pelkkänä JSON-oliona: {"name": string|null, "ingredients": string|null, "ean": string|null}`;
 let tessP=null;
 function loadTess(){ if(!tessP) tessP=new Promise((res,rej)=>{ if(window.Tesseract) return res(window.Tesseract); const sc=document.createElement('script'); sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js'; sc.onload=()=>res(window.Tesseract); sc.onerror=()=>{tessP=null;rej({code:'unavailable'});}; document.head.appendChild(sc); }); return tessP; }
-async function shrink(file,max){ const img=await loadImage(file); const sc=Math.min(1,max/Math.max(img.width,img.height)); const c=document.createElement('canvas'); c.width=Math.round(img.width*sc); c.height=Math.round(img.height*sc); const x=c.getContext('2d'); x.filter='grayscale(1) contrast(1.25)'; x.drawImage(img,0,0,c.width,c.height); return c; }
-async function ocrLocal(file){
-  const T=await loadTess(); const canvas=await shrink(file,2200);
-  const {data}=await T.recognize(canvas,'fin+eng');
-  let t=data&&data.text||''; const m=t.match(/(ainesosat|ingredients|ainekset|ingredienser)\s*:?([\s\S]*)/i); if(m) t=m[2];
-  t=t.replace(/-\n/g,'').replace(/\n+/g,' ').replace(/\s+/g,' ').trim();
-  return {name:null,ingredients:t||null,ean:null};
+let workerP=null, ocrProgress=null;
+function getWorker(){
+  if(!workerP) workerP=(async()=>{
+    const T=await loadTess();
+    const w=await T.createWorker('fin+eng',1,{logger:m=>{ if(ocrProgress&&m&&typeof m.progress==='number') ocrProgress(m.status,m.progress); }});
+    await w.setParameters({preserve_interword_spaces:'1',user_defined_dpi:'300'});
+    return w;
+  })().catch(e=>{ workerP=null; throw {code:'unavailable'}; });
+  return workerP;
 }
-async function readLabel(file){
-  const s=await getSample(); if(s) return s.json(OCR_PROMPT,{images:[file]});
-  if(STANDALONE) return ocrLocal(file);
-  throw {code:'unavailable'};
+function prepCanvas(img,mode){
+  const long=Math.max(img.width,img.height);
+  const sc= long>2400 ? 2400/long : long<1400 ? 1400/long : 1;
+  const w=Math.max(1,Math.round(img.width*sc)), h=Math.max(1,Math.round(img.height*sc));
+  const c=document.createElement('canvas'); c.width=w; c.height=h;
+  const x=c.getContext('2d',{willReadFrequently:true}); x.drawImage(img,0,0,w,h);
+  const id=x.getImageData(0,0,w,h), d=id.data, n=w*h;
+  // valitaan kanava, jossa teksti ja tausta erottuvat parhaiten (esim. punainen teksti vihreällä)
+  const chans=[[0.299,0.587,0.114],[1,0,0],[0,1,0],[0,0,1]]; let bestC=chans[0], bestStd=-1;
+  for(const cf of chans){ let s1=0,s2=0,cnt=0; for(let i=0;i<d.length;i+=4*7){ const v=d[i]*cf[0]+d[i+1]*cf[1]+d[i+2]*cf[2]; s1+=v; s2+=v*v; cnt++; } const sd=Math.sqrt(s2/cnt-(s1/cnt)**2); if(sd>bestStd*1.15){ bestStd=sd; bestC=cf; } }
+  const g=new Uint8ClampedArray(n);
+  for(let i=0,j=0;i<n;i++,j+=4) g[i]=d[j]*bestC[0]+d[j+1]*bestC[1]+d[j+2]*bestC[2];
+  // kontrastin venytys 2–98 %
+  const hist=new Uint32Array(256); for(let i=0;i<n;i++) hist[g[i]]++;
+  let lo=0,hi=255,acc=0; for(let v=0;v<256;v++){ acc+=hist[v]; if(acc>n*0.02){ lo=v; break; } } acc=0; for(let v=255;v>=0;v--){ acc+=hist[v]; if(acc>n*0.02){ hi=v; break; } }
+  const rng=Math.max(1,hi-lo); for(let i=0;i<n;i++) g[i]=Math.max(0,Math.min(255,(g[i]-lo)*255/rng));
+  // napaisuus: jos valtaosa kuvasta on tummaa, teksti on vaaleaa → käännetään
+  const h2=new Uint32Array(256); for(let i=0;i<n;i++) h2[g[i]]++;
+  let sum=0; for(let v=0;v<256;v++) sum+=v*h2[v];
+  let sumB=0,wB=0,maxV=0,thr=128; for(let v=0;v<256;v++){ wB+=h2[v]; if(!wB) continue; const wF=n-wB; if(!wF) break; sumB+=v*h2[v]; const mB=sumB/wB, mF=(sum-sumB)/wF; const bv=wB*wF*(mB-mF)**2; if(bv>maxV){ maxV=bv; thr=v; } }
+  let dark=0; for(let v=0;v<thr;v++) dark+=h2[v];
+  if(dark/n>0.55) for(let i=0;i<n;i++) g[i]=255-g[i];
+  let outG=g;
+  if(mode==='adaptive'){
+    // paikallinen kynnystys integraalikuvalla (tasaa kaarevan pinnan varjot ja heijastukset)
+    const W=w+1, ii=new Float64Array(W*(h+1));
+    for(let y=1;y<=h;y++){ let row=0; for(let xx=1;xx<=w;xx++){ row+=g[(y-1)*w+xx-1]; ii[y*W+xx]=ii[(y-1)*W+xx]+row; } }
+    const r=Math.max(8,Math.round(Math.min(w,h)/45)); outG=new Uint8ClampedArray(n);
+    for(let y=0;y<h;y++){ const y0=Math.max(0,y-r), y1=Math.min(h,y+r+1);
+      for(let xx=0;xx<w;xx++){ const x0=Math.max(0,xx-r), x1=Math.min(w,xx+r+1);
+        const area=(y1-y0)*(x1-x0); const m=(ii[y1*W+x1]-ii[y0*W+x1]-ii[y1*W+x0]+ii[y0*W+x0])/area;
+        outG[y*w+xx]= g[y*w+xx] < m*0.86-2 ? 0 : 255; } }
+  }
+  for(let i=0,j=0;i<n;i++,j+=4){ d[j]=d[j+1]=d[j+2]=outG[i]; d[j+3]=255; }
+  x.putImageData(id,0,0); return c;
 }
-function errText(e){ const c=e&&e.code; if(c==='not_granted'||c==='sampling_disabled'||c==='unavailable') return 'Kuvan lukeminen ei ole käytettävissä. Kirjoita tai liitä ainesosat tekstinä.'; if(c==='rate_limited') return 'Liian monta pyyntöä. Yritä hetken päästä uudelleen.'; if(c==='image_rejected') return 'Kuvaa ei voitu lukea. Ota uusi kuva lähempää.'; if(c==='cancelled') return ''; return 'Ainesosaluetteloa ei saatu luettua. Ota uusi kuva hyvässä valossa.'; }
-$('#ocrInput').addEventListener('change',async e=>{
-  const file=e.target.files[0]; e.target.value=''; if(!file) return;
-  const st=$('#ocrStatus'); st.innerHTML='<div class="status"><span class="spin"></span>Luetaan ainesosia…</div>';
-  try{ const j=await readLabel(file); if(j&&j.ingredients){ ingInput.value=j.ingredients; runCheck(); st.innerHTML=''; } else st.innerHTML='<div class="err">Kuvasta ei löytynyt ainesosaluetteloa.</div>'; }
-  catch(err){ const t=errText(err); st.innerHTML=t?`<div class="err">${esc(t)}</div>`:''; }
-});
+function collectLines(data){
+  const out=[];
+  if(data&&data.blocks) for(const b of data.blocks) for(const p of (b.paragraphs||[])){ let first=true; for(const l of (p.lines||[])){ const t=(l.text||'').replace(/\s+/g,' ').trim(); if(t) out.push({text:t,conf:l.confidence||0,pb:first}); first=false; } }
+  if(!out.length&&data&&data.text) for(const t of data.text.split('\n')){ const tt=t.trim(); if(tt) out.push({text:tt,conf:data.confidence||50,pb:false}); }
+  return out.filter(l=>!(l.conf<35&&(l.text.match(/[a-zåäö]/gi)||[]).length<4));
+}
+const HDR_FI=/(ainesosat|ainesosa|ainekset|raaka-?aineet|ainesosaluettelo|koostumus)\s*[:;.]?/i;
+const HDR_EN=/\b(ingredients?|ingr\.)\s*[:;.]?/i;
+const HDR_OTHER=/\b(ingredienser|zutaten|ingrédients|ingredientes|ingrediënten|ingredienti|składniki|koostisosad|sastāvdaļas|sudedamosios dalys|состав|ingrediencie|složení|összetevők)\b\s*[:;.]?/i;
+const STOP_RE=/(ravintosisältö|ravintoarvo|ravintoaine|ravintoarvot|näringsvärde|näringsinnehåll|nutrition|ernährung|valeur nutritive|\benergia\b|\benergi\b|\benergy\b|\bkj\b|\bkcal\b|säilytys|säilytä|säilytetään|förvar|store in|storage|keep refrigerated|parasta ennen|viimeinen käyttöpäivä|bäst före|sista förbrukningsdag|best before|use by|\bvalmistaja|tillverkare|manufacturer|produced by|maahantuoja|importör|valmistuttaja|markkinoija|marknadsförs|pakattu|packad|packed in|nettopaino|nettovikt|net weight|\bwww\.|https?:|\.fi\b|\.com\b|kuluttajapalvelu|asiakaspalvelu|konsumentservice|valmistusmaa|alkuperämaa|ursprungsland|country of origin|made in|käyttöohje|bruksanvisning|valmistusohje|tillagning|100 g sisältää|100 g:ssa|per 100|annos sisältää|portion innehåller|lajittelu|kierrätä|pantillinen|pant\b)/i;
+function wordsOf(t){ return t.toLowerCase().split(/[^a-zåäöéüß0-9-]+/).filter(w=>w.length>1); }
+function lineIngScore(t){
+  const s=t.toLowerCase(); const ws=wordsOf(s); if(!ws.length) return -1;
+  let known=0; for(const w of ws){ if(/^e\d{3}/.test(w)||MAP.has(w)||lookupVariants(w)) known++; }
+  const commas=(s.match(/[,;]/g)||[]).length, ecodes=(s.match(/\be\s?-?\d{3}/g)||[]).length, pcts=(s.match(/\d\s?%/g)||[]).length;
+  let sc=known/ws.length*2 + Math.min(commas,6)*0.35 + ecodes*0.5 + pcts*0.25 + (/[()]/.test(s)?0.2:0);
+  if(STOP_RE.test(s)) sc-=3;
+  if(/\d+([.,]\d+)?\s?(g|kj|kcal|mg|µg|ug|ml|kg|l)\b/.test(s)&&!pcts) sc-=1.2;
+  if(/^[A-ZÅÄÖ0-9 !]{6,}$/.test(t.trim())&&!commas) sc-=0.6; // isot mainoskirjaimet
+  return sc;
+}
+const ABBR_END=/\b(sis|mm|esim|n|ml|vrt|ym|yms|ca|appr|incl|inc)\.\s*$/i;
+function joinLines(lines){
+  let out='';
+  for(const raw of lines){ const t=raw.trim(); if(!t) continue;
+    if(!out){ out=t; continue; }
+    if(/[A-Za-zÅÄÖåäö]-$/.test(out)&&/^[a-zåäö]/.test(t)&&!/^(ja|and|och|sekä)\b/.test(t)) out=out.slice(0,-1)+t;
+    else out+=' '+t;
+  }
+  return out;
+}
+function findHeader(lines,re){ for(let i=0;i<lines.length;i++){ const m=lines[i].text.match(re); if(m) return {i,col:m.index+m[0].length,lang:re===HDR_FI?'fi':re===HDR_EN?'en':'xx'}; } return null; }
+function extractIngredients(lines){
+  if(!lines.length) return '';
+  const hdr=findHeader(lines,HDR_FI)||findHeader(lines,HDR_EN);
+  let picked=[];
+  if(hdr){
+    const first=lines[hdr.i].text.slice(hdr.col).trim(); if(first) picked.push(first);
+    for(let i=hdr.i+1;i<lines.length;i++){
+      const t=lines[i].text, low=t.toLowerCase();
+      const otherHdr=(hdr.lang==='fi'&&(HDR_OTHER.test(low)||HDR_EN.test(low)))||(hdr.lang==='en'&&HDR_OTHER.test(low));
+      const stopIdx=Math.min(...[low.search(STOP_RE),otherHdr?low.search(hdr.lang==='fi'?new RegExp(HDR_OTHER.source+'|'+HDR_EN.source,'i'):HDR_OTHER):-1].filter(v=>v>=0).concat([Infinity]));
+      if(stopIdx!==Infinity){ if(stopIdx>3) picked.push(t.slice(0,stopIdx)); break; }
+      const joined=picked.join(' ');
+      const open=/[,(\-:;&]\s*$/.test(joined)||((joined.match(/\(/g)||[]).length>(joined.match(/\)/g)||[]).length);
+      const sc=lineIngScore(t);
+      if(sc<0.55&&!open) break;
+      picked.push(t);
+      if(/\.\s*$/.test(t)&&!ABBR_END.test(t)&&!open){
+        const nx=lines[i+1]; if(!nx||lineIngScore(nx.text)<1.4||nx.pb) break;
+      }
+    }
+  } else {
+    // ei otsikkoa (esim. jatkokuva): valitaan yhtenäinen jakso, jossa ainesosamaisuus on suurin
+    const sc=lines.map(l=>lineIngScore(l.text)-0.7);
+    let best=-Infinity,bs=0,be=-1,cur=0,cs=0;
+    for(let i=0;i<sc.length;i++){ if(cur<=0){ cur=sc[i]; cs=i; } else cur+=sc[i]; if(cur>best){ best=cur; bs=cs; be=i; } }
+    if(be>=0&&best>0) picked=lines.slice(bs,be+1).map(l=>l.text);
+  }
+  let text=joinLines(picked);
+  const cut=text.search(STOP_RE); if(cut>15) text=text.slice(0,cut);
+  return text.replace(/^[\s:;.,-]+/,'').replace(/\s+([,.;)])/g,'$1').trim();
+}
+/* Kuvien yhdistäminen */
+const keyOf=t=>t.toLowerCase().replace(/[^a-zåäö0-9]+/g,' ').trim();
+function bigramSim(a,b){ a=keyOf(a); b=keyOf(b); if(!a||!b) return 0; if(a===b) return 1; const bg=s=>{ const m=new Map(); for(let i=0;i<s.length-1;i++){ const k=s.slice(i,i+2); m.set(k,(m.get(k)||0)+1); } return m; }; const A=bg(a),B=bg(b); let inter=0; for(const [k,v] of A) inter+=Math.min(v,B.get(k)||0); return 2*inter/Math.max(1,(a.length-1)+(b.length-1)); }
+const escRe=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+function mergeTwo(A,B){
+  if(!A.length) return B.slice(); if(!B.length) return A.slice();
+  // 1) rinnakkain otetut kuvat (leveä luettelo): rivin loppu A:ssa toistuu saman rivin alussa B:ssä
+  const pairs=[]; let jMin=0;
+  for(let i=0;i<A.length;i++){
+    const at=A[i].text.toLowerCase(); if(at.length<8) continue;
+    let hit=null;
+    for(let j=jMin;j<B.length&&!hit;j++){
+      const bt=B[j].text.toLowerCase(); const lim=Math.ceil(bt.length*0.65);
+      for(let trim=0;trim<=2&&!hit;trim++){
+        const aa=at.slice(0,at.length-trim);
+        for(let k=Math.min(40,aa.length);k>=6;k--){ const sub=aa.slice(-k); const idx=bt.indexOf(sub); if(idx>=0&&idx<lim){ hit={i,j,trim,cut:idx+k}; break; } }
+      }
+    }
+    if(hit){ pairs.push(hit); jMin=hit.j+1; }
+  }
+  if(pairs.length>=2&&pairs.length>=0.4*Math.min(A.length,B.length)){
+    const out=A.map(l=>({...l}));
+    for(const h of pairs){ out[h.i].text=A[h.i].text.slice(0,A[h.i].text.length-h.trim)+B[h.j].text.slice(h.cut); }
+    return out;
+  }
+  // 2) alekkain otetut kuvat: A:n viimeiset rivit toistuvat B:n alussa
+  for(let k=Math.min(8,A.length,B.length);k>=1;k--){
+    let ok=true; for(let t=0;t<k;t++){ if(bigramSim(A[A.length-k+t].text,B[t].text)<0.72){ ok=false; break; } }
+    if(ok) return A.concat(B.slice(k));
+  }
+  for(let j=0;j<Math.min(4,B.length);j++){ for(let i=Math.max(0,A.length-4);i<A.length;i++){ if(bigramSim(A[i].text,B[j].text)>=0.72) return A.slice(0,i+1).concat(B.slice(j+1)); } }
+  // 3) osittainen rivi: A:n viimeiset sanat löytyvät B:n alusta
+  const lastW=keyOf(A[A.length-1].text).split(' ').filter(Boolean).slice(-3);
+  if(lastW.length>=2){ const re=new RegExp(lastW.map(escRe).join('[^A-Za-zÅÄÖåäö0-9]+'),'i'); for(let j=0;j<Math.min(3,B.length);j++){ const m=B[j].text.match(re); if(m){ const rest=B[j].text.slice(m.index+m[0].length).trim(); return A.concat(rest?[{...B[j],text:rest}]:[],B.slice(j+1)); } } }
+  return A.concat(B);
+}
+function mergePhotos(list){ let acc=[]; for(const l of list) acc=acc.length?mergeTwo(acc,l):l.slice(); return acc; }
+async function ocrPhoto(file,onStep){
+  const img=await loadImage(file); const w=await getWorker();
+  let best=null;
+  for(const mode of ['adaptive','gray']){
+    onStep&&onStep(mode);
+    const c=prepCanvas(img,mode);
+    const {data}=await w.recognize(c,{rotateAuto:true},{text:true,blocks:true});
+    const lines=collectLines(data);
+    const ing=lines.reduce((a,l)=>a+Math.max(0,lineIngScore(l.text))*(l.conf/100),0);
+    const score=ing+(data.confidence||0)/25+(findHeader(lines,HDR_FI)||findHeader(lines,HDR_EN)?2:0);
+    if(!best||score>best.score) best={lines,score};
+    if((data.confidence||0)>=78&&ing>2) break;
+  }
+  return best?best.lines:[];
+}
+/* Kuvausvirta: yksi tai useampi kuva → ainesosaluettelo */
+function makePhotoFlow({mainInput,addInput,addBtn,thumbs,status,onText,onName}){
+  const st={files:[],lines:[]};
+  const setStatus=h=>{ status.innerHTML=h; };
+  const busy=t=>setStatus(`<div class="status"><span class="spin"></span><span>${esc(t)}</span></div>`);
+  function renderThumbs(){
+    thumbs.innerHTML=st.files.map((f,i)=>`<span class="thumb"><img alt="Kuva ${i+1}" src="${URL.createObjectURL(f)}"></span>`).join('')+(st.files.length?`<button class="thumbclear" type="button" aria-label="Poista kuvat">×</button>`:'');
+    thumbs.hidden=!st.files.length; addBtn.hidden=!st.files.length;
+    const cl=thumbs.querySelector('.thumbclear'); if(cl) cl.onclick=()=>{ st.files=[]; st.lines=[]; renderThumbs(); setStatus(''); };
+  }
+  async function handle(files,reset){
+    files=[...files].filter(f=>/^image\//.test(f.type)||/\.(jpe?g|png|heic|heif|webp)$/i.test(f.name));
+    if(!files.length) return;
+    if(reset){ st.files=[]; st.lines=[]; }
+    st.files.push(...files); renderThumbs();
+    try{
+      const s=await getSample();
+      if(s){
+        busy('Luetaan ainesosaluetteloa…');
+        const j=await s.json(OCR_PROMPT(st.files.length),{images:st.files.slice(-((await s.limits()).images.maxCount||5))});
+        if(j&&j.ingredients){ setStatus(''); onText(j.ingredients.trim()); if(j.name&&onName) onName(j.name); }
+        else setStatus('<div class="err">Kuvista ei löytynyt ainesosaluetteloa.</div>');
+        return;
+      }
+      if(!STANDALONE) throw {code:'unavailable'};
+      busy('Valmistellaan tekstintunnistusta…');
+      ocrProgress=(stt,p)=>{ if(/recogniz/.test(stt)) busy('Luetaan kuvaa '+cur+'/'+st.files.length+' · '+Math.round(p*100)+' %'); else if(/load/.test(stt)) busy('Ladataan kielitiedostoa · '+Math.round(p*100)+' %'); };
+      let cur=st.lines.length;
+      for(const f of files){ cur++; st.lines.push(await ocrPhoto(f)); }
+      ocrProgress=null;
+      const merged=mergePhotos(st.lines);
+      const text=extractIngredients(merged);
+      if(text&&text.length>3){ setStatus(''); onText(text); }
+      else setStatus('<div class="err">Kuvista ei löytynyt ainesosaluetteloa. Lisää kuva, jossa luettelo näkyy suoraan edestä.</div>');
+    }catch(err){ ocrProgress=null; const t=errText(err); setStatus(t?`<div class="err">${esc(t)}</div>`:''); }
+  }
+  mainInput.addEventListener('change',e=>{ const f=e.target.files; const arr=[...f]; e.target.value=''; handle(arr,true); });
+  addInput.addEventListener('change',e=>{ const arr=[...e.target.files]; e.target.value=''; handle(arr,false); });
+  return {reset(){ st.files=[]; st.lines=[]; renderThumbs(); setStatus(''); }};
+}
+function errText(e){ const c=e&&e.code; if(c==='not_granted'||c==='sampling_disabled'||c==='unavailable') return 'Kuvan lukeminen ei ole käytettävissä. Kirjoita tai liitä ainesosat tekstinä.'; if(c==='rate_limited') return 'Liian monta pyyntöä. Yritä hetken päästä uudelleen.'; if(c==='image_rejected') return 'Kuvaa ei voitu lukea. Ota uusi kuva lähempää.'; if(c==='cancelled') return ''; return 'Ainesosaluetteloa ei saatu luettua.'; }
+getSample().then(s=>{ if(s||STANDALONE){ $('#ocrBtn').hidden=false; } });
+const ingFlow=window.ingFlowRef=makePhotoFlow({mainInput:$('#ocrInput'),addInput:$('#ocrAddInput'),addBtn:$('#ocrAdd'),thumbs:$('#ocrThumbs'),status:$('#ocrStatus'),onText:t=>{ ingInput.value=t; runCheck(); }});
 
 // --- Reseptimuunnos (yksi napautus)
 const recipeInput=$('#recipeInput');
@@ -1198,18 +1494,19 @@ async function showProduct(ean){
     return;
   }
   out.innerHTML=`<div class="card"><div><h2>${p&&p.name?esc(p.name):'Tuotetta ei löytynyt'}</h2>${p&&p.name?'<div class="meta">Ainesosaluettelo puuttuu</div>':''}<div class="meta">${esc(ean)}</div></div>
-    <label class="btn block filebtn" id="labelBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 0 1 2-2h1.5l1.4-2h6.2l1.4 2H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><circle cx="12" cy="12.5" r="3.5"/></svg>Kuvaa ainesosaluettelo<input type="file" accept="image/*" capture="environment" id="labelInput"></label>
+    <div class="row"><label class="btn filebtn" id="labelBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 0 1 2-2h1.5l1.4-2h6.2l1.4 2H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><circle cx="12" cy="12.5" r="3.5"/></svg>Kuvaa ainesosaluettelo<input type="file" accept="image/*" multiple id="labelInput"></label>
+    <label class="btn ghost filebtn" id="labelAdd" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Lisää kuva<input type="file" accept="image/*" multiple id="labelAddInput"></label></div>
+    <div class="thumbs" id="labelThumbs" hidden></div>
     <div class="field"><input class="input" id="pName" aria-label="Tuotteen nimi" value="${esc(p&&p.name||'')}"></div>
     <div class="field"><textarea class="input" id="pIng" aria-label="Ainesosat"></textarea></div>
-    <button class="btn ghost block" id="pSave">Tallenna ja tarkista</button>
-    <div id="labelStatus"></div></div>`;
+    <div id="labelStatus"></div>
+    <div class="view" id="pPreview"></div>
+    <button class="btn ghost block" id="pSave">Tallenna</button></div>`;
   getSample().then(s=>{ if(!s&&!STANDALONE) $('#labelBtn').hidden=true; });
-  $('#labelInput').addEventListener('change',async e=>{
-    const file=e.target.files[0]; e.target.value=''; if(!file) return;
-    const st=$('#labelStatus'); st.innerHTML='<div class="status"><span class="spin"></span>Luetaan ainesosia…</div>';
-    try{ const j=await readLabel(file); if(j&&j.ingredients){ saveProduct(ean,{name:j.name||$('#pName').value||'',ingredients:j.ingredients}); showProduct(ean); } else st.innerHTML='<div class="err">Kuvasta ei löytynyt ainesosaluetteloa.</div>'; }
-    catch(err){ const t=errText(err); st.innerHTML=t?`<div class="err">${esc(t)}</div>`:''; }
-  });
+  const pIng=$('#pIng');
+  const preview=()=>{ const t=pIng.value.trim(); if(t){ renderAnalysis($('#pPreview'),analyze(t),'pp'); saveProduct(ean,{name:$('#pName').value.trim(),ingredients:t}); } else $('#pPreview').innerHTML=''; };
+  pIng.addEventListener('input',()=>{ clearTimeout(pIng._t); pIng._t=setTimeout(preview,150); });
+  makePhotoFlow({mainInput:$('#labelInput'),addInput:$('#labelAddInput'),addBtn:$('#labelAdd'),thumbs:$('#labelThumbs'),status:$('#labelStatus'),onText:t=>{ pIng.value=t; preview(); },onName:n=>{ if(!$('#pName').value.trim()) $('#pName').value=n; }});
   $('#pSave').onclick=()=>{ const ing=$('#pIng').value.trim(); if(!ing){ $('#pIng').focus(); return; } saveProduct(ean,{name:$('#pName').value.trim(),ingredients:ing}); showProduct(ean); };
 }
 let liveFailed=false, camStream=null, camTimer=null;

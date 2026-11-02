@@ -13,4 +13,9 @@ Kertoo yhdellä silmäyksellä, onko tuote vegaaninen, ja muuntaa reseptin vegaa
 - **Skannaa** – viivakoodi suoraan kamerakuvasta (EAN-13, EAN-8, UPC-A, UPC-E). Tuotetiedot haetaan Open Food Factsista, vegaanisuus arvioidaan aina sovelluksen omalla tietokannalla. Puuttuva ainesosaluettelo kuvataan ja tallennetaan laitteelle viivakoodin kanssa.
 - **Resepti** – sääntöpohjainen muunnos: ainesosan rooli päätellään reseptistä, määrät skaalautuvat annosten mukaan ja ohjeet päivittyvät.
 
+## Tietokanta
+- Oma ydintietokanta (ensisijainen): eläinperäiset ja epävarmat ainesosat todennäköisyyksineen sekä reseptien korvaussäännöt.
+- `off-taxonomy.json`: Open Food Factsin ainesosa- ja lisäainetaksonomia (yli 13 000 suomen- ja englanninkielistä termiä, vegaanisuus periytettynä yläkäsitteiltä). Lisenssi ODbL 1.0.
+- Rakennesäännöt mineraalisuoloille, vitamiinien muodoille, aminohapoille ja yhdyssanoille sekä sumea haku kirjoitus- ja tunnistusvirheille.
+
 Tuotetiedot: [Open Food Facts](https://world.openfoodfacts.org) (ODbL).
