@@ -1,0 +1,256 @@
+# Ainesosatestit. Muoto:  odotus | syöte
+# odotus: ok = Vegaaninen, bad = Ei vegaaninen, warn = Epävarma, !ok = mikä tahansa muu kuin Vegaaninen
+# Tärkein sääntö: mikään !ok- tai bad-rivi ei saa koskaan antaa tulosta Vegaaninen.
+
+## --- Väärät vihreät: kirjoitus- ja tunnistusvirheet
+bad | sokeri, kaseini, suola
+bad | sokeri, laktooosi
+bad | sokeri, mehiläisvha
+bad | sugar, gelatne, water
+bad | sokeri, liivatt
+bad | vehnäjauho, sokeri, maitojauhc, suola
+bad | socker, gelatn, vatten
+!ok | sokerl, vesl, suoia
+
+## --- Väärät vihreät: allergeenilausekkeet
+bad | sokeri (voi sisältää maitoa), kananmuna
+bad | Voi sisältää pähkinöitä, sokeri, liivate
+bad | sokeri, maitojauhe (voi sisältää soijaa), liivate
+bad | sokeri, kasvirasva (palmu, rypsi, liivate
+ok | Sokeri, kaakaovoi, kaakaomassa, emulgointiaine (soijalesitiini). Voi sisältää maitoa ja pähkinöitä.
+ok | Sokeri, kaakaovoi, kaakaomassa. Voi sisältää pieniä määriä maitoa, kananmunaa ja pähkinöitä
+ok | Sokeri, kaakaomassa, kaakaovoi. Saattaa sisältää maitoa
+ok | sugar, cocoa butter, cocoa mass. May contain milk, egg and nuts
+ok | socker, kakaosmör, kakaomassa. Kan innehålla spår av mjölk och ägg
+ok | vehnäjauho, vesi, suola, hiiva. Valmistettu leipomossa, jossa käsitellään myös maitoa ja kananmunaa.
+bad | Voi sisältää maitoa, kananmunaa, liivate, sokeri
+
+## --- Väärät vihreät: yhdyssanat ja monisanaiset nimet, joissa on tuntematon osa
+!ok | mink oil
+!ok | minkkiöljy
+!ok | xyzöljy, sokeri
+!ok | blorpjauhe
+bad | emuöljy
+bad | haimaksaöljy
+bad | lampaanrasva
+bad | sianihra
+bad | naudanliemi
+bad | hevosenliha
+bad | poronliha
+bad | hirvenpaisti
+bad | silakkafilee
+bad | ankanrasva
+bad | hanhenmaksa
+bad | kananliemijauhe
+bad | lohipala
+bad | kalaliemi
+bad | snail extract
+bad | snail secretion filtrate
+bad | shark liver oil
+bad | cod liver oil
+bad | beef tallow
+bad | chicken fat
+bad | pork gelatin
+bad | fish gelatine
+bad | duck fat
+
+## --- Kieltolauseet
+!bad | ei maitoa, kaura, vesi
+ok | Maidoton, munaton. Kaura, vesi, rypsiöljy, suola
+ok | ilman maitoa: kaura, vesi, suola
+
+## --- Erottimet ja muu pakkausteksti
+bad | sokeri – maitojauhe – suola
+bad | sokeri / maitojauhe
+ok | Ainesosat: vesi, sokeri, sitruunahappo. Ravintosisältö 100 g: energia 200 kcal, rasva 0 g, hiilihydraatit 10 g
+ok | Ainesosat: vesi, sokeri. Säilytys viileässä. Valmistaja: Oy Esimerkki Ab, Helsinki.
+
+## --- Harhaanjohtavat sanat (vegaanisia)
+ok | munakoiso, tomaatti, suola
+ok | hunajameloni, vesi
+ok | kalamata-oliivit, suola
+ok | cream of tartar, flour
+ok | butternut squash, water, salt
+ok | coconut cream, sugar
+ok | maitohappo, sokeri
+ok | maitohappobakteerit, kaura
+ok | kaakaovoi, sokeri
+ok | maapähkinävoi
+ok | sheavoi
+ok | kookosmaito, vesi
+ok | kauramaito, sokeri
+ok | silkkitofu
+ok | silken tofu
+ok | veriappelsiinimehu
+ok | hirvensarvisuola, vehnäjauho
+ok | peanut butter, salt
+ok | cocoa butter, sugar
+ok | shea butter
+ok | honeydew melon
+ok | eggplant, tomato
+ok | milk thistle extract
+ok | jordnötssmör, salt
+ok | kakaosmör, socker
+ok | havredryck
+ok | sojadryck
+ok | äggplanta, tomat
+ok | maidoton suklaa, sokeri
+ok | vegaaninen juusto, sokeri
+ok | kanelisokeri
+ok | muskottipähkinä
+ok | nutmeg
+ok | pearl barley
+ok | helmisokeri
+
+## --- Ruoka: tavalliset
+bad | Vehnäjauho, sokeri, kasvirasva (palmu, rypsi), kaakaovoi, rasvaton maitojauhe, kaakaomassa, emulgointiaine (E471, soijalesitiini), suola
+bad | sokeri, väri (karmiini)
+bad | E471, E120, sokeri
+bad | sokeri, kasviöljy, rasvaton maitojauhe 12%, heraproteiini
+bad | SOKERI, MAITOJAUHE, KAAKAOVOI
+bad | sokeri; kerma; vesi
+bad | lihaliemi, suola
+bad | juustoaromi, sokeri
+bad | maustettu kalaöljy
+bad | laktoositon maito
+bad | Ingredienser: vetemjöl, socker, smör, ägg, salt
+bad | socker, kakaosmör, helmjölkspulver
+bad | wheat flour, sugar, butter, eggs, salt
+ok | vatten, rapsolja, salt, citronsyra
+ok | sokeri, happamuudensäätöaine: E330
+ok | luonnollinen vaniljauute
+ok | kasvisliemi, suola
+ok | vehnäjauho, vesi, rypsiöljy, suola, hiiva
+ok | Kaura (vesi, kaura 10 %), rypsiöljy, kalsiumkarbonaatti, suola, D2-vitamiini, riboflaviini, B12-vitamiini
+ok | water, oats, rapeseed oil, salt
+ok | kuivattu tomaatti, suola
+ok | paahdettu sipuli, rypsiöljy
+warn | sokeri, glukoosisiirappi, aromi
+warn | vehnäjauho, vesi, hiiva, suola, E471
+warn | vesi, sokeri, D3-vitamiini
+warn | sugar, natural flavouring
+warn | punaviini, vesi
+
+## --- Kosmetiikka ja hygienia (INCI)
+bad | Aqua, Glycerin, Cetearyl Alcohol, Paraffinum Liquidum, Lanolin, Parfum
+bad | Aqua, Cera Alba, Butyrospermum Parkii Butter
+bad | Cera Flava, Ricinus Communis Seed Oil
+bad | Aqua, Mel, Glycerin
+bad | Aqua, CI 75470
+bad | Talc, Mica, CI 75170
+bad | Aqua, Hydrolyzed Keratin, Parfum
+bad | Aqua, Hydrolyzed Collagen
+bad | Aqua, Sodium Hyaluronate, Hydrolyzed Silk
+bad | Snail Secretion Filtrate, Aqua
+bad | Aqua, Lac, Glycerin
+bad | Aqua, Lactis Proteinum
+bad | Sodium Tallowate, Sodium Cocoate, Aqua
+bad | Paraffinum Liquidum, Mink Oil
+bad | Aqua, Propolis Extract
+bad | Aqua, Royal Jelly Extract
+bad | Shellac, Alcohol
+bad | Aqua, Elastin
+bad | Aqua, Sericin
+bad | Aqua, Hydrolyzed Milk Protein
+bad | Aqua, Lanolin Alcohol
+bad | Adeps Lanae, Petrolatum
+bad | Aqua, Guanine
+bad | Aqua, Musk Extract
+bad | Aqua, Castoreum
+bad | Aqua, Ambergris
+bad | Aqua, Civet
+bad | Squalus Liver Oil
+bad | Aqua, Ovum Extract
+bad | Aqua, Egg Yolk Extract
+bad | Aqua, Bee Venom
+bad | Aqua, Caviar Extract
+bad | Aqua, Pearl Powder
+bad | Aqua, Placental Protein
+!ok | Aqua, Squalane
+!ok | Aqua, Stearic Acid
+!ok | Aqua, Glyceryl Stearate
+!ok | Aqua, Cholesterol
+!ok | Aqua, Sodium Hyaluronate
+!ok | Aqua, Parfum
+!ok | Aqua, Glycerin
+!ok | Aqua, Cetyl Alcohol
+ok | Aqua, Sodium Laureth Sulfate, Cocamidopropyl Betaine, Sodium Chloride, Citric Acid
+ok | Aqua, Sodium Chloride, Citric Acid
+ok | Butyrospermum Parkii Butter, Cocos Nucifera Oil, Tocopherol
+ok | Aqua, Aloe Barbadensis Leaf Juice, Xanthan Gum
+ok | Simmondsia Chinensis Seed Oil, Prunus Amygdalus Dulcis Oil
+ok | Talc, Mica, CI 77891, CI 77491
+ok | Aqua, Synthetic Beeswax
+ok | Aqua, Panthenol, Urea
+ok | Aqua, Dimethicone, Phenoxyethanol
+ok | vesi, natriumkloridi, sitruunahappo
+
+## --- Maalit, liimat, askartelu
+bad | pellavaöljy, kalkki, kaseiini
+bad | luuliima
+bad | jäniksennahkaliima
+bad | eläinliima
+bad | arabikumi, glyseriini, härkäsappi
+bad | ox gall
+bad | Pigmentti: luumusta
+bad | bone black
+bad | sellakka, alkoholi
+bad | munatempera
+bad | kaseiinimaali
+ok | vesi, akryylisideaine, titaanidioksidi, kalsiumkarbonaatti
+ok | pellavaöljy, titaanidioksidi, talkki
+warn | arabikumi, pigmentti, vesi
+ok | arabikumi, titaanidioksidi, rautaoksidi, vesi
+
+## --- Vaatteet ja materiaalit
+bad | 70 % villa, 30 % polyamidi
+bad | 100 % merinovilla
+bad | Päällinen: polyesteri. Täyte: untuva 90 %, höyhen 10 %
+bad | Kuori: nahka
+bad | 100 % silkki
+bad | kashmir
+bad | mohair, akryyli
+bad | angora 30 %, nailon 70 %
+bad | alpakka
+bad | turkis
+bad | mokka
+bad | 100 % wool
+bad | 100 % silk
+bad | genuine leather
+bad | suede
+bad | down 80 %, feathers 20 %
+bad | cashmere
+bad | 100 % ull
+bad | läder
+bad | siden
+bad | dun 90 %, fjäder 10 %
+bad | sarvinappi
+bad | helmiäinen
+bad | lampaannahka
+bad | lambswool
+ok | 100 % puuvilla
+ok | 95 % puuvilla, 5 % elastaani
+ok | polyesteri, viskoosi
+ok | keinonahka
+ok | tekonahka
+ok | tekoturkis
+ok | 100 % cotton
+ok | faux leather
+ok | vegan leather
+ok | faux fur
+ok | 100 % bomull
+ok | konstläder
+ok | linen, cotton
+ok | pellava, lyocell
+ok | nailon, elastaani
+ok | modaali, polyamidi
+ok | kivivilla
+ok | lasivilla
+
+## --- Pesuaineet ja kodin tuotteet
+bad | talisaippua
+bad | natriumtalgaatti
+bad | sodium tallowate, aqua
+!ok | saippua
+!ok | entsyymit, vesi
+ok | vesi, natriumlaureettisulfaatti, natriumkloridi, sitruunahappo

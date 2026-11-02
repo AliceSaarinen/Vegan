@@ -416,6 +416,141 @@ kasvisnakki;kasvismakkara;vegaaninen;vegaaniset;vegan;kasvipohjainen;plant-based
 `;
 
 /* E-koodit: EU:ssa hyväksytyt lisäaineet. Oletus: vegaaninen (kasvi-, mineraali- tai synteettinen). */
+/* =====================================================================
+   LAAJENNETTU TIETOKANTA: kosmetiikka, hygienia, pesuaineet, maalit, liimat,
+   tekstiilit ja materiaalit sekä ruoan harvinaisemmat eläinperäiset aineet.
+   Samat rivimuodot kuin yllä (DB_A, DB_U, DB_V).
+   ===================================================================== */
+const DB_A2 = `
+mehiläisvaha;cera alba;cera flava;beeswax;bivax;cire d'abeille;mehiläisvahaa;keltainen mehiläisvaha;valkoinen mehiläisvaha|Mehiläinen|wax
+hunaja;mel;honey extract;mel extract;hunajauute;honungsextrakt;honey powder|Mehiläinen|honey
+propolis;propolis extract;propolis cera;propolisuute;kittivaha|Mehiläinen|
+kuningatarhyytelö;royal jelly;royal jelly extract;bidrottninggelé;mehiläishyytelö|Mehiläinen|
+mehiläismyrkky;bee venom;bimyrkky;apis mellifera venom|Mehiläinen|
+siitepöly (mehiläisten keräämä);bee pollen;mehiläisten siitepöly;bipollen|Mehiläinen|
+lanoliini;lanolin;adeps lanae;lanolin alcohol;lanolin alcohols;lanolin oil;lanolin wax;hydrogenated lanolin;acetylated lanolin;lanolin acid;lanoliinialkoholi;villarasva;wool fat;wool wax;wool grease;ullfett;lanolinalkohol|Lampaanvilla|
+kollageeni;collagen;hydrolyzed collagen;soluble collagen;marine collagen;kollagen;hydrolysoitu kollageeni;kalakollageeni;fish collagen;kollageenipeptidit;collagen peptides|Eläinten nahka, luut tai kalan suomut|protein
+elastiini;elastin;hydrolyzed elastin;soluble elastin;elastinhydrolysat|Naudan niskanivelside tai muu eläinkudos|
+keratiini;keratin;hydrolyzed keratin;keratin amino acids;keratiinihydrolysaatti;keratinhydrolysat|Eläinten karvat, sarvet, sulat|
+silkki;silk;silk powder;silk protein;silk amino acids;hydrolyzed silk;silkkiproteiini;silkkijauhe;sericin;serisiini;fibroin;fibroiini;siden;natursiden;mulberry silk;mulperisilkki;villisilkki;wild silk;tussah;tussahsilkki;bombyx mori;silk extract|Silkkiperhosen toukka|
+karmiini;carmine;cochineal;ci 75470;kokenilli;karmiinihappo;carminic acid;natural red 4;karmin;koschenill|Kokenillihyönteinen|carmine
+guaniini;guanine;ci 75170;pearl essence;kalanhopea;fish silver;guanin|Kalan suomut|
+helmijauhe;pearl powder;pearl extract;margarita powder;helmiäinen;helmiäiset;mother of pearl;mother-of-pearl;nacre;pärlemor;pärlemo;helmiäisnappi;conchiolin;hydrolyzed conchiolin protein;helmiäisjauhe|Simpukan tai osterin kuori|
+korallijauhe;coral powder;corallium;koralli;koraller|Koralli (eläin)|
+osterinkuorijauhe;oyster shell powder;ostrea shell powder;osterinkuori;ostronskal|Osteri|
+etanan lima;snail secretion filtrate;snail mucin;snail extract;helix aspersa;helix aspersa muller secretion filtrate;etanauute;etanalima;snigelslem;snigelextrakt;snail slime|Etana|
+sellakka;shellac;schellack;lac resin;shellac wax;lakkahartsi;lakka (hyönteis)|Lakkakirva|wax
+myski;musk;musk extract;moschus;myskiuute;myskihirvi;mysk;deer musk|Myskihirvi|
+sivetti;civet;civet extract;sivettikissa;civetta|Sivettikissa|
+kastoreumi;castoreum;bävergäll;majavanhausta;castoreum extract|Majava|
+ambra;ambergris;ambra grisea;harmaa ambra;valaanambra|Kaskelotti|
+spermaseetti;spermaceti;cetaceum;valaanrasva;whale oil;valasöljy;valrav|Valas|
+minkkiöljy;mink oil;mink fat;minkinrasva;minkolja|Minkki|
+emuöljy;emu oil;emu fat;emuolja|Emu|
+hevosöljy;horse oil;horse fat;hevosenrasva;hästfett|Hevonen|
+hainmaksaöljy;shark liver oil;haimaksaöljy;squalus liver oil;squalus acanthias liver oil;hajleverolja|Hai|
+kalanmaksaöljy;fish liver oil;turskanmaksaöljy;cod liver oil;gadus morhua liver oil;torskleverolja;fiskleverolja|Kala|
+lohiöljy;salmon oil;salmon roe extract;laxolja|Lohi|
+kaviaariuute;caviar extract;mätiuute;roe extract;fish roe extract;kaviarextrakt|Kalan mäti|
+munauute;ovum extract;egg extract;egg yolk extract;egg yolk;ovum;ovi vitellus;egg powder;egg protein;whole egg powder;munanvalkuaisuute;ovalbumin;ovalbumiini;albumen;egg white extract;äggextrakt|Kananmuna|egg
+maitouute;lac;lactis proteinum;lactis lipida;milk extract;milk protein;hydrolyzed milk protein;lactoferrin;laktoferriini;lactoperoxidase;laktoperoksidaasi;colostrum;ternimaito;colostrum extract;milk lipids;yoghurt extract;mjölkextrakt;mjölkprotein;buttermilk powder|Maito|milk
+heraproteiini;whey protein;hydrolyzed whey protein;whey;lactis serum;vassleprotein|Maito|protein
+kaseiini;casein;caseinate;sodium caseinate;calcium caseinate;kaseinaatti;natriumkaseinaatti;kalsiumkaseinaatti;kaseiinimaali;casein paint;kaseiiniliima;casein glue;kaseinfärg;kaseinlim|Maito|protein
+istukkauute;placental protein;placenta extract;placental extract;istukka;placenta;moderkaka|Eläimen istukka|
+lapsivesi;amniotic fluid;bovine amniotic fluid;fostervatten|Nauta|
+eläinliima;animal glue;luuliima;bone glue;nahkaliima;hide glue;jäniksennahkaliima;rabbit skin glue;kaninlim;benlim;hudlim;djurlim;kalaliima;fish glue;isinglass;husblas;gelatiiniliima;rabbit glue|Eläinten luut, nahka tai kalan uimarakko|
+härkäsappi;ox gall;oxgall;sappi;gall;bile;naudan sappi;oxgalla;gallsalt;bile salts;sappihappo|Nauta|
+luumusta;bone black;bone char;ivory black;pigment black 9;pbk9;pbk 9;ci 77267;luuhiili;norsunluumusta;benkol;elfenbenssvart;bone ash;luutuhka;bone meal;luujauho|Eläinten luut|
+munatempera;egg tempera;äggtempera;munankeltuaistempera;kananmunankeltuainen;tempera (munapohjainen)|Kananmuna|egg
+seepia;sepia ink;sepiamuste;mustekalan muste;cuttlefish ink;squid ink;bläckfiskbläck|Seepiamustekala|
+villa;wool;ull;merinovilla;merino;merino wool;merinoull;lampaanvilla;lambswool;lammasvilla;lammull;neitsytvilla;virgin wool;new wool;uusvilla;shetlandinvilla;shetland wool;islanninvilla;tweed;huopa (villa);wool felt;villahuopa;ullfilt;villaa;villainen;yllet;woollen;woolen;bouclé (villa)|Lammas|
+kashmir;cashmere;kashmirvilla;kaschmir;cashmere wool|Kashmirvuohi|
+mohair;mohairvilla;kid mohair|Angoravuohi|
+angora;angoravilla;angora wool;angoraull|Angorakani|
+alpakka;alpaca;alpakkavilla;alpaca wool;alpacka;alpackaull;baby alpaca;vikunja;vicuna;vicuña;laama;llama;llama wool|Alpakka, laama tai vikunja|
+kamelinkarva;camel hair;kamelinvilla;kamelhår;jakinvilla;yak wool;yak;jakki;qiviut;myskihärän villa;possum;possum wool;opossum wool|Eläinten karvat|
+jouhi;horsehair;hevosenjouhi;tagel;hästtagel;jouhet|Hevonen|
+nahka;leather;genuine leather;aito nahka;läder;äkta läder;naudannahka;cowhide;cow leather;lampaannahka;sheepskin;lammasnahka;fårskinn;vuohennahka;goatskin;sianahka;pigskin;vasikannahka;calfskin;mokka;mokkanahka;suede;nubuck;nubukki;mocka (läder);patent leather;kiiltonahka;nappanahka;nappa leather;nappa;bonded leather;regenerated leather;mustangnahka;kengurunnahka;kangaroo leather;strutsinnahka;ostrich leather;käärmeennahka;snakeskin;krokotiilinnahka;crocodile leather;rasvanahka;vahattu nahka;skinn;skinnet;mockaskinn;nahkaa;nahkainen|Eläimen nahka|
+turkis;fur;genuine fur;real fur;aito turkis;päls;äkta päls;minkinturkis;mink fur;ketunturkis;fox fur;kaninturkis;rabbit fur;supinturkis;finnraccoon;sopuli;chinchilla;sable;soopeli;karakul;karakuli;persian lamb;lampaantalja;shearling;talja;taljat;fårskinnspäls;lammaskarva|Eläimen turkki|
+untuva;down;goose down;duck down;hanhenuntuva;ankanuntuva;untuvaa;untuvat;dun;gåsdun;anddun;untuvatäyte;down filling;dunfyllning;ejderdun;eider down;haahkanuntuva|Linnut|
+höyhen;feather;feathers;höyhenet;höyheniä;fjäder;fjädrar;sulat;sulka;sulkatäyte;feather filling|Linnut|
+sarvi;horn;sarvinappi;horn button;hornknapp;sarvikampa;sarviaines;antler;hirvensarvi (materiaali);kavio;hoof|Eläimen sarvi tai kavio|
+luu (materiaali);bone;luunappi;bone button;benknapp;norsunluu;ivory;elfenben;valaanluu;whalebone|Eläimen luu|
+talisaippua;sodium tallowate;natriumtalgaatti;potassium tallowate;kaliumtalgaatti;tallow soap;talgtvål;sodium tallow;tallowamine;tallow amine;hydrogenated tallow;tallow acid;tallowamide;tallowate;talgsyra;tallow glycerides;talirasvahappo|Eläinrasva (tali)|animalfat
+tali;tallow;beef tallow;naudantali;lampaantali;talg;talia;suet;munuaisrasva;njurtalg|Eläinrasva|animalfat
+ihra;lard;laardi;siansilava;silava;ister;smult;schmaltz;kananrasva;chicken fat;ankanrasva;duck fat;hanhenrasva;goose fat;ankfett;gåsfett;lampaanrasva;mutton fat;sianrasva;pork fat;naudanrasva;beef fat;horse fat;dripping|Eläinrasva|animalfat
+kitiini;chitin;kitin|Äyriäisten kuori tai hyönteiset|
+kondroitiini;chondroitin;chondroitin sulfate;kondroitiinisulfaatti;kondroitin;sodium chondroitin sulfate|Rusto|
+glukosamiini (äyriäis);shellfish glucosamine|Äyriäiset|
+hyönteisjauho;insect flour;insect protein;sirkkajauho;cricket flour;cricket powder;jauhomato;mealworm;jauhomatojauho;buffalo worm;heinäsirkka;locust;syrsa;syrsmjöl;insektsmjöl;mjölmask|Hyönteiset|
+krilliöljy;krill oil;krill;krill extract;krillolja|Krilli|
+äyriäinen;äyriäiset;crustacean;crustaceans;shellfish;skaldjur;kräftdjur;nilviäinen;nilviäiset;mollusc;molluscs;mollusk;blötdjur|Äyriäiset tai nilviäiset|shrimp
+eläinperäinen;animal;animal origin;animal derived;animal-derived;eläinperäistä;eläinperäiset;eläinrasva;animal fat;animal fats;djurfett;animaliskt;animaliskt fett;animalisk|Eläin|animalfat
+naudanliha;beef;nauta;nautaa;naudan;naudanlihaa;naudanlihaliemi;beef extract;beef stock;oxkött;nötkött;bovine;bos taurus|Nauta|meat
+sianliha;pork;sika;sian;porsas;possu;porsaan;sianlihaa;griskött;fläskkött;porcine;sus scrofa|Sika|meat
+lammas;lammasta;lampaan;karitsa;karitsan;lamb;mutton;lammkött;fårkött;ovine;vuohi;vuohen;goat;get;getkött;kili;kid meat|Lammas tai vuohi|meat
+hevonen;hevosen;hevosenliha;horse meat;hästkött;equine;varsa|Hevonen|meat
+riista;poro;poron;poronliha;hirvi;hirven;hirvenliha;peura;peuran;kauris;jänis;jäniksen;kani;kanin;rabbit;venison;viltkött;renkött;älgkött;rådjur;hjortkött;kanin;villisika;wild boar|Riistaeläimet|meat
+kana;kanan;broileri;broilerin;siipikarja;poultry;chicken;kyckling;fågel;kalkkuna;kalkkunan;turkey;kalkon;ankka;ankan;duck;anka;hanhi;hanhen;goose;gås;viiriäinen;quail;vaktel;fasaani;pheasant;gallus;helmikana|Siipikarja|chicken
+kala;kalaa;kalan;fish;fisk;lohi;lohen;lohta;salmon;lax;turska;turskan;cod;torsk;seiti;sei;silakka;silakan;silli;sillin;herring;sill;strömming;muikku;muikun;vendace;siika;hauki;ahven;kuha;made;lahna;särki;kampela;flounder;rauta;taimen;trout;forell;kirjolohi;rainbow trout;regnbåge;makrilli;mackerel;makrill;sardiini;sardine;sardin;sardelli;anjovis;anchovy;anchovies;ansjovis;sardell;tonnikala;tuna;tonfisk;miekkakala;swordfish;tilapia;pangasius;ankerias;eel;ål;hai;shark;haj;rausku;ray;meriantura;squalus;gadus;salmo|Kala|fish
+`;
+
+const DB_U2 = `
+glyseriini;glycerin;glycerine;glycerol;glyseroli;e422;kasviglyseriini|0.85;kosmetiikka=0.92;koti=0.92;maali=0.92|Kasviöljyt (yleisin) tai eläinrasva (tali)|
+steariinihappo;stearic acid;stearinsyra;stearin;steariini;stearate;stearaatti|0.75;kosmetiikka=0.88;koti=0.85;maali=0.85|Palmuöljy tai muu kasvirasva (yleisin) tai tali|
+parfyymi;parfum;fragrance;perfume;tuoksu;hajuste;hajusteet;parfyymiseos;doft;parfym;aroma (kosmetiikka)|0.95|Synteettiset tai kasviperäiset tuoksuaineet (yleisin); harvoin myski, sivetti, kastoreumi tai ambra|
+skvalaani;squalane;skvalan;squalaani|0.85|Oliivi tai sokeriruoko (yleisin); hain maksaöljy|
+skvaleeni;squalene;skvalen|0.6|Hain maksaöljy tai oliivi|
+kolesteroli;cholesterol;kolesterol|0.25|Lanoliini (yleisin); kasvisteroleista harvoin|
+hyaluronihappo;hyaluronic acid;sodium hyaluronate;natriumhyaluronaatti;hydrolyzed hyaluronic acid;hyaluronsyra;natriumhyaluronat;hydrolyzed sodium hyaluronate;sodium acetylated hyaluronate;potassium hyaluronate|0.9|Bakteerikäyminen (yleisin); kukon heltta|
+allantoiini;allantoin;allantoin|0.92|Synteettinen (yleisin); kasvit tai eläimen virtsahappo|
+setyylialkoholi;cetyl alcohol;cetylalkohol;setearyylialkoholi;cetearyl alcohol;cetearylalkohol;stearyl alcohol;stearyylialkoholi;cetostearyl alcohol;myristyl alcohol;behenyl alcohol;oleyl alcohol;oleyylialkoholi;oleylalkohol;arachidyl alcohol;lauryl alcohol;cetyl palmitate;cetyl esters;cetearyl ethylhexanoate;cetearyl isononanoate|0.95|Palmu- tai kookosöljy (yleisin); tali|
+glyseryylistearaatti;glyceryl stearate;glyceryl stearate se;glyceryl stearate citrate;glyceryl oleate;glyceryl laurate;glyceryl caprylate;glyceryl behenate;glyceryl dibehenate;glyceryl distearate;glyceryl isostearate;glyceryl myristate;glyceryl palmitate;peg-100 stearate;peg-40 stearate;peg-8 stearate;peg-2 stearate;polyglyceryl-3 diisostearate;polyglyceryl-4 isostearate;polyglyceryl-2 dipolyhydroxystearate;sorbitan stearate;sorbitan oleate;sorbitan sesquioleate;sorbitan tristearate;sucrose stearate;ethylhexyl stearate;isopropyl palmitate;isopropyl myristate;octyldodecanol;ethylhexyl palmitate;myristyl myristate;decyl oleate;oleic acid;öljyhappo;palmitic acid;palmitiinihappo;myristic acid;myristiinihappo;lauric acid;lauriinihappo;isostearic acid;hydroxystearic acid;behenic acid;arachidic acid;caprylic/capric triglyceride;caprylic capric triglyceride;triglyceride;triglyseridi;tribehenin;trihydroxystearin;hydrogenated vegetable glycerides|0.92|Palmu-, kookos- tai muu kasviöljy (yleisin); tali|
+retinyylipalmitaatti;retinyl palmitate;retinol;retinyl acetate;retinyylipalmitat|0.9|Synteettinen (yleisin); kalanmaksaöljy|
+aminohapot;amino acids;aminosyror;hydrolyzed protein;hydrolysoitu proteiini;hydrolyzed proteins|0.6|Kasvit tai käyminen; voi olla keratiinista, silkistä tai maidosta|
+kitosaani;chitosan;kitosan|0.4|Äyriäisten kuori (yleisin); sienet|
+glukosamiini;glucosamine;glukosamin|0.4|Äyriäisten kuori (yleisin); käyminen|
+lesitiini (kosmetiikka);hydrogenated lecithin;lysolecithin|0.9|Soija tai auringonkukka (yleisin); kananmuna|
+ceramidit;ceramide;ceramide np;ceramide ap;ceramide eop;ceramides;keramidit;ceramider|0.9|Synteettinen tai kasvit (yleisin); eläinkudos|
+entsyymit (pesuaine);subtilisin;subtilisiini;protease (pesuaine);amylase (pesuaine);cellulase;sellulaasi;mannanase|0.95|Mikrobikäyminen|
+saippua;soap;tvål;saippuaa;sodium soap;natriumsaippua;kaliumsaippua;potassium soap;mäntysuopa;suopa;såpa|0.6;koti=0.7|Kasviöljyt tai eläinrasva (tali)|
+mokka (kahvi);mokka;mocha;mocka|0.9;tekstiili=0.03|Kahvi; vaatteissa ja kengissä mokkanahka|
+nahkiainen;nahkiaisia|0|Kala (nahkiainen)|
+helmi;helmet;pearl;pearls;pärla;pärlor|0.5;tekstiili=0.4|Lasi, muovi tai simpukan helmi|
+siveltin;siveltimet;brush;pensel|0.6;maali=0.5|Synteettinen kuitu tai eläimen karva (sable, sika, orava)|
+pigmentti;pigmentit;pigment;pigments;väripigmentti|0.95;maali=0.95|Mineraalit tai synteettiset (yleisin); luumusta, seepia tai karmiini harvoin|
+sideaine;sideaineet;binder;bindemedel|0.9;maali=0.9|Akryyli, öljy tai kasviliima; voi olla kaseiinia tai eläinliimaa|
+liima;glue;lim;liimat|0.85;maali=0.85|Synteettinen (yleisin); eläinliima tai kaseiini|
+vaha;wax;vax;vahat;waxes|0.7|Parafiini, kasvivaha tai mehiläisvaha|
+huopa;felt;filt|0.6;tekstiili=0.6|Polyesteri tai villa|
+tekstiilikuitu;muu kuitu;other fibres;other fibers;övriga fibrer;muut kuidut;mixed fibres;sekoitekuitu|0.6|Eri kuituja, voi olla villaa tai silkkiä|
+`;
+
+const DB_V2 = `
+puuvilla;cotton;bomull;organic cotton;luomupuuvilla;kierrätetty puuvilla;recycled cotton;pima;supima;mercerized cotton;merseroitu puuvilla;puuvillaa;puuvillaa;puuvillakangas;bomullstyg;denim;farkkukangas;kord;corduroy;vakosametti;flanelli (puuvilla);cotton wool;vanu;vanulappu;pumpuli;pumpulipuikko;cotton swab
+pellava;linen;flax;linne;lin;pellavakangas;pellavakuitu;hamppu;hemp;hampa;hamppukuitu;ramie;rami;jute;juutti;sisal;sisaali;kookoskuitu;coir;bambukuitu;bamboo fibre;bamboo fiber;bambu;bamboo;nokkoskuitu;nettle fibre;piña;ananaskuitu;pinatex;piñatex;korkki;cork;kork;korkkinahka;cork leather
+polyesteri;polyester;kierrätetty polyesteri;recycled polyester;polyamidi;polyamide;nailon;nylon;polyamid;akryyli;acrylic;akryl;elastaani;elastane;spandex;lycra;elastan;elastodieeni;polypropeeni;polypropylene;polyeteeni;polyethylene;polyuretaani;polyurethane;pu;polyuretan;pvc;vinyyli;vinyl;mikrokuitu;microfibre;microfiber;mikrofiber;fleece;fleecekangas;fliisi;mikrofleece;modakryyli;modacrylic;aramidi;aramid;kevlar;goretex;gore-tex;tyvek;neopreeni;neoprene;softshell;taftti;taffeta;satiini (polyesteri);polyesteritäyte;polyester filling;kuituvanu;vanutäyte;fiberfill;thinsulate;primaloft;synteettinen täyte;synthetic filling;syntetfyllning;tekountuva;synthetic down;faux down
+viskoosi;viscose;rayon;viskos;modaali;modal;lyocell;tencel;lyosell;kupro;cupro;asetaatti (kuitu);acetate;triasetaatti;triacetate;ecovero;livaeco;bambuviskoosi;bamboo viscose
+keinonahka;tekonahka;faux leather;vegan leather;synthetic leather;pu leather;pu-nahka;leatherette;konstläder;imitationsläder;veganskt läder;vegaaninen nahka;kasvinahka;omenanahka;apple leather;kaktusnahka;cactus leather;sienenahka;mushroom leather;mylo;tekomokka;faux suede;microsuede;alcantara;mikromokka;konstmocka;tekoturkis;faux fur;fake fur;konstpäls;fuskpäls;tekoturkista;karvakangas;plush;plyysi;teddy (polyesteri);tekovilla
+kivivilla;rock wool;rockwool;stenull;mineraalivilla;mineral wool;mineralull;lasivilla;glass wool;glasull;teräsvilla;steel wool;stålull;puuvilla (vanu);puuvillavanu;sellu;sellulose;selluloosa;cellulose;paperi;paper;papper;pahvi;kartonki;cardboard;kumi;rubber;gummi;luonnonkumi;natural rubber;lateksi;latex;eva;tpu;tpr;metalli;metal;teräs;steel;alumiini;aluminium;messinki;brass;lasi;glass;glas;keramiikka;ceramic;puu;wood;trä;bambu;muovi;plastic;plast;silikoni;silicone;silikon;kierrätetty muovi;recycled plastic
+akryylisideaine;acrylic binder;akryylimaali;acrylic paint;akrylfärg;akryylidispersio;acrylic emulsion;vinyyliakrylaatti;lateksimaali;latex paint;alkydi;alkydimaali;alkyd;alkyd resin;alkydharts;pellavaöljymaali;linseed oil paint;linoljefärg;keitetty pellavaöljy;boiled linseed oil;tärpätti;turpentine;terpentin;mineraalitärpätti;white spirit;lakkabensiini;titaanidioksidi;titanium dioxide;titandioxid;sinkkivalkoinen;zinc white;kalkki;lime;kalk;kalkkimaali;liitu;chalk;krita;talkki;talc;talk;kaoliini;kaolin;savi;clay;lera;rautaoksidi;iron oxide;järnoxid;okra;ochre;ockra;umbra;umber;siena;ultramariini;ultramarine;kobolttisininen;cobalt blue;kadmium;cadmium;kromioksidivihreä;chromium oxide green;ftalosyaniini;phthalocyanine;kinakridoni;quinacridone;nokimusta;carbon black;lampblack;lamp black;kasvihiili;vine black;arabikumi;gum arabic;gummi arabicum;akaasiakumi;dekstriini;dextrin;dextrinlim;tapettiliima (selluloosa);metyyliselluloosa;methyl cellulose;tapetklister;pva;pva-liima;pva glue;polyvinyl acetate;puuliima;wood glue;trälim;tärkkelysliima;starch paste;vehnätärkkelysliima;wheat paste;vesiliukoinen;sokeriväri;hartsi;resin;harts;dammar;dammarhartsi;kolofonium;rosin;kasvivaha;plant wax;karnaubavaha;carnauba wax;copernicia cerifera cera;kandelillavaha;candelilla wax;euphorbia cerifera cera;soijavaha;soy wax;sojavax;rypsivaha;rapeseed wax;auringonkukkavaha;sunflower wax;helianthus annuus seed cera;riisileseen vaha;rice bran wax;oryza sativa bran cera;parafiini;paraffin;paraffinum liquidum;mineral oil;petrolatum;vaseliini;vaselin;cera microcristallina;microcrystalline wax;mikrokristallinen vaha;ozokerite;synthetic beeswax;synthetic wax;synteettinen mehiläisvaha;synteettinen vaha;polyethylene wax;pvc-liima;epoksi;epoxy;silikonimassa;akryylimassa;tempera (akryyli);akvarelliväri (synteettinen sappi);synteettinen siveltin;synthetic brush;taklon;nylonsivellin
+helmisokeri;pearl sugar;pärlsocker;raesokeri (helmi);helmiohra;helmisuurimo;pearl barley;pärlgryn;tapiokahelmet;tapioca pearls;sagohelmet;pantenoli;panthenol;d-panthenol;dexpanthenol;urea;karbamidi;hedelmäliha;kookosliha;fruktkött;kokoskött;fruit pulp;kurpitsanliha;melonin liha;thai;thaibasilika;thai basil;karviainen;gooseberry;krusbär;lammassalaatti;lamb's lettuce;vårsallat;collard;collard greens;lehtikaali (collard);crabapple;crab apple;koristeomena;hawthorn;orapihlaja;buckthorn;sea buckthorn;tyrni;havtorn;hippophae rhamnoides fruit oil;hippophae rhamnoides oil
+veriappelsiini;blood orange;blodapelsin;veriappelsiinimehu;blood orange juice;verigreippi;äggplanta;munakoiso;aubergine;eggplant;vegokött;sojakött;växtbaserat kött;kasvisliha;soijaliha;soijarouhe;soy mince;veggie mince;plant-based meat
+vesi;aqua;water;eau;aqua purificata;vatten;deionized water;demineralized water;ionisoitu vesi
+natriumlaureettisulfaatti;sodium laureth sulfate;sles;natriumlaurylsulfaatti;sodium lauryl sulfate;sls;ammonium lauryl sulfate;ammonium laureth sulfate;sodium coco-sulfate;sodium coco sulfate;sodium cocoyl isethionate;sodium lauroyl sarcosinate;sodium cocoamphoacetate;disodium cocoamphodiacetate;disodium laureth sulfosuccinate;cocamidopropyl betaine;kokamidopropyylibetaiini;coco-glucoside;decyl glucoside;lauryl glucoside;cocamide dea;cocamide mea;sodium c14-16 olefin sulfonate;sodium dodecylbenzenesulfonate;sodium laureth-sulfate;polysorbate 20;polysorbaatti 20;ppg-26-buteth-26;peg-40 hydrogenated castor oil;peg-7 glyceryl cocoate;natriumkokoaatti;sodium cocoate;sodium palmate;sodium olivate;sodium palm kernelate;sodium shea butterate;sodium sunflowerate;sodium castorate;sodium rapeseedate;potassium cocoate;potassium oleate (kasvi);kaliumoleaatti (kasvi)
+natriumkloridi;sodium chloride;natriumklorid;sitruunahappo;citric acid;citronsyra;natriumsitraatti;sodium citrate;natriumhydroksidi;sodium hydroxide;natriumhydroxid;kaliumhydroksidi;potassium hydroxide;natriumbentsoaatti;sodium benzoate;kaliumsorbaatti;potassium sorbate;fenoksietanoli;phenoxyethanol;etyyliheksyyliglyseriini;ethylhexylglycerin;bentsyylialkoholi;benzyl alcohol;dehydroasetiinihappo;dehydroacetic acid;sodium dehydroacetate;sorbic acid;benzoic acid;salicylic acid;salisyylihappo;metyyliparabeeni;methylparaben;propylparaben;ethylparaben;butylparaben;metyyli-isotiatsolinoni;methylisothiazolinone;methylchloroisothiazolinone;imidazolidinyl urea;dmdm hydantoin;chlorphenesin;caprylyl glycol;1,2-hexanediol;pentylene glycol;propylene glycol;propyleeniglykoli;butylene glycol;butyleeniglykoli;dipropylene glycol;hexylene glycol;glycol distearate (synteettinen);disodium edta;tetrasodium edta;edta;tetrasodium glutamate diacetate;sodium gluconate;sodium phytate;phytic acid;trisodium ethylenediamine disuccinate;bht;bha;alcohol;alcohol denat;denaturoitu alkoholi;etanoli;ethanol;isopropyl alcohol;isopropanoli;isopropanol
+dimetikoni;dimethicone;cyclopentasiloxane;cyclohexasiloxane;cyclomethicone;amodimethicone;dimethiconol;phenyl trimethicone;trimethylsiloxysilicate;dimethicone crosspolymer;silica;piidioksidi;silica dimethyl silylate;hydrated silica;polyacrylamide;carbomer;karbomeeri;acrylates copolymer;acrylates/c10-30 alkyl acrylate crosspolymer;sodium polyacrylate;ammonium acryloyldimethyltaurate/vp copolymer;polyquaternium-7;polyquaternium-10;polyquaternium-11;guar hydroxypropyltrimonium chloride;hydroxyethylcellulose;hydroxypropyl methylcellulose;cellulose gum;karboksimetyyliselluloosa;xanthan gum;ksantaanikumi;sclerotium gum;carrageenan;karrageeni;agar;alginate;algin;sodium alginate;gellan gum;pullulan;sodium carbomer;nylon-12;polymethyl methacrylate;polyethylene;polybutene;polyisobutene;hydrogenated polyisobutene;isohexadecane;isododecane;c13-14 isoparaffin;c15-19 alkane;coco-caprylate/caprate;coco-caprylate;dicaprylyl carbonate;dicaprylyl ether;caprylyl methicone;polyglyceryl-6 polyricinoleate;tocopherol;tokoferoli;tocopheryl acetate;tokoferyyliasetaatti;ascorbic acid;askorbiinihappo;sodium ascorbyl phosphate;ascorbyl glucoside;niacinamide;niasiiniamidi;zinc oxide;sinkkioksidi;titanium dioxide;ci 77891;ci 77491;ci 77492;ci 77499;ci 77007;ci 77510;ci 77288;ci 77289;ci 77742;ci 77163;ci 77019;mica;kiille;ci 77019;ci 19140;ci 15985;ci 16035;ci 17200;ci 42090;ci 45410;ci 14700;ci 47005;ci 60730;ci 61570;ci 15850;ci 45380;ci 73360;ci 77120;ci 77947;ci 77400;ci 77480;ci 77000;calcium carbonate;kalsiumkarbonaatti;magnesium carbonate;kaolin;bentonite;bentoniitti;boron nitride;bismuth oxychloride;ci 77163;aluminum hydroxide;alumina;silica silylate;synthetic fluorphlogopite;calcium sodium borosilicate;tin oxide;sodium hydroxide;triethanolamine;aminomethyl propanol;lactic acid;maitohappo (synteettinen);glycolic acid;glykolihappo;mandelic acid;gluconolactone;sodium lactate;sodium pca;menthol;mentoli;camphor;kamferi;eucalyptol;limonene;linalool;citral;geraniol;citronellol;coumarin;hexyl cinnamal;alpha-isomethyl ionone;benzyl salicylate;benzyl benzoate;eugenol;farnesol;butylphenyl methylpropional;hydroxycitronellal;amyl cinnamal;cinnamyl alcohol;anise alcohol;benzyl cinnamate;isoeugenol;musk ketone;musk xylene;galaxolide;ethylene brassylate;habanolide;ambroxan;ambrox;synteettinen myski;synthetic musk;ethylhexyl methoxycinnamate;octocrylene;avobenzone;butyl methoxydibenzoylmethane;homosalate;ethylhexyl salicylate;bis-ethylhexyloxyphenol methoxyphenyl triazine;ethylhexyl triazone;diethylamino hydroxybenzoyl hexyl benzoate;methylene bis-benzotriazolyl tetramethylbutylphenol;phenylbenzimidazole sulfonic acid;sodium fluoride;natriumfluoridi;sodium monofluorophosphate;stannous fluoride;hydroxyapatite (synteettinen);hydrated silica;sorbitol;xylitol;ksylitoli;sodium saccharin;sakariininatrium;sucralose;cocamidopropyl hydroxysultaine;sodium bicarbonate;natriumbikarbonaatti;sodium carbonate;natriumkarbonaatti;sodium percarbonate;natriumperkarbonaatti;sodium sulfate;natriumsulfaatti;sodium silicate;natriumsilikaatti;zeolite;zeoliitti;polycarboxylate;fosfonaatti;phosphonate;optical brightener;optinen kirkaste;nonionic surfactants;ionittomat pinta-aktiiviset aineet;anionic surfactants;anioniset pinta-aktiiviset aineet;amphoteric surfactants;amfoteeriset pinta-aktiiviset aineet;cationic surfactants;kationiset pinta-aktiiviset aineet;pinta-aktiiviset aineet;surfactants;tensider;nonjoniska tensider;anjoniska tensider;saippuapähkinä;soap nut;sapindus mukorossi;kvillajauute;quillaja
+`;
+
+/* Eläinten ja eläinperäisten osien sanajuuret. Jos sana tai yhdyssana sisältää juuren, ainesosa
+   on eläinperäinen, ellei se ole poikkeuslistalla (harhaanjohtavat sanat, kuten munakoiso).
+   Pitkät juuret tunnistetaan missä kohtaa sanaa tahansa. Lyhyet juuret vain kokonaisena sanana,
+   taivutettuna tai yhdyssanan osana, jonka toinen osa on tunnettu sana. */
+const ROOTS_LONG = `maito maidon maitoa mjölk kerma kerman grädd juusto juuston rahka jogurt yoghurt yogurt piimä kefiir kefir kasein kaseiin laktoos laktos lactose liivate gelatiin gelatin kollageen kollagen collagen keratiin keratin elastiin elastin lanoliin lanolin karmiin karmin carmine kokenill koschenill cochineal sellakka schellack shellac mehiläis honung hunaja honey propolis bivax beeswax naudan nauta härän possu porsa lampaa lammas karitsa vuohen vasika hevose hevonen hirven peuran jänikse kalkkun broiler siipikarja riista ankan hanhen viiriäi pekoni kinkku makkara salami pepperoni meetvurst chorizo prosciutto pancetta sappi rusto nahka nahkoja villa villaa villai silkki siden untuva höyhen turkis jouhi helmiäi simpuk osteri katkarap hummeri äyriäi nilviäi mustekal kalmari kaviaari anjovis sardelli sardiini silakka muikku turska makrilli ankerias tonnikal tonfisk minkki minkin majava sivetti myskihirv kastoreum ambergris spermacet kilpikonn etanan etana snigel kotilo hyönteis jauhomato toukka silkkiäi lakkakirv laardi kondroitiin istukka placent amniot bovine porcine ovine equine eläinper eläinras eläinlii animal djurfett animalisk kyckling fläsk kött skinka räkor krabb hummer musslor ostron bläckfisk skaldjur kräft kaviar löjrom läder fjäder päls lammull merino kashmir cashmere kaschmir mohair angora alpakka alpaca alpacka vikunja vicuna kamelinkarva jakinvilla qiviut chicken bacon sausage gelatine anchov sardine herring mackerel salmon shrimp prawn lobster oyster mussel squid octopus cuttlefish shellfish crustace mollus caviar isinglass rennet pepsin albumen leather suede feather lambswool sericin fibroin civet castoreum ambergris whale guanine snail tallow suet butter cheese cream whey casein caseinat yolk krill`;
+const ROOTS_EXACT = `mel lac ovum roe hai haj emu dun down fur cod musk tuna crab horn bone lard ull duck`;
+const ROOTS_SHORT = `kala kalan kalaa fisk fish lohi lohen lohta lax sill silli muna munan munia munaa kana kanan kanaa liha lihaa lihan luu luut luun veri veren verta tali talia ihra sika sian poro poron hirvi peura kani kanin mäti mätiä rapu ravun egg eggs ägg milk beef pork lamb veal goose wool silk mink sarvi smör talg`;
+/* Poikkeukset: nämä sanaosat ovat kasviperäisiä tai muuten vegaanisia, vaikka sisältävät eläinjuuren. */
+const ROOT_EXCEPT = `munakois|äggplant|eggplant|hunajamelon|honeydew|honeysuckle|honeybush|kalamat|maitohap|maitohors|maito-ohdak|maitoohdak|mjölksyra|milk thistle|milkweed|maidoton|maidottom|maidotto|mjölkfri|dairy-free|dairy free|non-dairy|nondairy|kaakaovoi|kakaosmör|cocoa butter|cacao butter|sheavoi|sheasmör|shea butter|maapähkinävoi|jordnötssmör|peanut butter|nut butter|pähkinävoi|mantelivoi|almond butter|cashewvoi|apple butter|omenavoi|butternut|butterfly|buttercup|butterhead|cream of tartar|cream cracker|cheesecloth|silkkitofu|silken tofu|silkestofu|silkkipaper|silkespapper|silkkinen|silkinpehme|veriappels|verigreip|blood orange|blodapelsin|hirvensarvisuola|hjorthornssalt|sarvisuola|sevill|vanill|puuvill|bomull|cotton wool|steel wool|rock wool|glass wool|mineral wool|wood wool|kivivill|lasivill|mineraalivill|teräsvill|stenull|glasull|mineralull|stålull|keinonahk|tekonahk|konstläder|faux leather|vegan leather|synthetic leather|leatherette|kasvinahk|omenanahk|kaktusnahk|sienenahk|korkkinahk|cork leather|apple leather|cactus leather|mushroom leather|tekoturk|faux fur|fake fur|konstpäls|fuskpäls|tekomokk|faux suede|tekovill|tekountuv|synthetic down|faux down|hedelmälih|kookoslih|fruktkött|kokoskött|muskot|muskmelon|musk ketone|musk xylene|synthetic musk|synteettinen mysk|eläinkoke|eläimillä|animal test|animal-free|animal free|cruelty free|cruelty-free|kanel|kanaal|kanav|kanad|kanarian|kanapee|kalanteri|skalaari|luumu|lohko|lohkar|sikuri|sikari|emulg|emuls|synthetic beeswax|synteettinen mehiläisvaha|synthetic wax|kasvivah|plant wax|sojavax|sarvikuono|maksaruoho|haikara|creamer substitute|kasvikerm|kauraker|soijaker|kookosker|riisiker|mantelik|kasvijuust|melonilih|melonliha|avokadonlih|kurpitsanlih|omenanlih|crabapple|crab apple|hawthorn|thorn|thai|shanghai|collard|lamb's lettuce|lambs lettuce|lammassalaat|vårsallat|gooseberr|caramel|karamel|turkissa|metan|egg-free|eggfree|äggfri|munaton|munattom|ilman kananmunaa|without egg|without milk|ilman maitoa|utan mjölk|utan ägg|no milk|no egg|kauramaito|riisimaito|soijamaito|mantelimaito|kookosmaito|oat milk|soy milk|rice milk|almond milk|coconut milk|coconut cream|oat cream|soy cream|havremjölk|sojamjölk|kokosmjölk|kokosgrädde|havregrädde|sojagrädde|juustokumin|osterivinok|oyster mushroom|honey mushroom|kvillaj|kvillai|quillaj|indigokarmiin|indigo carmine|pregelatin|pre-gelatin|magnesiamaito|milk of magnesia|rice cream|creamed coconut|butter bean|lima bean|nutmeg butter|sesame butter|cashew butter|macadamia butter|tigernut milk|horn of plenty|seaweed caviar|milk cap|turkish|vegetable oyster|civetone|fucosyllact|sialyllact|keratinase|microsuede|imitationsläder|imitation leather|imitation fur|mikromokka|kasvismakkara|kasvisliha|kasvisjauheliha|soijaliha|vegokött|sojakött|maitotuotteeton`;
 const E_V = `100 101 102 104 110 122 123 124 127 129 131 132 133 140 141 142 150a 150b 150c 150d 151 155 160a 160b 160c 160d 160e 161b 161g 162 163 170 171 172 173 174 175 180 200 202 203 210 211 212 213 214 215 218 219 220 221 222 223 224 226 227 228 234 235 239 242 249 250 251 252 260 261 262 263 270 280 281 282 283 284 285 290 296 297 300 301 302 304 306 307 308 309 310 315 316 319 320 321 325 326 327 330 331 332 333 334 335 336 337 338 339 340 341 343 350 351 352 353 354 355 356 357 363 380 385 386 387 388 392 400 401 402 403 404 405 406 407 407a 410 412 413 414 415 416 417 418 420 421 425 426 427 431 440 442 444 445 450 451 452 459 460 461 462 463 464 465 466 468 469 476 499 500 501 503 504 507 508 509 511 512 513 514 515 516 517 520 521 522 523 524 525 526 527 528 529 530 535 536 538 541 551 552 553a 553b 554 555 556 558 559 574 575 576 577 578 579 585 586 598 599 620 621 622 623 624 625 640 650 900 902 903 905 907 914 927b 938 939 941 942 943a 943b 944 948 949 950 951 952 953 954 955 957 959 960 960a 961 962 964 965 967 968 969 999 1103 1200 1201 1202 1203 1204 1404 1410 1412 1413 1414 1420 1422 1440 1442 1450 1451 1452 1505 1517 1518 1519 1520 1521`;
 
 const E_NAMES = {
@@ -496,6 +631,16 @@ for(const line of DB_U.trim().split('\n')){
   const terms=DB_V.split(/[;\n]/).map(s=>s.trim()).filter(s=>s&&!s.includes('?'));
   for(const t of terms) addEntry({name:cap(t),cls:'V',terms:[t]});
 }
+for(const line of DB_A2.trim().split('\n')){
+  const [names,src,rk]=line.split('|'); const terms=names.split(';').map(s=>s.trim()).filter(Boolean);
+  addEntry({name:cap(terms[0]),cls:'A',source:src,rk:(rk||'').trim(),terms});
+}
+for(const line of DB_U2.trim().split('\n')){
+  const [names,p,orig,rk]=line.split('|');
+  const terms=names.split(';').map(s=>s.trim()).filter(Boolean);
+  addEntry({name:cap(terms[0]),cls:'U',p:parseP(p),origins:orig,rk:(rk||'').trim(),terms});
+}
+for(const t of DB_V2.split(/[;\n]/).map(s=>s.trim()).filter(Boolean)) addEntry({name:cap(t),cls:'V',terms:[t]});
 for(const code of E_V.split(/\s+/)){
   const c='e'+code; const nm=E_NAMES[c];
   addEntry({name:(nm?cap(nm)+' ':'')+'('+c.toUpperCase()+')',cls:'V',terms:nm?[c,nm]:[c],ecode:c});
@@ -645,8 +790,10 @@ const SUFFIXES=['ttä','tta','iä','ia','jä','ja','tä','ta','ä','a','n','t'];
 const SV_SUFFIXES=['erna','arna','orna','ena','na','en','et','er','ar','or','s','n','t'];
 function lookupVariants(n){
   let e=mget(n); if(e) return e;
-  for(const s of (CUR_LANG==='sv'?SV_SUFFIXES:SUFFIXES)){ if(n.length>s.length+3&&n.endsWith(s)){ e=mget(n.slice(0,-s.length)); if(e) return e; } }
-  return null;
+  // Kaikki taivutusmuodon tulkinnat; jos yksikin on eläinperäinen, se voittaa (sappia → sappi, ei SAPP)
+  const hits=[];
+  for(const s of (CUR_LANG==='sv'?SV_SUFFIXES:SUFFIXES)){ if(n.length>s.length+3&&n.endsWith(s)){ e=mget(n.slice(0,-s.length)); if(e) hits.push(e); } }
+  return hits.length? worst(hits) : null;
 }
 function classifyWordNoNeutral(w){ return classifyWordCore(w,false); }
 function classifyWord(w){ return classifyWordCore(w,true); }
@@ -654,7 +801,9 @@ function classifyWordCore(w,useNeutral){
   let e=lookupVariants(w); if(e) return e;
   for(const p of PLANT_PRE){ if(w.startsWith(p)&&w.length>p.length+2){ const rest=w.slice(p.length).replace(/^[-n]/,''); if(DAIRY_HEAD.some(h=>rest.startsWith(h))) return PLANT_ENTRY; } }
   { const ch=chemClass(w); if(ch) return ch; }
-  if(w.length<6) return null;
+  // Etuliite, joka ei muuta alkuperää (luomuporkkana → porkkana)
+  for(const pm of PRE_MOD){ if(w.length>pm.length+3&&w.startsWith(pm)){ const r=classifyWordCore(w.slice(pm.length).replace(/^-/,''),useNeutral); if(r) return r; } }
+  if(w.length<6) return rootScan(w);
   // Yhdyssana: tunnettu alkuosa + neutraali loppuosa (tomaattijauhe, sipuliuute)
   if(useNeutral) for(const h of NEUTRAL_HEADS){
     if(w.length>h.length+2&&w.endsWith(h)){
@@ -663,12 +812,16 @@ function classifyWordCore(w,useNeutral){
       if(er) return er;
     }
   }
-  // Yhdyssana: kaksi tunnettua osaa
+  // Yhdyssana: kaksi tunnettua osaa (poikkeuslistan sanaosaa ei pilkota, esim. veriappelsiini)
+  const mw=maskExc(w);
   for(let i=3;i<=w.length-3;i++){
+    if(mw[i]==='#'&&mw[i-1]==='#') continue;
     const a=w.slice(0,i), b=w.slice(i);
     const ea=mget(a)||(CUR_LANG==='sv'&&a.endsWith('s')&&a.length>4?mget(a.slice(0,-1)):null), eb=lookupVariants(b);
     if(ea&&eb) return worst([ea,eb]);
   }
+  // Eläinperäinen sanaosa (minkkiöljy, naudanliemi, strutsinmuna)
+  { const r=rootScan(w); if(r) return r; }
   // Pääsana lopussa
   let head=null;
   const ST=singles();
@@ -679,13 +832,49 @@ function classifyWordCore(w,useNeutral){
   for(const t of ST){
     if(w.length>t.length+2&&w.startsWith(t)){
       if(!longestPre||t.length>longestPre.length) longestPre=t;
-      const en=mget(t); if(en&&en.cls==='A'&&t.length>=4&&(!mod||t.length>mod.length)) mod=t;
+      const en=mget(t); if(en&&en.cls==='A'&&t.length>=4&&!mw.slice(0,t.length).includes('#')&&(!mod||t.length>mod.length)) mod=t;
     }
   }
   if(mod&&longestPre&&longestPre.length>mod.length&&mget(longestPre).cls==='V') mod=null;
-  const res=[]; if(head) res.push(mget(head)); if(mod) res.push(mget(mod));
-  return res.length?worst(res):null;
+  if(mod) return worst([mget(mod),head?mget(head):null]);
+  if(!head) return null;
+  // Pääsana tunnetaan, mutta alkuosa ei: tulos ei voi olla vegaaninen (esim. minkkiöljy).
+  const he=mget(head); if(he.cls==='A'&&!mw.slice(-head.length).includes('#')) return he;
+  if(he.cls==='A') return null;
+  const pre=w.slice(0,-head.length).replace(/-$/,'');
+  if(pre.length<=2||PRE_MOD.has(pre)) return he;
+  const pe=lookupVariants(pre)||((pre.endsWith('n')||pre.endsWith('s'))&&pre.length>3?lookupVariants(pre.slice(0,-1)):null)||(pre.length>=4?classifyWordNoNeutral(pre):null);
+  return pe? worst([he,pe]) : null;
 }
+/* Etuliitteet, jotka eivät muuta ainesosan alkuperää */
+const PRE_MOD=new Set(['luomu','eko','bio','täysjyvä','täys','kevyt','light','vähä','rasvaton','kuivattu','kuivatut','pakaste','tuore','esi','hieno','karkea','puoli','luonnon','aito','extra','super','mini','iso','pikku','puhdas','raaka','paahdettu','paahto','savu','savustettu','ekologisk','fullkorn','naturell','färsk','fryst','organic','whole','raw','natural','instant','pika','kokojyvä','tumma','vaalea','punainen','valko','musta','vihreä','keltainen','ruskea','sininen','kylmä','kuuma','sokeroitu','makeutettu','suolattu','maustettu','pastöroitu','homogenoitu','jauhettu','rouhittu','murskattu','pilkottu','viipaloitu','kuorittu','esikeitetty','keitetty','haudutettu','kypsennetty','uunissa','grillattu','marinoitu','fermentoitu','hapatettu','idätetty','hydrattu','osittain','rafinoitu','rafinoimaton','kylmäpuristettu','neitsyt','vegaaninen','vegaani']);
+/* ---------- Eläinjuuret ---------- */
+const R_LONG=ROOTS_LONG.split(/\s+/).filter(Boolean).sort((a,b)=>b.length-a.length);
+const R_SHORT=ROOTS_SHORT.split(/\s+/).filter(Boolean).sort((a,b)=>b.length-a.length);
+const R_SHORT_SET=new Set(R_SHORT), R_EXACT=new Set(ROOTS_EXACT.split(/\s+/).filter(Boolean));
+const R_EXC=ROOT_EXCEPT.split('|').map(x=>x.trim()).filter(Boolean).sort((a,b)=>b.length-a.length);
+const ROOT_INFL=['n','a','ä','ta','tä','t','in','ia','iä','ja','jä','en','ien','ista','istä','issa','issä','s','et','ar','er','na','erna','arna','es'];
+const ROOT_ENTRY=new Map();
+function rootEntry(r){ let e=ROOT_ENTRY.get(r); if(!e){ e={name:cap(r),cls:'A',source:'Eläinperäinen sanaosa “'+r+'”',rk:'',terms:[],root:true}; e.id=ENTRIES.length; ENTRIES.push(e); ROOT_ENTRY.set(r,e); } return e; }
+function maskExc(s){ for(const x of R_EXC){ if(s.includes(x)) s=s.split(x).join('#'.repeat(x.length)); } return s; }
+function rootScan(term){
+  const m=maskExc(term);
+  for(const r of R_LONG) if(m.includes(r)) return rootEntry(r);
+  for(const w of m.split(/[\s\-\/,()]+/)){
+    if(w.length<2||w.includes('#')) continue;
+    if(R_EXACT.has(w)||R_SHORT_SET.has(w)) return rootEntry(w);
+    for(const sf of ROOT_INFL){ if(w.length>sf.length+2&&w.endsWith(sf)){ const b=w.slice(0,-sf.length); if(R_SHORT_SET.has(b)||R_EXACT.has(b)) return rootEntry(b); } }
+    for(const r of R_SHORT){
+      if(w.length>=r.length+3&&w.startsWith(r)){ const rest=w.slice(r.length).replace(/^[-sn](?=.{3})/,''); if(rest.length>=3&&(lookupVariants(rest)||R_SHORT_SET.has(rest))) return rootEntry(r); }
+      if(w.length>=r.length+3&&w.endsWith(r)) return rootEntry(r);
+    }
+  }
+  return null;
+}
+/* Sanat, jotka eivät kerro alkuperästä (adjektiivit, käsittelytavat, prepositiot) */
+const MOD_WORDS=new Set([...PRE_MOD,'of','and','or','with','from','in','the','a','an','de','du','la','le','av','med','från','och','eller','ja','sekä','tai','ilman','without','utan','for','för','to','extra','virgin','refined','unrefined','powdered','ground','roasted','smoked','salted','sweetened','partially','fully','hydrogenated','concentrated','dried','fresh','fine','coarse','dark','light','white','brown','red','green','black','yellow','pure','sliced','diced','chopped','crushed','minced','frozen','cooked','pasteurised','pasteurized','skimmed','whole','plain','mixed','modified','natural','organic','raw','cultured','nature','naturel','torkad','torkade','rostad','rostade','rökt','rökta','saltad','sötad','hackad','hackade','krossade','skalade','färska','frysta','malen','mald','hel','hela','ljus','mörk','röd','gul','grön','vit','svart','naturlig','naturliga','ekologiska','ekologiskt','vegansk','veganska','veganskt','växtbaserad','växtbaserade','luontainen','luontaiset','luonnollinen','luonnolliset','pieni','pienet','iso','isot','tuoreet','kuivatut','paahdetut','suolatut','kypsät','vähärasvainen','vähärasvaista','täysrasvainen','vähäsuolainen','makeuttamaton','maustamaton','maustamatonta','sokeroimaton','kidesokeroitu','e','g','kg','mg','ml','l','%','extract','extracts','uute','uutteet','extrakt','oil','oils','öljy','olja','powder','jauhe','pulver','juice','mehu','saft','water','vesi','vatten','leaf','leaves','seed','seeds','fruit','root','flower','bark','peel','kernel','stem','herb','lehti','lehdet','siemen','siemenet','hedelmä','juuri','kukka','kuori','blad','frö','frön','rot','blomma','skal','filtrate','ferment','hydrosol','distillate','wax','cera','butter (kasvi)']);
+const MOD_SUFFIX=/(?:ttu|tty|ttua|ttyä|tut|tyt|ttuja|ttyjä|ttuna|ttynä|nut|nyt|neet|neita|inen|iset|ista|istä|llinen|lliset|ton|tön|ttomat|ttömät|maton|mätön|ad|ade|at|ig|iga|igt|isk|iska|iskt|ed|less|ful|ish|ic|ous|ive|ly)$/;
+function isModifier(w){ return MOD_WORDS.has(w)||NEUTRAL_SET.has(w)||/^[\d.,%]+$/.test(w)||w.length<=2||(w.length>=6&&MOD_SUFFIX.test(w)); }
 /* Kemialliset nimet: mineraalisuolat, vitamiinien muodot ja aminohapot tunnistetaan rakenteesta,
    jotta jokaista yhdistelmää ei tarvitse luetella erikseen. */
 const CAT_FI='(?:mono|di|tri|tetra|penta|heksa)?(?:natrium|kalium|kalsium|magnesium|ammonium|rauta|ferro|ferri|sinkki|kupari|mangaani|seleeni|kromi|molybdeeni|fluori|alumiini|nikkeli|koboltti|litium|strontium|vety|natriumvety|kaliumvety|kalsiumvety)';
@@ -714,28 +903,46 @@ function chemClass(n){
 const NEUTRAL_HEADS=['jauhe','jauheet','jauho','uute','uutteet','tiiviste','tiivisteet','konsentraatti','mehu','mehutiiviste','sose','pyree','hiutale','hiutaleet','rouhe','murska','murskat','muru','pala','palat','paloja','paloina','kuutio','kuutiot','suikale','suikaleet','viipale','viipaleet','raaste','öljy','rasva','rae','rakeet','kide','kiteet','siirappi','kuitu','tärkkelys','proteiini','proteiinit','isolaatti','hydrolysaatti','valmiste','seos','massa','tahna','pasta','aromi','väri','kuori','kuoret','siemen','siemenet','lehti','lehdet','jyvä','jyvät','juuri','varsi','kukka','kukat','marja','marjat','hedelmä','vesi','liemi','kastike','juoma','kerros','kuorrute','täyte','paahto','rouheet','flakes','powder','extract','juice','puree','oil','fat','flour','starch','fibre','fiber','syrup','paste','concentrate','pieces','chunks','bits','pulver','extrakt','koncentrat','saft','puré','flingor','olja','fett','mjöl','stärkelse','sirap','bitar','kross','protein','proteinisolat','isolat','granulat','skal','frön','frö','blad','arom','färg','mos','fiber','kärnor','strimlor','tärningar','skivor','gryn'];
 const NEUTRAL_SET=new Set(NEUTRAL_HEADS);
 
+const PLANT_RE=/^(vegetable|vegetabilisk|vegetabiliskt|vegetabiliska|microbial|mikrobiperäinen|mikrobinen|non-animal|non animal|kasviperäinen|kasviperäistä|kasviperäiset|plant|vegaani|vegaaninen|vegaanista|vegan|kasvipohjainen|kasvipohjaista|plant-based|plant based|maidoton|maidotonta|dairy-free|dairy free|non-dairy|munaton|munatonta|egg-free|vegansk|veganska|veganskt|växtbaserad|växtbaserade|växtbaserat|mjölkfri|mjölkfritt|äggfri)\b/;
+const FAUX_RE=/^(faux|fake|imitation|synthetic|synteettinen|teko|keino|konst|fusk|pu|vegan|vegaaninen)$/;
+const MATERIAL_HEAD=/^(leather|nahka|nahkaa|läder|fur|turkis|päls|suede|mokka|silk|silkki|down|untuva|dun|wool|villa|ull|beeswax|mehiläisvaha|musk|myski|mysk|wax|vaha)$/;
+const INCI_PLANT={name:'Kasviperäinen ainesosa',cls:'V',terms:[]};
 function classifyTerm(raw){
   const n=normTerm(raw); if(!n) return null;
-  if(/^(vegaani|vegaaninen|vegan|kasvipohjainen|plant-based|plant based|maidoton|dairy-free|munaton|egg-free)\b/.test(n)) return PLANT_ENTRY;
+  if(PLANT_RE.test(n)) return PLANT_ENTRY;
   let e=lookupVariants(n); if(e) return e;
   { const ch=chemClass(n); if(ch) return ch; }
   if(/^e\d{3,4}[a-f]?$/.test(n)){ e=mget(n.replace(/[a-f]$/,'')); return e||null; }
   const words=n.split(/[\s\/]+/).filter(Boolean);
   if(words.length>1){
-    // kasvipohjainen + maitotuote (esim. oat milk)
-    if(PLANT_PRE.includes(words[0])&&DAIRY_HEAD.some(h=>words[1].startsWith(h))) return PLANT_ENTRY;
-    if(/^(vegansk|veganska|veganskt|växtbaserad|växtbaserade|mjölkfri|mjölkfritt|äggfri)$/.test(words[0])) return PLANT_ENTRY;
+    // kasvipohjainen + maitotuote (oat milk, coconut cream)
+    if(PLANT_PRE.includes(words[0])&&words.slice(1).some(w=>DAIRY_HEAD.some(h=>w.startsWith(h)))) return PLANT_ENTRY;
+    // tekonahka, faux fur, synthetic beeswax
+    if(FAUX_RE.test(words[0])&&words.slice(1).some(w=>MATERIAL_HEAD.test(w))) return PLANT_ENTRY;
+    // Kasvin tieteellinen nimi + kasvinosa/tuote (Simmondsia Chinensis Seed Oil)
+    if(INCI_GENERA.has(words[0])&&words.length>=2&&!rootScan(n)&&!words.slice(1).some(animalNear)) return INCI_PLANT;
+    const masked=maskExc(n).split(/[\s\/]+/).filter(Boolean);
+    const covered=words.map((w,i)=>!!(masked[i]&&/^#+$/.test(masked[i])));
     const found=[];
     for(let len=Math.min(4,words.length-1);len>=1;len--){
       for(let i=0;i+len<=words.length;i++){
-        const ph=words.slice(i,i+len).join(' ');
-        const m=lookupVariants(ph); if(m) found.push(m);
+        if(covered.slice(i,i+len).some(Boolean)) continue;
+        const m=lookupVariants(words.slice(i,i+len).join(' '));
+        if(m){ found.push(m); for(let j=i;j<i+len;j++) covered[j]=true; }
       }
-      if(found.length) break;
     }
-    if(!found.length){ for(const w of words){ const m=classifyWord(w); if(m) found.push(m); } }
-    else { for(const w of words){ const m=classifyWord(w); if(m&&m.cls==='A') found.push(m); } }
-    return found.length?worst(found):null;
+    let unknownPart=false;
+    words.forEach((w,i)=>{
+      if(masked[i]&&/^#+$/.test(masked[i])) return;
+      const m=classifyWord(w);
+      if(covered[i]){ if(m&&m.cls==='A') found.push(m); return; }
+      if(m) found.push(m); else if(!isModifier(w)) unknownPart=true;
+    });
+    const r=rootScan(n); if(r) found.push(r);
+    if(!found.length) return null;
+    const wst=worst(found);
+    if(wst.cls==='A') return wst;
+    return unknownPart? null : wst;
   }
   return classifyWord(n);
 }
@@ -749,8 +956,10 @@ async function loadOffTaxonomy(){
   try{
     const r=await fetch('off-taxonomy.json'); if(!r.ok) return false;
     const d=await r.json(); const made=new Array(d.entries.length);
+    // Saman sanan taivutusmuoto, joka on omassa tietokannassa eläinperäinen, ei saa muuttua vegaaniseksi
+    const collides=(t,cls)=>{ if(cls==='A') return false; for(const sf of ['a','ä','ta','tä','n','t','en','et','s']){ if(t.length>sf.length+2&&t.endsWith(sf)){ const b=MAP.get(t.slice(0,-sf.length)); if(b&&b.cls==='A'&&!b.off&&!b.inci) return true; } } return false; };
     for(const [term,idx] of Object.entries(d.terms)){
-      if(MAP.has(term)) continue;
+      if(MAP.has(term)||collides(term,d.entries[idx][1])) continue;
       let e=made[idx];
       if(!e){ const [name,cls,nameSv]=d.entries[idx];
         e=made[idx]={name,nameSv,cls,terms:[],source:'Open Food Facts',off:true,rk:'',
@@ -763,6 +972,21 @@ async function loadOffTaxonomy(){
     for(const [term,idx] of Object.entries(d.terms_sv||{})){ if(SVMAP.has(term)) continue; SVMAP.set(term,mk(idx)); }
     rebuildSingles();
     FUZZ=null; FUZZ_SV=null; offLoaded=true; return true;
+  }catch{ return false; }
+}
+/* Kosmetiikan INCI-nimet (inci.json, rakennettu tools/build-inci.js:llä omilla säännöillä) */
+let inciLoaded=false; const INCI_GENERA=new Set();
+const INCI_V={name:'Kosmetiikan ainesosa',cls:'V',terms:[],source:'CosIng'};
+async function loadInci(){
+  try{
+    const r=await fetch('inci.json'); if(!r.ok) return false;
+    const d=await r.json();
+    for(const g of d.plantGenera||[]) INCI_GENERA.add(g);
+    const put=(t,e)=>{ const k=normTerm(t); if(!k||MAP.has(k)) return; MAP.set(k,e); };
+    for(const t of d.A){ const e={name:cap(t),cls:'A',source:'Eläinperäinen (kosmetiikan ainesosa)',rk:'',terms:[t],inci:true}; e.id=ENTRIES.length; ENTRIES.push(e); put(t,e); }
+    for(const [t,p,o] of d.U){ const e={name:cap(t),cls:'U',p:{default:p},origins:d.origins[o],rk:'',terms:[t],inci:true}; e.id=ENTRIES.length; ENTRIES.push(e); put(t,e); }
+    for(const t of d.V) put(t,INCI_V);
+    rebuildSingles(); FUZZ=null; FUZZ_SV=null; inciLoaded=true; return true;
   }catch{ return false; }
 }
 let FUZZ=null, FUZZ_SV=null;
@@ -782,29 +1006,46 @@ function fuzzyLookup(n){
   if(!n||n.length<5) return null;
   let F;
   if(CUR_LANG==='sv'){ if(!FUZZ_SV) buildFuzzSv(); F=FUZZ_SV; } else { if(!FUZZ) buildFuzz(); F=FUZZ; }
-  const max=n.length>=10?2:1; let best=null,bd=max+1;
-  const cands=(F.get(n[0])||[]).concat(n.length>=8?(F.get(n[1])||[]).filter(k=>k.length>=n.length-1):[]);
-  for(const k of cands){ if(Math.abs(k.length-n.length)>max) continue; const d=lev(n,k,max); if(d<bd){ bd=d; best=k; if(d===0) break; } }
-  return best&&bd<=max? {entry:mget(best),term:best} : null;
+  const max=n.length>=10?2:1; let bd=max+1, bests=[];
+  const cands=(F.get(n[0])||[]).concat(n.length>=6?(F.get(n[1])||[]).filter(k=>k.length>=n.length-1):[]);
+  for(const k of cands){ if(Math.abs(k.length-n.length)>max) continue; const d=lev(n,k,max); if(d<bd){ bd=d; bests=[k]; } else if(d===bd) bests.push(k); }
+  if(!bests.length||bd>max) return null;
+  const e=worst(bests.map(k=>mget(k))); return {entry:e,term:bests.find(k=>mget(k)===e),dist:bd};
+}
+/* Onko sana yhden kirjoitusvirheen päässä eläinperäisestä nimestä (honey ↔ hony) */
+function animalNear(w){
+  if(w.length<4||isModifier(w)) return false;
+  const e=mget(w); if(e) return e.cls==='A';
+  if(!FUZZ) buildFuzz();
+  for(const k of (FUZZ.get(w[0])||[]).concat(FUZZ.get(w[1])||[])){ if(Math.abs(k.length-w.length)>1) continue; const ek=MAP.get(k); if(ek&&ek.cls==='A'&&lev(w,k,1)<=1) return true; }
+  return false;
 }
 function fuzzyClassify(label){
   const n=normTerm(label); if(!n) return null;
   const whole=fuzzyLookup(n); if(whole) return whole;
-  const words=n.split(/[\s\/]+/).filter(w=>w.length>=5); const hits=[];
-  for(const w of words){ const f=fuzzyLookup(w)||null; if(f) hits.push(f); }
+  const words=n.split(/[\s\/]+/).filter(Boolean); const hits=[]; let unknownPart=false;
+  for(const w of words){
+    const exact=w.length>=3?classifyWord(w):null; if(exact){ hits.push({entry:exact,term:w}); continue; }
+    const f=w.length>=5?fuzzyLookup(w):null; if(f){ hits.push(f); continue; }
+    if(!isModifier(w)) unknownPart=true;
+  }
   if(!hits.length) return null;
-  const e=worst(hits.map(h=>h.entry)); return {entry:e,term:hits.find(h=>h.entry===e).term};
+  const e=worst(hits.map(h=>h.entry));
+  if(e.cls!=='A'&&unknownPart) return null;
+  return {entry:e,term:hits.find(h=>h.entry===e).term};
 }
 
 /* =====================================================================
    AINESOSALUETTELON JÄSENNYS
    ===================================================================== */
 function splitTop(s){
-  const out=[]; let depth=0, cur='';
+  const out=[]; let depth=0, cur='', prev='';
   for(const ch of s){
     if('([{'.includes(ch)) depth++;
     if(')]}'.includes(ch)) depth=Math.max(0,depth-1);
-    if(depth===0&&(ch===','||ch===';'||ch==='\n'||ch==='•')){ out.push(cur); cur=''; continue; }
+    const sep= ch===','||ch===';'||ch==='\n'||ch==='•'||ch==='|'||((ch==='–'||ch==='—'||ch==='/')&&prev===' ');
+    prev=ch;
+    if(depth===0&&sep){ out.push(cur); cur=''; continue; }
     cur+=ch;
   }
   out.push(cur);
@@ -821,18 +1062,55 @@ function splitTop(s){
   }
   return res.map(x=>x.trim()).filter(Boolean);
 }
+/* Allergeenilausekkeet ("voi sisältää …") poistetaan vain niin pitkältä kuin lauseke oikeasti ulottuu:
+   sulkujen sisällä sulkuun asti, muuten niin kauan kuin seuraavat sanat ovat allergeeneja.
+   Näin piste puuttuva luettelo ei koskaan kadota varsinaisia ainesosia. */
+const ALLERGEN_CLAUSE=/(?:voi|saattaa)\s+(?:myös\s+)?(?:sisältää|esiintyä)|may(?:\s+also)?\s+contain|can\s+contain|contains?\s+traces\s+of|kan\s+(?:även\s+)?(?:innehålla|förekomma|finnas)|spår\s+av/i;
+const ALLERGEN_WORD=/^(?:(?:hyvin\s+)?pieni(?:ä)?\s+määriä\s+|pieni\s+määrä\s+|jäämiä\s+|hivenen\s+|hivenmääriä\s+|små\s+mängder(?:\s+av)?\s+|spår\s+av\s+|(?:small\s+amounts|traces?)\s+of\s+|other\s+|muita\s+|muuta\s+|andra\s+|övriga\s+)?(?:maito\p{L}*|maido\p{L}*|laktoosi\p{L}*|kananmun\p{L}*|muna\p{L}*|pähkin\p{L}*|maapähkin\p{L}*|mantel\p{L}*|hasselpähkin\p{L}*|cashew\p{L}*|pekaani\p{L}*|pistaasi\p{L}*|saksanpähkin\p{L}*|parapähkin\p{L}*|macadamia\p{L}*|seesami\p{L}*|soija\p{L}*|vehnä\p{L}*|gluteeni\p{L}*|ohra\p{L}*|rui\p{L}*|rukii\p{L}*|kaura\p{L}*|speltti\p{L}*|selleri\p{L}*|sinap\p{L}*|kala\p{L}*|äyriäi\p{L}*|nilviäi\p{L}*|lupiini\p{L}*|sulfiit\p{L}*|rikkidioksid\p{L}*|mjölk\p{L}*|ägg\p{L}*|nöt\p{L}*|jordnöt\p{L}*|mandel\p{L}*|mandl\p{L}*|hasselnöt\p{L}*|sesam\p{L}*|soja\p{L}*|vete\p{L}*|gluten\p{L}*|korn|råg|havre|spelt|selleri\p{L}*|senap\p{L}*|fisk\p{L}*|kräftdjur|blötdjur|lupin\p{L}*|sulfit\p{L}*|milk|eggs?|nuts?|tree\s+nuts|peanuts?|almonds?|hazelnuts?|walnuts?|cashews?|pecans?|pistachios?|sesame\p{L}*|soy\p{L}*|wheat|gluten|barley|rye|oats?|spelt|celery|mustard|fish|crustaceans?|molluscs?|lupin\p{L}*|sulphites?|sulfites?|sulphur\s+dioxide|siemeniä|seeds)$/iu;
+function stripAllergenClauses(t){
+  for(let guard=0;guard<20;guard++){
+    const m=ALLERGEN_CLAUSE.exec(t); if(!m) break;
+    const start=m.index; let pos=start+m[0].length;
+    const before=t.slice(0,start); const depth=(before.match(/\(/g)||[]).length-(before.match(/\)/g)||[]).length;
+    if(depth>0){
+      let d=1, i=pos; for(;i<t.length;i++){ if(t[i]==='(') d++; else if(t[i]===')'){ d--; if(d===0) break; } }
+      const open=before.replace(/\s+$/,'').endsWith('(');
+      const from= open? before.lastIndexOf('(') : start;
+      t=t.slice(0,from)+(open?'':'')+t.slice(open? Math.min(i+1,t.length) : i);
+      continue;
+    }
+    pos+=(t.slice(pos).match(/^\s*:?\s*/)||[''])[0].length;
+    const TOK=/^\s*([^,.;()]*?)\s*(,|;|\.|$|\s+(?:ja|sekä|tai|and|or|och|eller)\s+)/i;
+    let end=pos;
+    for(let k=0;k<40;k++){
+      const tm=TOK.exec(t.slice(end)); if(!tm||!tm[1]) break;
+      if(!ALLERGEN_WORD.test(tm[1].trim())) break;
+      end+=tm[0].length; if(tm[2]==='.'||tm[2]==='') break;
+    }
+    t=t.slice(0,start)+' '+t.slice(end);
+  }
+  return t;
+}
 function cleanText(t){
-  return t.replace(/\r/g,'')
+  t=stripAllergenClauses(t.replace(/\r/g,''));
+  return t
     .replace(/\(\s*(i{1,3}|iv|v|vi)\s*\)/gi,'')
     .replace(/(^|[\s.])(ainesosat|ingredients|ainekset|ingredienser|ainesosaluettelo)\s*:/gi,'$1')
-    .replace(/(voi|saattaa)\s+sisältää[^.]*\.?/gi,'')
-    .replace(/(may contain|can contain|contains traces)[^.]*\.?/gi,'')
-    .replace(/(kan innehålla|kan förekomma|kan finnas|spår av)[^.]*\.?/gi,'')
     .replace(/(^|[\s.])(innehåll|beståndsdelar)\s*:/gi,'$1')
+    .replace(/(valmistettu|pakattu|tuotettu|tillverkad|förpackad|produced|made|manufactured|packed)\b[^.]*?\b(jossa|joissa|missä|där|som även|which also|that also|where)\b[^.]*(\.|$)/gi,'')
     .replace(/(valmistettu|pakattu)[^.]*(tehtaassa|laitoksessa|tiloissa)[^.]*\.?/gi,'')
     .replace(/\b\d+([.,]\d+)?\s*%/g,'')
     .replace(/\b(min\.|vähintään|at least)\b/gi,'')
     .replace(/\.\s*(?=[A-ZÅÄÖ])/g,', ');
+}
+/* Pakkauksen muu teksti: aloitetaan ainesosaotsikosta ja lopetetaan ravintosisältöön, säilytykseen,
+   valmistajaan tms. */
+const TEXT_HDR=/(?:^|[\s.;,])(ainesosat|ainekset|raaka-?aineet|ainesosaluettelo|ingredients?|ingredienser|innehåll|beståndsdelar|koostumus|ingrédients|zutaten)\s*:/i;
+const TEXT_STOP=/(?:\b(?:käyttö|käyttöohje|käyttöohjeet|varoitus|varoitukset|warnings?|caution|directions|how to use|användning|bruksanvisning|varning|pesuohje|hoito-ohje|hoito-ohjeet|care instructions|care|tvättråd|skötselråd|valmistusmaa|alkuperämaa|country of origin|ursprungsland)\s*:)|ravintosisältö|ravintoarvo|näringsvärde|näringsinnehåll|nutrition(?:al)?\s+(?:information|facts|declaration)|\benergia\s*\d|\benergy\s*\d|\bsäilytys|\bsäilytä\b|\bförvar|\bstore in\b|\bstorage\b|parasta ennen|bäst före|best before|\bvalmistaja\b|\btillverkare\b|\bmanufacturer\b|\bmaahantuoja\b|\bimportör\b|nettopaino|nettovikt|net weight|asiakaspalvelu|kuluttajapalvelu|konsumentservice|100 g sisältää|per 100 ?g/i;
+function focusIngredients(t){
+  const h=TEXT_HDR.exec(t); if(h&&h.index>0) t=t.slice(h.index+h[0].length);
+  const s=TEXT_STOP.exec(t); if(s&&s.index>3) t=t.slice(0,s.index);
+  return t;
 }
 function parseItem(str){
   let s=str.trim().replace(/^[-–•·]\s*/,'').replace(/[.]+$/,'').trim();
@@ -848,24 +1126,44 @@ function parseItem(str){
   }
   return {parent:parent.trim(), raw:str.trim(), children, classWord};
 }
+function balanceParens(t){ const o=(t.match(/[(\[]/g)||[]).length, c=(t.match(/[)\]]/g)||[]).length; return o>c? t+')'.repeat(o-c) : t; }
+const NEG_RE=/^(ei|eikä|ilman|without|no|not|free from|utan|inte|ingen|inga|fri från|vapaa|contains no|sisältää ei)\b/i;
 function detectGroup(allNorm){
   const has=w=>allNorm.some(n=>n.includes(w));
+  const cnt=re=>allNorm.filter(n=>re.test(n)).length;
+  const textile=cnt(/^(puuvilla|cotton|bomull|polyesteri|polyester|polyamidi|polyamide|nailon|nylon|elastaani|elastane|viskoosi|viscose|villa|wool|ull|silkki|silk|siden|pellava|linen|lin|akryyli|acrylic|modaali|modal|lyocell|nahka|leather|läder|untuva|down|dun|höyhen|feather|fjäder|kashmir|cashmere|alpakka|alpaca|mohair|angora|merinovilla|merino|keinonahka|tekonahka|turkis|päls|fur|mokka|suede)$/);
+  const cosm=cnt(/^(aqua|parfum|fragrance|glycerin|dimethicone|phenoxyethanol|ci \d{5}|sodium laureth sulfate|sodium lauryl sulfate|cetearyl alcohol|cetyl alcohol|paraffinum liquidum|tocopherol|butyrospermum|.* (seed|leaf|root|flower|fruit|kernel) (oil|extract|butter|water|juice)|limonene|linalool|citral|xanthan gum|caprylic\/capric triglyceride|propylene glycol|butylene glycol|sodium hydroxide|disodium edta|benzyl alcohol)/);
+  const paint=cnt(/(pigmentti|pigment|sideaine|binder|akryyli|acrylic binder|pellavaöljy|linseed|tärpätti|turpentine|liima|glue|tempera|kaseiini|gum arabic|arabikumi|titaanidioksidi|titanium dioxide|kalkki|liitu)/);
+  if(textile>=1&&textile>=allNorm.length/2) return 'tekstiili';
+  if(cosm>=2||(cosm>=1&&allNorm.length<=3)) return 'kosmetiikka';
+  if(paint>=2) return 'maali';
   if((has('hiiva')||has('yeast')||has('leivinjauhe'))&&(has('jauho')||has('flour'))) return 'leipa';
   if(has('kaakaovoi')||has('kaakaomassa')||has('cocoa butter')||((has('sokeri')||has('sugar'))&&(has('glukoosisiirappi')||has('glucose syrup')))) return 'makeiset';
   if((has('rypsiöljy')||has('kasviöljy')||has('kasvirasva'))&&has('vesi')&&!has('jauho')) return 'margariini';
+  if(has('tensid')||has('surfactant')||has('pinta-aktiiv')||has('soap')||has('saippua')||has('tvål')) return 'koti';
   return 'default';
 }
 function pFor(e,group){ return e.p ? (e.p[group]!=null?e.p[group]:e.p.default) : 1; }
+/* Usean epävarman ainesosan yhteistodennäköisyys: ainesosat eivät ole toisistaan riippumattomia
+   (sama valmistaja käyttää yleensä samaa raaka-ainelinjaa), joten pienin todennäköisyys painaa
+   täysin ja muut neliöjuuren verran. */
+function combineP(ps){ if(!ps.length) return null; const s=[...ps].sort((a,b)=>a-b); return s.slice(1).reduce((a,p)=>a*Math.sqrt(p),s[0]); }
 function analyze(text){
   const lang=detectLang(text);
   return withLang(lang,()=>{ const r=analyzeCore(text); r.lang=lang; return r; });
 }
+function fuzzyEntry(f){
+  if(f.entry.cls!=='V') return f.entry;
+  // Kirjoitusvirheeksi tulkittu vegaaninen sana ei riitä vihreään tulokseen.
+  return {name:f.entry.name,nameSv:f.entry.nameSv,cls:'U',p:{default:0.9},origins:'Luettu epävarmasti; lähin vastine '+f.entry.name,terms:[],fuzzyOf:f.entry};
+}
 function analyzeCore(text){
   const items=[];
-  const cleaned=cleanText(text||'');
+  const cleaned=balanceParens(cleanText(focusIngredients(text||'')));
   const tops=splitTop(cleaned).map(parseItem);
   const walk=(it,depth)=>{
     const pn=normTerm(it.parent);
+    if(pn&&NEG_RE.test(pn)) return;
     const hasKids=it.children.length>0;
     if(pn&&!(hasKids&&NOCLASS.has(pn))&&!(NOCLASS.has(pn)&&!hasKids&&!ALONE_OK.has(pn))){
       const e=classifyTerm(it.parent);
@@ -879,17 +1177,17 @@ function analyzeCore(text){
   // poista tyhjät ja duplikaatit
   const seen=new Set(); const uniq=[];
   for(const it of items){ const k=normTerm(it.label); if(!k||k.length<2||/^[\d.,\s]+$/.test(k)) continue; if(seen.has(k)) continue; seen.add(k); uniq.push(it); }
+  for(const it of uniq){ if(!it.entry){ const f=fuzzyClassify(it.label); if(f){ it.entry=fuzzyEntry(f); it.fuzzy=f.term; } } }
   const group=detectGroup(uniq.map(i=>normTerm(i.label)));
   const animals=uniq.filter(i=>i.entry&&i.entry.cls==='A');
   const uncertain=uniq.filter(i=>i.entry&&i.entry.cls==='U');
-  for(const it of uniq){ if(!it.entry){ const f=fuzzyClassify(it.label); if(f){ it.entry=f.entry; it.fuzzy=f.term; } } }
   const unknown=uniq.filter(i=>!i.entry);
   let verdict='ok', prob=null;
   if(!uniq.length) verdict='none';
   else if(animals.length) verdict='bad';
   else if(uncertain.length||unknown.length){
     verdict='warn';
-    if(uncertain.length){ prob=uncertain.reduce((a,i)=>a*pFor(i.entry,group),1); }
+    if(uncertain.length) prob=combineP(uncertain.map(i=>pFor(i.entry,group)));
   }
   return {items:uniq, animals, uncertain, unknown, verdict, prob, group};
 }
@@ -1388,7 +1686,7 @@ function runCheck(){ const a=analyze(ingInput.value); renderAnalysis($('#checkOu
 ingInput.addEventListener('input',()=>{ clearTimeout(ingT); ingT=setTimeout(runCheck,120); });
 $('#clearIng').onclick=()=>{ ingInput.value=''; runCheck(); if(window.ingFlowRef) window.ingFlowRef.reset(); ingInput.focus(); };
 runCheck();
-loadOffTaxonomy().then(ok=>{ if(ok){ runCheck(); renderRecent(); } });
+loadOffTaxonomy().then(ok=>{ if(ok){ runCheck(); renderRecent(); } return loadInci(); }).then(ok=>{ if(ok){ runCheck(); renderRecent(); } });
 
 // --- Claude (kuvan lukeminen)
 let samplePromise=null;
