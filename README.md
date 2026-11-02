@@ -17,9 +17,15 @@ Ainesosaluettelosta ei voi nähdä valmistuksen apuaineita (esim. viinin kirkast
 - **Ainesosat** – tulos heti tekstistä tai pakkauksen kuvasta (Vegaaninen / Ei vegaaninen / Epävarma + todennäköisyys).
 - **Ruoka, kosmetiikka, hygienia, pesuaineet, maalit, liimat, vaatteet ja materiaalit** – tuoteryhmä tunnistetaan luettelosta.
 - **Skannaa** – viivakoodi suoraan kamerakuvasta (EAN-13, EAN-8, UPC-A, UPC-E). Tuotetiedot haetaan Open Food, Beauty, Products ja Pet Food Factsista, vegaanisuus arvioidaan aina sovelluksen omalla tietokannalla. Puuttuva ainesosaluettelo kuvataan ja tallennetaan laitteelle viivakoodin kanssa.
+- **Aiemmat haut** – avautuvat otsikkoa napauttamalla. Haku poistetaan ×-painikkeella tai pyyhkäisemällä vasemmalle, kaikki kerralla *Tyhjennä kaikki* -painikkeella. Poiston voi kumota hetken ajan.
+- **Ilmoita väärä tulos** – tallentaa luettelon ja tuloksen laitteen puutelistaan (valikko ⋯) myöhempää tietokannan korjausta varten.
 - **Resepti** – sääntöpohjainen muunnos: ainesosan rooli päätellään reseptistä, määrät skaalautuvat annosten mukaan ja ohjeet päivittyvät.
 
 ## Tekstintunnistus
+- **Oma kamera:** laukaisin ottaa kuvan heti ja kamera pysyy auki, joten pitkän tai leveän luettelon osat kuvataan peräkkäin ilman välivaiheita. Kuvia voi lisätä myös kuvakirjastosta.
+- **Automaattinen rajaus:** jokaisesta kuvasta etsitään ainesosaluettelon alue jo kuvatessa. Rajausnäkymässä alue näkyy kehyksenä; jos se osui oikein, riittää *Valmis*. Kehystä voi siirtää, sen reunoja ja kulmia vetää tai piirtää uuden vetämällä kuvan päällä. Teksti luetaan vain kehyksen sisältä täydellä tarkkuudella, joten pieni teksti ja muu pakkauksen teksti eivät häiritse.
+- Luettelon otsikko löytyy, vaikka tunnistus lukisi sen hieman väärin (esim. *Aınesosal*, *lngredienser*). Jos otsikkoa ei ole, luettelo päätellään sisällöstä.
+- Valaistus tasataan ennen tunnistusta: kaarevan pinnan varjot, heijastukset ja liukuvärit eivät sotke kirjaimia.
 - Kuvan laatu tarkistetaan ensin (epätarkkuus, heijastukset, pieni teksti).
 - Teksti luetaan 2–3 kierroksella eri kuvankäsittelyillä; kierrokset äänestävät sanoista.
 - Tunnistettu teksti korjataan sanakirjaan tunnistukselle tyypillisillä sekaannuksilla (rn↔m, l↔1, 0↔o, ä↔a …) ja E-koodit korjataan (E47l → E471).
