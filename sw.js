@@ -1,5 +1,5 @@
 // Vegan – offline-välimuisti
-const CACHE = 'vegan-v3';
+const CACHE = 'vegan-v4';
 const CORE = ['./', './index.html', './manifest.webmanifest', './off-taxonomy.json', './icons/icon-192.png', './icons/apple-touch-icon.png',
   'https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting())); });

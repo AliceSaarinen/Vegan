@@ -465,7 +465,7 @@ const ENTRIES = [];
 function normTerm(s){
   return String(s).toLowerCase().normalize('NFC')
     .replace(/[*®™†‡]/g,'')
-    .replace(/\b(luomu|organic|bio|eko)\b/g,' ')
+    .replace(/\b(luomu|organic|bio|eko|ekologisk|ekologiska|ekologiskt|krav)\b/g,' ')
     .replace(/\be\s*-?\s*(\d{3,4})\s*([a-f])?(?![a-zåäö])/g,(m,d,l)=>'e'+d+(l||''))
     .replace(/[’`´]/g,"'")
     .replace(/^[\s.:;,\-–]+|[\s.:;,\-–]+$/g,'')
@@ -507,10 +507,130 @@ for(const [c,p,orig,syn] of E_U){
   const nm=E_NAMES[c]; addEntry({name:(nm?cap(nm)+' ':'')+'('+c.toUpperCase()+')',cls:'U',p:parseP(p),origins:orig,rk:'',terms:[c,...(nm?[nm]:[]),...(syn?syn.split(';'):[])],ecode:c});
 }
 let SINGLE_TERMS=[...MAP.keys()].filter(k=>!k.includes(' ')&&k.length>=3);
-const PLANT_PRE=['kaura','soija','kookos','mantelin','manteli','riisi','kasvis','kasvi','herne','pähkinä','maapähkinä','cashew','kaakao','shea','hamppu','härkäpapu','vegaani','vegaaninen','oat','soy','soya','almond','coconut','rice','cocoa','peanut','vegan','pea','hemp'];
-const DAIRY_HEAD=['maito','juoma','kerma','jogurtti','juusto','rahka','voi','levite','jäätelö','fraiche','majoneesi','milk','cream','butter','drink','yoghurt','yogurt','cheese','mayo','jauheliha','makkara','nakki','pihvi','suikale','suikaleet'];
+/* ---------- Ruotsi: oma sanasto, jotta samannäköiset sanat eivät sekoitu kielten välillä ----------
+   Luettelon kieli tunnistetaan ensin; ruotsinkielisessä luettelossa käytetään ruotsin sanastoa
+   ja vasta sitten yhteistä (englanti, E-koodit). Suomenkielinen luettelo ei koskaan käytä ruotsin sanastoa. */
+let CUR_LANG='fi';
+const SVMAP=new Map(); let SV_SINGLE=[];
+function mget(k){ if(CUR_LANG==='sv'){ const e=SVMAP.get(k); if(e) return e; } return MAP.get(k); }
+function mhas(k){ return (CUR_LANG==='sv'&&SVMAP.has(k))||MAP.has(k); }
+function singles(){ return CUR_LANG==='sv'? SV_SINGLE : SINGLE_TERMS; }
+// muoto: ruotsinkieliset nimet = suomenkielinen avain omassa tietokannassa (säännöt ja todennäköisyydet periytyvät)
+const SV_CORE_ALIAS=`
+mjölk;helmjölk;mellanmjölk;lättmjölk;standardmjölk;komjölk;laktosfri mjölk=maito
+mjölkpulver;skummjölkspulver;helmjölkspulver;torrmjölk;skummjölkpulver;mjölkpulver av skummjölk=maitojauhe
+mjölkprotein;mjölkproteiner;mjölkproteinkoncentrat=maitoproteiini
+mjölkfett;smörfett;vattenfritt mjölkfett=maitorasva
+smör;normalsaltat smör;osaltat smör;smörolja;skirat smör;ghee=voi
+grädde;vispgrädde;matlagningsgrädde;gräddpulver;mellangrädde;kaffegrädde=kerma
+gräddfil;crème fraiche;creme fraiche;smetana;filmjölk;fil=kermaviili
+yoghurt;turkisk yoghurt;grekisk yoghurt;yoghurtpulver;naturell yoghurt=jogurtti
+kvarg=rahka
+kärnmjölk;kefir=piimä
+ost;riven ost;ostpulver;cheddarost;mozzarella;mozzarellaost;emmentaler;herrgårdsost;prästost;grevéost;västerbottensost;blåmögelost;smältost;dessertost;hushållsost=juusto
+parmesan;parmesanost;grana padano;pecorino=parmesaani
+fetaost;salladsost;vitost=feta
+halloumi;halloumiost;paneer=halloumi
+mascarpone;ricotta=mascarpone
+färskost;färskost naturell=tuorejuusto
+keso;cottage cheese=raejuusto
+vassle;vasslepulver;vassleprotein;vassleproteinkoncentrat;demineraliserat vasslepulver;vasslepermeat=hera
+kasein;kaseinat;natriumkaseinat;kalciumkaseinat=kaseiini
+laktos;mjölksocker=laktoosi
+mjölkchoklad;vit choklad=maitosuklaa
+kondenserad mjölk;sötad kondenserad mjölk;dulce de leche=kondensoitu maito
+glass;gräddglass;mjölkglass;vaniljglass=jäätelö
+kola;kolasås;knäck=kinuski
+ägg;hönsägg;helägg;äggpulver;torkat ägg;pastöriserat ägg;äggmassa;helägg pulver=kananmuna
+äggula;äggulor;äggulepulver=munankeltuainen
+äggvita;äggvitor;äggvitepulver;äggviteprotein;albumin=munanvalkuainen
+honung;honungspulver=hunaja
+bivax=mehiläisvaha
+gelatin;gelatinblad;gelatinpulver;nötgelatin;fläskgelatin=liivate
+kollagen=kollageeni
+karmin;koschenill;karminsyra=karmiini
+schellack=sellakka
+lanolin=lanoliini
+ister;talg;animaliskt fett;nötfett;fläskfett;gåsfett;ankfett=eläinrasva
+köttfärs;nötfärs;blandfärs;fläskfärs;kycklingfärs;färs=jauheliha
+kött;nötkött;fläskkött;fläsk;griskött;lamm;lammkött;kalv;kalvkött;vilt;älg;ren;renkött;hjort;oxfilé;fläskfilé;entrecote;köttbullar;lever=liha
+kyckling;kycklingfilé;kycklingfiléer;kycklingkött;kalkon;anka;höna;kycklinglårfilé=kana
+skinka;bacon;kokt skinka;rökt skinka;lufttorkad skinka;pancetta=pekoni
+korv;salami;prinskorv;falukorv;grillkorv;chorizo;pepperoni;medwurst=makkara
+köttbuljong;kycklingbuljong;oxbuljong;köttfond;kycklingfond;kalvfond;köttextrakt;buljongtärning kött=lihaliemi
+fisk;torsk;sej;sill;strömming;makrill;abborre;gös;sik;fiskpinnar;surimi;fiskfilé=kala
+lax;regnbåge;rökt lax;gravad lax;laxfilé=lohi
+tonfisk=tonnikala
+ansjovis;sardeller;sardell=anjovis
+fisksås=kalakastike
+fiskbuljong;fiskfond=kalaliemi
+fiskolja;fiskleverolja;torskleverolja;fiskgelatin=kalaöljy
+ostronsås=osterikastike
+räkor;räka;krabba;hummer;musslor;blåmusslor;ostron;pilgrimsmusslor;bläckfisk;kräftor;skaldjur;kräftdjur;krill=katkarapu
+rom;kaviar;löjrom;stenbitsrom=kaviaari
+majonnäs;aioli;remouladsås=majoneesi
+worcestershiresås=worcestershirekastike
+pepsin=pepsiini
+kitin;kitosan;glukosamin=kitiini
+äggpasta;äggnudlar;färsk pasta=munapasta
+lecitin;lecitiner=lesitiini
+arom;aromer;aromämne;aromämnen;naturlig arom;naturliga aromer;naturliga aromämnen;aromextrakt;rökarom;vaniljarom=aromi
+d-vitamin;d3-vitamin;vitamin d;vitamin d3;kolekalciferol=d3-vitamiini
+a-vitamin;vitamin a;retinol;retinylpalmitat;retinylacetat=a-vitamiini
+omega-3-fettsyror=omega-3
+margarin;bordsmargarin;matfett;bakmargarin;flytande margarin=margariini
+emulgeringsmedel=emulgointiaine
+fett;fetter;bakfett=rasva
+vin;rödvin;vitt vin;mousserande vin;portvin;sherry=viini
+öl;mörk öl;ljus öl=olut
+cider=siideri
+choklad;mörk choklad;chokladbitar;chokladknappar;blockchoklad;chokladöverdrag;överdrag=suklaa
+löpe;ostlöpe=juoksete
+enzym;enzymer=entsyymi
+buljong;buljongtärning;fond;buljongpulver;fondkoncentrat=liemikuutio
+kex;kakor;småkakor;kexsmulor;digestivekex=keksi
+karamell;karamellbitar=karamelli
+bröd;vetebröd;formbröd;tunnbröd;tortillabröd;bullar;fralla;frallor=leipä
+ströbröd;panko=korppujauho
+pasta;nudlar;makaroner;spaghetti;lasagneplattor=pasta
+rörsocker;råsocker=ruokosokeri
+färgämne;färgämnen=luontainen väri
+kalciumfosfat=kalsiumfosfaatti
+probiotika;kultur;kulturer;startkultur=probiootti`;
+const SV_CORE_V=`vatten;dricksvatten;socker;strösocker;florsocker;pärlsocker;farinsocker;brunt socker;vaniljsocker;salt;havssalt;bordssalt;jodberikat salt;dextros;druvsocker;glukos;fruktos;glukossirap;glukos-fruktossirap;fruktos-glukossirap;invertsockersirap;sirap;ljus sirap;mörk sirap;lönnsirap;agavesirap;maltodextrin;maltextrakt;kornmaltextrakt;malt;rostad malt;vetemjöl;vetemjöl special;grahamsmjöl;fullkornsvetemjöl;rågmjöl;fullkornsrågmjöl;rågsikt;kornmjöl;havremjöl;havregryn;havre;havrekli;råg;korn;vete;vetegluten;gluten;dinkel;dinkelmjöl;durumvete;mannagryn;vetekli;vetegroddar;ris;rismjöl;basmatiris;jasminris;majs;majsmjöl;majsstärkelse;potatisstärkelse;potatismjöl;stärkelse;modifierad stärkelse;vetestärkelse;tapioka;tapiokastärkelse;potatis;potatisflingor;sötpotatis;bovete;hirs;quinoa;bulgur;couscous;mjöl;rapsolja;solrosolja;olivolja;jungfruolivolja;palmolja;palmfett;palmkärnolja;palmkärnfett;kokosolja;kokosfett;sheasmör;sheaolja;vegetabilisk olja;vegetabiliska oljor;vegetabiliskt fett;vegetabiliska fetter;majsolja;sojaolja;sesamolja;linfröolja;raps;solros;palm;kokos;olja;kakao;kakaopulver;fettreducerat kakaopulver;kakaomassa;kakaosmör;kakaonibs;vanilj;vaniljstång;vaniljextrakt;vanillin;bourbonvanilj;kanel;peppar;svartpeppar;vitpeppar;kryddor;krydda;örter;ingefära;kardemumma;nejlika;muskot;paprika;paprikapulver;rökt paprika;chili;chilipulver;cayennepeppar;curry;gurkmeja;spiskummin;kummin;koriander;persilja;basilika;oregano;timjan;rosmarin;dill;mynta;lagerblad;lök;gul lök;rödlök;schalottenlök;purjolök;vitlök;vitlöksklyfta;vitlökspulver;lökpulver;tomat;tomater;tomatpuré;krossade tomater;passerade tomater;körsbärstomater;morot;morötter;ärtor;gröna ärtor;ärtprotein;ärtmjöl;soja;sojabönor;sojaprotein;sojamjöl;sojalecitin;solroslecitin;rapslecitin;sojasås;tamari;tofu;silkestofu;rökt tofu;tempeh;seitan;kikärtor;kikärtsmjöl;linser;röda linser;bönor;svarta bönor;kidneybönor;vita bönor;bondbönor;bondbönsprotein;edamame;mandel;mandlar;mandelmjöl;hasselnötter;hasselnöt;hasselnötsmassa;cashewnötter;jordnötter;jordnötssmör;nötter;valnötter;pistagenötter;pekannötter;paranötter;macadamianötter;pinjenötter;sesamfrö;sesamfrön;tahini;solrosfrön;pumpafrön;linfrö;linfrön;chiafrön;hampafrön;vallmofrön;jäst;torrjäst;färsk jäst;jästextrakt;näringsjäst;bakpulver;bikarbonat;natriumbikarbonat;hjorthornssalt;vinsten;citronsyra;askorbinsyra;c-vitamin;ättika;ättiksprit;vinäger;äppelcidervinäger;vinäger av vin;rödvinsvinäger;vitvinsvinäger;balsamvinäger;risvinäger;citron;citronsaft;citronjuice;citronskal;lime;limesaft;apelsin;apelsinjuice;äpple;äpplen;jordgubbar;blåbär;hallon;lingon;tranbär;hjortron;havtorn;svarta vinbär;röda vinbär;körsbär;banan;bananer;russin;dadlar;fikon;aprikoser;plommon;persika;päron;ananas;mango;frukt;frukter;bär;äppelmos;fruktpuré;juice;saft;koncentrat;fruktkoncentrat;kokosflingor;riven kokos;kokosmjölk;kokosgrädde;kokosdryck;havredryck;sojadryck;mandeldryck;risdryck;ärtdryck;havregrädde;sojagrädde;växtgrädde;havrefraiche;havreyoghurt;sojayoghurt;kokosyoghurt;sojakvarg;grönsaksbuljong;grönsaksfond;grönsaksbuljongtärning;växtfärs;vegofärs;sojafärs;vegokorv;svamp;svampar;champinjoner;kantareller;trattkantareller;shiitake;ostronskivling;kungsmussling;grönsaker;spenat;grönkål;vitkål;rödkål;broccoli;blomkål;selleri;rotselleri;kålrot;rödbetor;palsternacka;gurka;sallad;ruccola;avokado;oliver;kapris;squash;zucchini;aubergine;pumpa;majskorn;senap;senapsfrö;senapspulver;ketchup;tomatketchup;sriracha;mjölksyra;mjölksyrabakterier;mjölksyrabakteriekultur;sjögräs;nori;kombu;wakame;spirulina;agar;agar-agar;pektin;karragenan;xantangummi;guarkärnmjöl;guargummi;johannesbrödkärnmjöl;gummi arabicum;akaciagummi;cellulosa;metylcellulosa;fiber;kostfiber;inulin;cikoriarot;cikoriarotfiber;betfiber;havrefiber;psyllium;stevia;steviolglykosider;erytritol;xylitol;sorbitol;maltitol;isomalt;sukralos;aspartam;acesulfam k;koffein;kaffe;snabbkaffe;kaffeextrakt;te;grönt te;teextrakt;matcha;kalciumkarbonat;kalcium;järn;zink;magnesium;kalium;jod;kaliumjodid;b12-vitamin;vitamin b12;kobalamin;cyanokobalamin;b-vitaminer;riboflavin;tiamin;niacin;folsyra;folat;biotin;pantotensyra;e-vitamin;tokoferol;tokoferoler;tokoferolrikt extrakt;d2-vitamin;ergokalciferol;k-vitamin;betakaroten;sockerkulör;rödbetsfärg;rödbetsjuice;svartmorotskoncentrat;gurkmejaextrakt;paprikaextrakt;färgande livsmedel;växtkoncentrat;lakritsextrakt;anis;stjärnanis;salmiak;ammoniumklorid;kaliumklorid;natriumklorid;glukonodeltalakton;natriumcitrat;kaliumsorbat;natriumbensoat;natriumnitrit;natriumglutamat;mononatriumglutamat;kolsyra;koldioxid;kväve;vegansk;veganska;veganskt;växtbaserad;växtbaserade;mjölkfri;mjölkfritt;äggfri;veteprotein;risprotein;potatisprotein;mykoprotein`;
+for(const line of SV_CORE_ALIAS.trim().split('\n')){
+  const [names,key]=line.split('='); const e=MAP.get(normTerm(key));
+  if(!e){ console.warn('SV alias puuttuu',key); continue; }
+  for(const nm of names.split(';')){ const k=normTerm(nm); if(k&&!SVMAP.has(k)) SVMAP.set(k,e); }
+}
+for(const t of SV_CORE_V.split(';')){ const k=normTerm(t); if(!k||SVMAP.has(k)) continue; const e={name:cap(t.trim()),cls:'V',terms:[t.trim()]}; e.id=ENTRIES.length; ENTRIES.push(e); SVMAP.set(k,e); }
+function rebuildSingles(){
+  SINGLE_TERMS=[...MAP.keys()].filter(k=>!k.includes(' ')&&k.length>=3);
+  SV_SINGLE=[...new Set([...SVMAP.keys()].filter(k=>!k.includes(' ')&&k.length>=3).concat(SINGLE_TERMS))];
+}
+rebuildSingles();
+const SV_MARK=/\b(och|socker|vetemjöl|mjölk|mjölkpulver|vatten|ingredienser|innehåller|kan innehålla|surhetsreglerande|emulgeringsmedel|konserveringsmedel|förtjockningsmedel|stabiliseringsmedel|färgämne|aromer|ägg|smör|rapsolja|solrosolja|av vilka|sötningsmedel|jäst|mjöl|havregryn|grädde|nötter|gör så här|msk|tsk|krm|portioner|vispa|grädda|ugnen|blanda|tillsätt|smält)\b/gi;
+const FI_MARK=/\b(ja|sekä|sokeri|suola|vesi|ainesosat|sisältää|happamuudensäätöaine|emulgointiaine|säilöntäaine|aromi|aromit|vehnäjauho|vehnäjauhoja|kasviöljy|rypsiöljy|maito|maitoa|kerma|kermaa|voi|voita|kananmuna|hiiva|jauho|rkl|tl|annosta|valmistus|sekoita|lisää|paista|sokeria|suolaa)\b/gi;
+const EN_MARK=/\b(and|sugar|water|wheat flour|milk|ingredients|contains|may contain|acidity regulator|emulsifier|preservative|flavouring|flavoring|vegetable oil|egg|eggs|butter|yeast|cream|tbsp|tsp|cups?|servings|of which|stir|bake|add|mix)\b/gi;
+function detectLang(text){
+  const t=' '+String(text||'').toLowerCase()+' ';
+  const sv=(t.match(SV_MARK)||[]).length+(t.match(/å/g)||[]).length*0.6;
+  const fi=(t.match(FI_MARK)||[]).length+(t.match(/(?:ää|öö|yy|ii|uu|aa)/g)||[]).length*0.08;
+  const en=(t.match(EN_MARK)||[]).length;
+  // sanastoäänestys: sanat, jotka löytyvät vain ruotsin tai vain muusta sanastosta
+  let svOnly=0, otherOnly=0;
+  for(const w of t.split(/[^a-zåäöéü0-9-]+/)){ if(w.length<3) continue; const inSv=SVMAP.has(w), inO=MAP.has(w); if(inSv&&!inO) svOnly++; else if(inO&&!inSv) otherOnly++; }
+  const svScore=sv+svOnly, nonSv=fi+en+otherOnly*0.7;
+  if(svScore>nonSv&&svScore>=1) return 'sv';
+  if(en>fi&&en>sv) return 'en';
+  return 'fi';
+}
+function withLang(lang,fn){ const prev=CUR_LANG; CUR_LANG=lang; try{ return fn(); } finally{ CUR_LANG=prev; } }
+const PLANT_PRE=['kaura','soija','kookos','mantelin','manteli','riisi','kasvis','kasvi','herne','pähkinä','maapähkinä','cashew','kaakao','shea','hamppu','härkäpapu','vegaani','vegaaninen','oat','soy','soya','almond','coconut','rice','cocoa','peanut','vegan','pea','hemp','havre','soja','kokos','mandel','ris','ärt','växt','vegansk','veganska','veganskt','kakao','hampa','jordnöt','jordnöts','nöt','shea','vego','bondböna','bondböns'];
+const DAIRY_HEAD=['maito','juoma','kerma','jogurtti','juusto','rahka','voi','levite','jäätelö','fraiche','majoneesi','milk','cream','butter','drink','yoghurt','yogurt','cheese','mayo','jauheliha','makkara','nakki','pihvi','suikale','suikaleet','mjölk','dryck','grädde','yoghurt','ost','smör','glass','majonnäs','färs','korv','fraiche','burgare','biff','bitar','strimlor'];
 const PLANT_ENTRY={name:'Kasvipohjainen tuote',cls:'V',terms:[]};
-const NOCLASS=new Set(['säilöntäaine','säilöntäaineet','emulgointiaine','emulgointiaineet','väri','väriaine','väriaineet','happamuudensäätöaine','happamuudensäätöaineet','sakeuttamisaine','sakeuttamisaineet','paksuntamisaine','paksuntamisaineet','stabilointiaine','stabilointiaineet','hapettumisenestoaine','hapettumisenestoaineet','antioksidantti','makeutusaine','makeutusaineet','kohotusaine','kohotusaineet','aromivahvenne','aromivahventeet','jauhonparanne','jauhonparanteet','pintakäsittelyaine','kosteudensäilytysaine','hyytelöimisaine','täyteaine','kiilloteaine','emulgointisuola','emulgointisuolat','paakkuuntumisenestoaine','vaahdonestoaine','happo','acidity regulator','acidity regulators','emulsifier','emulsifiers','preservative','preservatives','colour','colours','color','colors','stabiliser','stabilisers','stabilizer','thickener','thickeners','antioxidant','antioxidants','raising agent','raising agents','sweetener','sweeteners','flavour enhancer','flavour enhancers','glazing agent','glazing agents','gelling agent','humectant','acid','vitamiinit','vitamins','kivennäisaineet','minerals','vitamiini','ainesosat','ingredients','ainekset','täyte','kuorrute','pohja','filling','mausteseos','maustekastike']);
+const NOCLASS=new Set(['säilöntäaine','säilöntäaineet','emulgointiaine','emulgointiaineet','väri','väriaine','väriaineet','happamuudensäätöaine','happamuudensäätöaineet','sakeuttamisaine','sakeuttamisaineet','paksuntamisaine','paksuntamisaineet','stabilointiaine','stabilointiaineet','hapettumisenestoaine','hapettumisenestoaineet','antioksidantti','makeutusaine','makeutusaineet','kohotusaine','kohotusaineet','aromivahvenne','aromivahventeet','jauhonparanne','jauhonparanteet','pintakäsittelyaine','kosteudensäilytysaine','hyytelöimisaine','täyteaine','kiilloteaine','emulgointisuola','emulgointisuolat','paakkuuntumisenestoaine','vaahdonestoaine','happo','acidity regulator','acidity regulators','emulsifier','emulsifiers','preservative','preservatives','colour','colours','color','colors','stabiliser','stabilisers','stabilizer','thickener','thickeners','antioxidant','antioxidants','raising agent','raising agents','sweetener','sweeteners','flavour enhancer','flavour enhancers','glazing agent','glazing agents','gelling agent','humectant','acid','vitamiinit','vitamins','kivennäisaineet','minerals','vitamiini','ainesosat','ingredients','ainekset','täyte','kuorrute','pohja','filling','mausteseos','maustekastike','konserveringsmedel','färgämnen','surhetsreglerande medel','surhetsreglerande medel','förtjockningsmedel','stabiliseringsmedel','antioxidationsmedel','antioxidant','sötningsmedel','smakförstärkare','klumpförebyggande medel','ytbehandlingsmedel','jäsmedel','bakpulver (jäsmedel)','fuktighetsbevarande medel','gelbildningsmedel','vitaminer','mineraler','ingredienser','fyllning','överdrag','kryddblandning','emulgeringssalt','emulgeringssalter','modifierad stärkelse (förtjockningsmedel)']);
+const ALONE_OK=new Set(['emulgointiaine','emulgointiaineet','aromi','väri','väriaine','emulgeringsmedel','färgämne','arom','emulsifier','emulsifiers','colour','colouring']);
 
 function worst(list){
   let best=null;
@@ -522,9 +642,10 @@ function worst(list){
 }
 function pDefault(e){return e.p?e.p.default:1}
 const SUFFIXES=['ttä','tta','iä','ia','jä','ja','tä','ta','ä','a','n','t'];
+const SV_SUFFIXES=['erna','arna','orna','ena','na','en','et','er','ar','or','s','n','t'];
 function lookupVariants(n){
-  let e=MAP.get(n); if(e) return e;
-  for(const s of SUFFIXES){ if(n.length>s.length+3&&n.endsWith(s)){ e=MAP.get(n.slice(0,-s.length)); if(e) return e; } }
+  let e=mget(n); if(e) return e;
+  for(const s of (CUR_LANG==='sv'?SV_SUFFIXES:SUFFIXES)){ if(n.length>s.length+3&&n.endsWith(s)){ e=mget(n.slice(0,-s.length)); if(e) return e; } }
   return null;
 }
 function classifyWordNoNeutral(w){ return classifyWordCore(w,false); }
@@ -538,30 +659,31 @@ function classifyWordCore(w,useNeutral){
   if(useNeutral) for(const h of NEUTRAL_HEADS){
     if(w.length>h.length+2&&w.endsWith(h)){
       const root=w.slice(0,-h.length).replace(/-$/,'');
-      const er=lookupVariants(root)||(root.endsWith('n')?lookupVariants(root.slice(0,-1)):null)||(root.length>=5?classifyWordNoNeutral(root):null);
+      const er=lookupVariants(root)||((root.endsWith('n')||root.endsWith('s'))?lookupVariants(root.slice(0,-1)):null)||(root.length>=5?classifyWordNoNeutral(root):null);
       if(er) return er;
     }
   }
   // Yhdyssana: kaksi tunnettua osaa
   for(let i=3;i<=w.length-3;i++){
     const a=w.slice(0,i), b=w.slice(i);
-    const ea=MAP.get(a), eb=lookupVariants(b);
+    const ea=mget(a)||(CUR_LANG==='sv'&&a.endsWith('s')&&a.length>4?mget(a.slice(0,-1)):null), eb=lookupVariants(b);
     if(ea&&eb) return worst([ea,eb]);
   }
   // Pääsana lopussa
   let head=null;
-  for(const t of SINGLE_TERMS){ if(t.length>=4&&w.length>t.length&&w.endsWith(t)&&(!head||t.length>head.length)) head=t; }
+  const ST=singles();
+  for(const t of ST){ if(t.length>=4&&w.length>t.length&&w.endsWith(t)&&(!head||t.length>head.length)) head=t; }
   // Eläinperäinen määriteosa alussa
   let mod=null;
   let longestPre=null;
-  for(const t of SINGLE_TERMS){
+  for(const t of ST){
     if(w.length>t.length+2&&w.startsWith(t)){
       if(!longestPre||t.length>longestPre.length) longestPre=t;
-      const en=MAP.get(t); if(en.cls==='A'&&t.length>=4&&(!mod||t.length>mod.length)) mod=t;
+      const en=mget(t); if(en&&en.cls==='A'&&t.length>=4&&(!mod||t.length>mod.length)) mod=t;
     }
   }
-  if(mod&&longestPre&&longestPre.length>mod.length&&MAP.get(longestPre).cls==='V') mod=null;
-  const res=[]; if(head) res.push(MAP.get(head)); if(mod) res.push(MAP.get(mod));
+  if(mod&&longestPre&&longestPre.length>mod.length&&mget(longestPre).cls==='V') mod=null;
+  const res=[]; if(head) res.push(mget(head)); if(mod) res.push(mget(mod));
   return res.length?worst(res):null;
 }
 /* Kemialliset nimet: mineraalisuolat, vitamiinien muodot ja aminohapot tunnistetaan rakenteesta,
@@ -572,21 +694,24 @@ const MINERAL_FI=new RegExp('^'+CAT_FI+'(?:[- ]?'+CAT_FI+')*[- ]?(?:\\(?[ivx]+\\
 const MINERAL_EN=/^(?:mono|di|tri|tetra)?(?:sodium|potassium|calcium|magnesium|ammonium|ferrous|ferric|iron|zinc|cupric|copper|manganese|selenium|chromium|chromic|molybdenum|aluminium|aluminum|nickel|cobalt|lithium|strontium|hydrogen)(?: (?:mono|di|tri|tetra)?(?:sodium|potassium|calcium|magnesium|hydrogen|iron|ammonium))*(?: \(?(?:i{1,3}|iv)\)?)? (?:chloride|carbonate|hydrogen carbonate|bicarbonate|sulphate|sulfate|sulphite|sulfite|bisulphite|metabisulphite|metabisulfite|phosphate|diphosphate|triphosphate|pyrophosphate|polyphosphate|orthophosphate|citrate|acetate|diacetate|tartrate|malate|fumarate|gluconate|oxide|hydroxide|iodide|iodate|selenite|selenate|molybdate|fluoride|nitrate|nitrite|succinate|bisglycinate|glycinate|picolinate|silicate|aluminosilicate|lactate|propionate|sorbate|benzoate|alginate|ascorbate|erythorbate|ferrocyanide|glutamate|glycerophosphate|pantothenate|aspartate|saccharin|cyclamate|adipate|sulfide|bromide)s?$/;
 const VITAMIN_V=/^(?:d-?)?(?:alfa|alpha|dl-alfa|dl-alpha|d-alfa|d-alpha)?-?(?:tokoferyyli|tocopheryl)[- ]?(?:asetaatti|acetate|sukkinaatti|succinate)$|^(?:pyridoksiini|pyridoxine|tiamiini|thiamine?|riboflaviini|riboflavin)[- ]?(?:hydrokloridi|hydrochloride|mononitraatti|mononitrate|5'?-?fosfaatti|5'?-?phosphate|natriumfosfaatti|sodium phosphate)?$|^(?:nikotiiniamidi|nicotinamide|nikotiinihappo|nicotinic acid|syanokobalamiini|cyanocobalamin|metyylikobalamiini|methylcobalamin|hydroksokobalamiini|hydroxocobalamin|adenosyylikobalamiini|fyllokinoni|phylloquinone|fytomenadioni|phytomenadione|menakinoni|menaquinone|mk-7|foolihappo|folic acid|pteroyylimonoglutamiinihappo|kalsium-l-metyylifolaatti|l-metyylifolaatti|biotiini|biotin|d-biotiini|d-biotin|kalsium-d-pantotenaatti|calcium d-pantothenate|dekspantenoli|dexpanthenol|l-askorbiinihappo|l-ascorbic acid|askorbyylipalmitaatti|ascorbyl palmitate|beetakaroteeni|beta-carotene|ergokalsiferoli|ergocalciferol|koliini|choline|kolinikloridi|inositoli|inositol|b1-vitamiini|b2-vitamiini|b3-vitamiini|b5-vitamiini|b6-vitamiini|b7-vitamiini|b9-vitamiini|c-vitamiini|e-vitamiini|k-vitamiini|k1-vitamiini|k2-vitamiini|vitamin b1|vitamin b2|vitamin b3|vitamin b5|vitamin b6|vitamin b7|vitamin b9|vitamin e|vitamin k|vitamin k1|vitamin k2)$/;
 const AMINO_V=/^(?:l-|d-|dl-)?(?:leusiini|leucine|isoleusiini|isoleucine|valiini|valine|lysiini|lysine|lysiinihydrokloridi|lysine hydrochloride|metioniini|methionine|treoniini|threonine|tryptofaani|tryptophan|fenyylialaniini|phenylalanine|arginiini|arginine|glutamiini|glutamine|glutamiinihappo|glutamic acid|histidiini|histidine|tyrosiini|tyrosine|alaniini|alanine|glysiini|glycine|seriini|serine|proliini|proline|asparagiini|asparagine|asparagiinihappo|aspartic acid|karnitiini|carnitine|tauriini|taurine|sitrulliini|citrulline|ornitiini|ornithine|beeta-alaniini|beta-alanine|kreatiini|creatine|kreatiinimonohydraatti|creatine monohydrate)$/;
-const CHEM_U=/(stearaatti|stearate|stearoyyli|stearoyl|palmitaatti(?!.*askorbyyli)|oleaatti|oleate|inosinaatti|inosinate|guanylaatti|guanylate|ribonukleotid|kysteiini|cysteine|kystiini|cystine)/;
+const CHEM_U=/(stearaatti|stearat|stearoyl|oleat|inosinat|guanylat|cystein|stearate|stearoyyli|stearoyl|palmitaatti(?!.*askorbyyli)|oleaatti|oleate|inosinaatti|inosinate|guanylaatti|guanylate|ribonukleotid|kysteiini|cysteine|kystiini|cystine)/;
 const MINERAL_ENTRY={name:'Mineraaliyhdiste',cls:'V',terms:[]};
 const VITAMIN_ENTRY={name:'Vitamiini',cls:'V',terms:[]};
 const AMINO_ENTRY={name:'Aminohappo',cls:'V',terms:[]};
 const CHEM_U_ENTRY={name:'Rasvahappo- tai nukleotidiyhdiste',cls:'U',p:{default:0.7},origins:'Kasviöljyt tai käyminen; voi olla eläinrasvasta, lihasta tai kalasta',rk:'',terms:[]};
+const MINERAL_SV=/^(?:mono|di|tri|tetra)?(?:natrium|kalium|kalcium|magnesium|ammonium|järn|järn\(ii\)|järn\(iii\)|zink|koppar|mangan|selen|krom|molybden|fluor|aluminium|nickel|kobolt|litium|strontium|väte)(?:[- ]?(?:mono|di|tri|tetra)?(?:natrium|kalium|kalcium|magnesium|väte|järn|ammonium))*[- ]?(?:klorid|karbonat|vätekarbonat|bikarbonat|sulfat|vätesulfat|sulfit|bisulfit|disulfit|fosfat|vätefosfat|divätefosfat|ortofosfat|difosfat|trifosfat|pyrofosfat|polyfosfat|metafosfat|citrat|acetat|diacetat|tartrat|malat|fumarat|glukonat|oxid|hydroxid|peroxid|jodid|jodat|selenit|selenat|molybdat|fluorid|nitrat|nitrit|succinat|bisglycinat|glycinat|pikolinat|silikat|aluminiumsilikat|laktat|propionat|sorbat|bensoat|alginat|askorbat|erytorbat|ferrocyanid|glutamat|glycerofosfat|pantotenat|aspartat|sackarinat|cyklamat|adipat|sulfid|bromid)(?:er)?$/;
+const VITAMIN_SV=/^(?:d-?)?(?:alfa|dl-alfa|d-alfa)?-?tokoferyl[- ]?(?:acetat|succinat)$|^(?:pyridoxin|tiamin|riboflavin)[- ]?(?:hydroklorid|mononitrat|5'?-?fosfat|natriumfosfat)?$|^(?:nikotinamid|nikotinsyra|cyanokobalamin|metylkobalamin|hydroxokobalamin|fyllokinon|fytomenadion|menakinon|folsyra|kalcium-l-metylfolat|biotin|d-biotin|kalcium-d-pantotenat|dexpantenol|l-askorbinsyra|askorbylpalmitat|betakaroten|ergokalciferol|kolin|kolinklorid|inositol|b1-vitamin|b2-vitamin|b3-vitamin|b5-vitamin|b6-vitamin|b7-vitamin|b9-vitamin|c-vitamin|e-vitamin|k-vitamin|k1-vitamin|k2-vitamin)$/;
+const AMINO_SV=/^(?:l-|d-|dl-)?(?:leucin|isoleucin|valin|lysin|lysinhydroklorid|metionin|treonin|tryptofan|fenylalanin|arginin|glutamin|glutaminsyra|histidin|tyrosin|alanin|glycin|serin|prolin|asparagin|asparaginsyra|karnitin|taurin|citrullin|ornitin|beta-alanin|kreatin|kreatinmonohydrat)$/;
 function chemClass(n){
   const t=n.replace(/\s+/g,' ').trim();
   if(CHEM_U.test(t)) return CHEM_U_ENTRY;
-  if(MINERAL_FI.test(t.replace(/\s+/g,''))||MINERAL_FI.test(t)||MINERAL_EN.test(t)) return MINERAL_ENTRY;
-  if(VITAMIN_V.test(t)) return VITAMIN_ENTRY;
-  if(AMINO_V.test(t)) return AMINO_ENTRY;
+  if(MINERAL_FI.test(t.replace(/\s+/g,''))||MINERAL_FI.test(t)||MINERAL_EN.test(t)||MINERAL_SV.test(t)||MINERAL_SV.test(t.replace(/\s+/g,''))) return MINERAL_ENTRY;
+  if(VITAMIN_V.test(t)||VITAMIN_SV.test(t)) return VITAMIN_ENTRY;
+  if(AMINO_V.test(t)||AMINO_SV.test(t)) return AMINO_ENTRY;
   return null;
 }
 /* Yhdyssanan "neutraali" loppuosa: jauhe, uute, tiiviste… saa alkuosan luokan (tomaattijauhe → tomaatti) */
-const NEUTRAL_HEADS=['jauhe','jauheet','jauho','uute','uutteet','tiiviste','tiivisteet','konsentraatti','mehu','mehutiiviste','sose','pyree','hiutale','hiutaleet','rouhe','murska','murskat','muru','pala','palat','paloja','paloina','kuutio','kuutiot','suikale','suikaleet','viipale','viipaleet','raaste','öljy','rasva','rae','rakeet','kide','kiteet','siirappi','kuitu','tärkkelys','proteiini','proteiinit','isolaatti','hydrolysaatti','valmiste','seos','massa','tahna','pasta','aromi','väri','kuori','kuoret','siemen','siemenet','lehti','lehdet','jyvä','jyvät','juuri','varsi','kukka','kukat','marja','marjat','hedelmä','vesi','liemi','kastike','juoma','kerros','kuorrute','täyte','paahto','rouheet','flakes','powder','extract','juice','puree','oil','fat','flour','starch','fibre','fiber','syrup','paste','concentrate','pieces','chunks','bits'];
+const NEUTRAL_HEADS=['jauhe','jauheet','jauho','uute','uutteet','tiiviste','tiivisteet','konsentraatti','mehu','mehutiiviste','sose','pyree','hiutale','hiutaleet','rouhe','murska','murskat','muru','pala','palat','paloja','paloina','kuutio','kuutiot','suikale','suikaleet','viipale','viipaleet','raaste','öljy','rasva','rae','rakeet','kide','kiteet','siirappi','kuitu','tärkkelys','proteiini','proteiinit','isolaatti','hydrolysaatti','valmiste','seos','massa','tahna','pasta','aromi','väri','kuori','kuoret','siemen','siemenet','lehti','lehdet','jyvä','jyvät','juuri','varsi','kukka','kukat','marja','marjat','hedelmä','vesi','liemi','kastike','juoma','kerros','kuorrute','täyte','paahto','rouheet','flakes','powder','extract','juice','puree','oil','fat','flour','starch','fibre','fiber','syrup','paste','concentrate','pieces','chunks','bits','pulver','extrakt','koncentrat','saft','puré','flingor','olja','fett','mjöl','stärkelse','sirap','bitar','kross','protein','proteinisolat','isolat','granulat','skal','frön','frö','blad','arom','färg','mos','fiber','kärnor','strimlor','tärningar','skivor','gryn'];
 const NEUTRAL_SET=new Set(NEUTRAL_HEADS);
 
 function classifyTerm(raw){
@@ -594,11 +719,12 @@ function classifyTerm(raw){
   if(/^(vegaani|vegaaninen|vegan|kasvipohjainen|plant-based|plant based|maidoton|dairy-free|munaton|egg-free)\b/.test(n)) return PLANT_ENTRY;
   let e=lookupVariants(n); if(e) return e;
   { const ch=chemClass(n); if(ch) return ch; }
-  if(/^e\d{3,4}[a-f]?$/.test(n)){ e=MAP.get(n.replace(/[a-f]$/,'')); return e||null; }
+  if(/^e\d{3,4}[a-f]?$/.test(n)){ e=mget(n.replace(/[a-f]$/,'')); return e||null; }
   const words=n.split(/[\s\/]+/).filter(Boolean);
   if(words.length>1){
     // kasvipohjainen + maitotuote (esim. oat milk)
     if(PLANT_PRE.includes(words[0])&&DAIRY_HEAD.some(h=>words[1].startsWith(h))) return PLANT_ENTRY;
+    if(/^(vegansk|veganska|veganskt|växtbaserad|växtbaserade|mjölkfri|mjölkfritt|äggfri)$/.test(words[0])) return PLANT_ENTRY;
     const found=[];
     for(let len=Math.min(4,words.length-1);len>=1;len--){
       for(let i=0;i+len<=words.length;i++){
@@ -626,18 +752,21 @@ async function loadOffTaxonomy(){
     for(const [term,idx] of Object.entries(d.terms)){
       if(MAP.has(term)) continue;
       let e=made[idx];
-      if(!e){ const [name,cls]=d.entries[idx];
-        e=made[idx]={name,cls,terms:[],source:'Open Food Facts',off:true,rk:'',
+      if(!e){ const [name,cls,nameSv]=d.entries[idx];
+        e=made[idx]={name,nameSv,cls,terms:[],source:'Open Food Facts',off:true,rk:'',
           p:cls==='U'?{default:0.7}:undefined,
           origins:cls==='U'?'Voi olla kasvi- tai eläinperäinen (Open Food Facts)':undefined};
         e.id=ENTRIES.length; ENTRIES.push(e); }
       e.terms.push(term); MAP.set(term,e);
     }
-    SINGLE_TERMS=[...MAP.keys()].filter(k=>!k.includes(' ')&&k.length>=3);
-    FUZZ=null; offLoaded=true; return true;
+    const mk=idx=>{ let e=made[idx]; if(!e){ const [name,cls,nameSv]=d.entries[idx]; e=made[idx]={name,nameSv,cls,terms:[],source:'Open Food Facts',off:true,rk:'',p:cls==='U'?{default:0.7}:undefined,origins:cls==='U'?'Voi olla kasvi- tai eläinperäinen (Open Food Facts)':undefined}; e.id=ENTRIES.length; ENTRIES.push(e); } else if(!e.nameSv) e.nameSv=d.entries[idx][2]; return e; };
+    for(const [term,idx] of Object.entries(d.terms_sv||{})){ if(SVMAP.has(term)) continue; SVMAP.set(term,mk(idx)); }
+    rebuildSingles();
+    FUZZ=null; FUZZ_SV=null; offLoaded=true; return true;
   }catch{ return false; }
 }
-let FUZZ=null;
+let FUZZ=null, FUZZ_SV=null;
+function buildFuzzSv(){ FUZZ_SV=new Map(); for(const k of new Set([...SVMAP.keys(),...MAP.keys()])){ if(k.length<5||k.length>32) continue; const b=k[0]; if(!FUZZ_SV.has(b)) FUZZ_SV.set(b,[]); FUZZ_SV.get(b).push(k); } }
 function buildFuzz(){ FUZZ=new Map(); for(const k of MAP.keys()){ if(k.length<5||k.length>32) continue; const b=k[0]; if(!FUZZ.has(b)) FUZZ.set(b,[]); FUZZ.get(b).push(k); } }
 function lev(a,b,max){
   if(Math.abs(a.length-b.length)>max) return max+1;
@@ -651,11 +780,12 @@ function lev(a,b,max){
 }
 function fuzzyLookup(n){
   if(!n||n.length<5) return null;
-  if(!FUZZ) buildFuzz();
+  let F;
+  if(CUR_LANG==='sv'){ if(!FUZZ_SV) buildFuzzSv(); F=FUZZ_SV; } else { if(!FUZZ) buildFuzz(); F=FUZZ; }
   const max=n.length>=10?2:1; let best=null,bd=max+1;
-  const cands=(FUZZ.get(n[0])||[]).concat(n.length>=8?(FUZZ.get(n[1])||[]).filter(k=>k.length>=n.length-1):[]);
+  const cands=(F.get(n[0])||[]).concat(n.length>=8?(F.get(n[1])||[]).filter(k=>k.length>=n.length-1):[]);
   for(const k of cands){ if(Math.abs(k.length-n.length)>max) continue; const d=lev(n,k,max); if(d<bd){ bd=d; best=k; if(d===0) break; } }
-  return best&&bd<=max? {entry:MAP.get(best),term:best} : null;
+  return best&&bd<=max? {entry:mget(best),term:best} : null;
 }
 function fuzzyClassify(label){
   const n=normTerm(label); if(!n) return null;
@@ -681,7 +811,7 @@ function splitTop(s){
   const res=[];
   for(const p of out){
     // " ja " / " and " jakaa, mutta ei "mono- ja diglyseridit"
-    const pieces=p.split(/\s+(?:ja|sekä|and|&)\s+/i);
+    const pieces=p.split(/\s+(?:ja|sekä|and|och|&)\s+/i);
     let acc=pieces[0];
     for(let i=1;i<pieces.length;i++){
       if(/-\s*$/.test(acc)||/\([^)]*$/.test(acc)) acc+=' ja '+pieces[i];
@@ -697,6 +827,8 @@ function cleanText(t){
     .replace(/(^|[\s.])(ainesosat|ingredients|ainekset|ingredienser|ainesosaluettelo)\s*:/gi,'$1')
     .replace(/(voi|saattaa)\s+sisältää[^.]*\.?/gi,'')
     .replace(/(may contain|can contain|contains traces)[^.]*\.?/gi,'')
+    .replace(/(kan innehålla|kan förekomma|kan finnas|spår av)[^.]*\.?/gi,'')
+    .replace(/(^|[\s.])(innehåll|beståndsdelar)\s*:/gi,'$1')
     .replace(/(valmistettu|pakattu)[^.]*(tehtaassa|laitoksessa|tiloissa)[^.]*\.?/gi,'')
     .replace(/\b\d+([.,]\d+)?\s*%/g,'')
     .replace(/\b(min\.|vähintään|at least)\b/gi,'')
@@ -725,13 +857,17 @@ function detectGroup(allNorm){
 }
 function pFor(e,group){ return e.p ? (e.p[group]!=null?e.p[group]:e.p.default) : 1; }
 function analyze(text){
+  const lang=detectLang(text);
+  return withLang(lang,()=>{ const r=analyzeCore(text); r.lang=lang; return r; });
+}
+function analyzeCore(text){
   const items=[];
   const cleaned=cleanText(text||'');
   const tops=splitTop(cleaned).map(parseItem);
   const walk=(it,depth)=>{
     const pn=normTerm(it.parent);
     const hasKids=it.children.length>0;
-    if(pn&&!(hasKids&&NOCLASS.has(pn))&&!(NOCLASS.has(pn)&&!hasKids&&pn!=='emulgointiaine'&&pn!=='emulgointiaineet'&&pn!=='aromi'&&pn!=='väri'&&pn!=='väriaine')){
+    if(pn&&!(hasKids&&NOCLASS.has(pn))&&!(NOCLASS.has(pn)&&!hasKids&&!ALONE_OK.has(pn))){
       const e=classifyTerm(it.parent);
       if(!hasKids||(e&&e.cls==='A')||!e) {
         if(!(hasKids&&!e)) items.push({label:it.parent.replace(/\s+/g,' ').trim(), entry:e});
@@ -789,19 +925,19 @@ function renderAnalysis(el,a,key){
   const rows=order.map((it,idx)=>rowHTML(it,a,key+'-'+idx)).join('');
   const unk=a.unknown.map((it,idx)=>rowHTML(it,a,key+'-u'+idx)).join('');
   el.innerHTML=verdictHTML(a)+`
-    <button class="disclosure" aria-expanded="${openState}" data-disc>Ainesosat <span class="count">${a.items.length}</span>${ICON.chev}</button>
+    <button class="disclosure" aria-expanded="${openState}" data-disc>Ainesosat <span class="count">${a.items.length}${a.lang==='sv'?' · ruotsi':a.lang==='en'?' · englanti':''}</span>${ICON.chev}</button>
     <ul class="ilist" ${openState?'':'hidden'} data-list>${rows}${unk?`<li class="group-h">Tuntemattomat</li>${unk}`:''}</ul>`;
   el.querySelector('[data-disc]').onclick=e=>{ openState=!openState; e.currentTarget.setAttribute('aria-expanded',openState); el.querySelector('[data-list]').hidden=!openState; };
   el.querySelectorAll('.irow').forEach(b=>b.onclick=()=>{ const d=b.nextElementSibling; if(d&&d.classList.contains('detail')){ d.hidden=!d.hidden; b.setAttribute('aria-expanded',!d.hidden);} });
 }
 function rowHTML(it,a,key){
-  const e=it.entry; const cls=e?e.cls:'X';
+  const e=it.entry; const cls=e?e.cls:'X'; const eName=e&&(a.lang==='sv'&&e.nameSv? e.nameSv+' / '+e.name : e.name);
   const tag= cls==='A'?'Eläinperäinen': cls==='U'?pct(pFor(e,a.group)): cls==='X'?'Tuntematon':'';
   let det='';
   if(cls==='A'){ det=`<div><b>Lähde:</b> ${esc(e.source||'Eläin')}</div>${e.rk&&RULE_NAME[e.rk]?`<div><b>Korvike:</b> ${esc(RULE_NAME[e.rk])}</div>`:''}`; }
   else if(cls==='U'){ det=`<div><b>${pct(pFor(e,a.group))}</b> todennäköisesti vegaaninen</div><div><b>Mahdolliset alkuperät:</b> ${esc(e.origins)}</div>`; }
   else if(cls==='X'){ det=`<div>Ei tietokannassa. Ei vaikuta tulokseen vegaanisena.</div>`; }
-  const matched = it.fuzzy ? `<div><b>Tulkittu:</b> ${esc(e.name)} (lähin vastine sanalle “${esc(it.label)}”)</div>` : (e&&e!==PLANT_ENTRY&&normTerm(e.name)!==normTerm(it.label) ? `<div><b>Tunnistettu:</b> ${esc(e.name)}</div>`:'');
+  const matched = it.fuzzy ? `<div><b>Tulkittu:</b> ${esc(eName)} (lähin vastine sanalle “${esc(it.label)}”)</div>` : (e&&e!==PLANT_ENTRY&&normTerm(e.name)!==normTerm(it.label)&&normTerm(e.nameSv||'')!==normTerm(it.label) ? `<div><b>Tunnistettu:</b> ${esc(eName)}</div>`:'');
   const hasDet = cls!=='V' || matched;
   return `<li><button class="irow ${cls}" ${hasDet?'aria-expanded="false"':''}><span class="dot"></span><span class="nm">${esc(cap(it.label))}</span><span class="tag">${tag}</span></button>${hasDet?`<div class="detail" hidden>${matched}${det}</div>`:''}</li>`;
 }
@@ -809,9 +945,9 @@ function rowHTML(it,a,key){
 /* =====================================================================
    KORVAUSSÄÄNNÖT (reseptimuunnos, ei tekoälyä)
    ===================================================================== */
-const VOL={ml:1,cl:10,dl:100,l:1000,rkl:15,tl:5,mm:1,cup:240,cups:240,kuppi:240,kuppia:240,tbsp:15,tsp:5};
+const VOL={ml:1,cl:10,dl:100,l:1000,rkl:15,tl:5,mm:1,msk:15,tsk:5,krm:1,kopp:240,koppar:240,cup:240,cups:240,kuppi:240,kuppia:240,tbsp:15,tsp:5};
 const WT={g:1,kg:1000,oz:28.35,lb:453.6};
-const PACK={prk:200,pkt:400,rs:400,tlk:400,ps:250,pss:250};
+const PACK={prk:200,pkt:400,rs:400,tlk:400,ps:250,pss:250,förp:400};
 function toMl(ln,dens=1){ const u=ln.unit; if(ln.q==null) return null; if(VOL[u]) return ln.q*VOL[u]; if(WT[u]) return ln.q*WT[u]/dens; return null; }
 function toG(ln,dens=1,pack){ const u=ln.unit; if(ln.q==null) return null; if(WT[u]) return ln.q*WT[u]; if(VOL[u]) return ln.q*VOL[u]*dens; if(PACK[u]) return ln.q*(pack||PACK[u]); return null; }
 const ORIG=(name)=>({orig:true,name});
@@ -820,9 +956,9 @@ const RULE_NAME={
 };
 function eggRole(ln,ctx){
   const note=(ln.note+' '+ln.name).toLowerCase();
-  if(/voitel|sivel|brush/.test(note)) return 'brush';
+  if(/voitel|sivel|brush|pensl/.test(note)) return 'brush';
   if(ctx.omelet) return 'omelet';
-  if(ctx.baking&&/täyte|kreemi|filling|vanukas|custard|kuorrute/.test(ln.section||'')) return 'set';
+  if(ctx.baking&&/täyte|kreemi|filling|vanukas|custard|kuorrute|fyllning|kräm|glasyr|topping/.test(ln.section||'')) return 'set';
   if(ctx.meringue) return 'whip';
   if(ctx.patty) return 'bind';
   if(ctx.cakey) return 'leaven';
@@ -853,7 +989,7 @@ const RULES={
   milk(ln,ctx){ return ctx.baking?{label:'soijajuoma',parts:[ORIG('soijajuomaa')],why:'Leivonta: soijan proteiini tukee rakennetta'}:{label:'kaurajuoma',parts:[ORIG('kaurajuomaa')]}; },
   milkpowder(){ return {label:'soijamaitojauhe',parts:[ORIG('soijamaitojauhetta')]}; },
   buttermilk(ln){ const ml=toMl(ln)||250; return {label:'soijajuoma',parts:[{amt:ml,u:'ml',name:'soijajuomaa'},{amt:ml/20,u:'ml',name:'sitruunamehua'}],why:'Hapan maitotuote',pre:['Sekoita sitruunamehu soijajuomaan ja anna seistä 5 minuuttia.']}; },
-  cream(ln,ctx){ const whip=/kuohu|vispi|whipping|double|heavy/.test(ln.name)&&ctx.whipSteps;
+  cream(ln,ctx){ const whip=/kuohu|vispi|whipping|double|heavy|visp/.test(ln.name)&&ctx.whipSteps;
     return whip?{label:'kasvikerma',parts:[ORIG('vispautuvaa kasvikermaa')],why:'Vaahdotus'}:{label:'kaurakerma',parts:[ORIG('kaurakermaa (ruoanvalmistukseen)')]}; },
   sourcream(){ return {label:'kaurafraiche',parts:[ORIG('kaurafraichea')]}; },
   yogurt(ln,ctx){ return ctx.baking?{label:'soijajogurtti',parts:[ORIG('maustamatonta soijajogurttia')]}:{label:'kaurajogurtti',parts:[ORIG('maustamatonta kaurajogurttia')]}; },
@@ -885,7 +1021,7 @@ const RULES={
   fishsauce(){ return {label:'soijakastike',parts:[ORIG('soijakastiketta'),{amt:null,name:'ripaus merilevähiutaleita'}]}; },
   oystersauce(){ return {label:'sieniosterikastike',parts:[ORIG('sieniosterikastiketta (vegaaninen)')]}; },
   worcester(ln){ const ml=toMl(ln)||15; return {label:'soijakastike',parts:[{amt:ml/2,u:'ml',name:'soijakastiketta'},{amt:ml/2,u:'ml',name:'omenaviinietikkaa'}]}; },
-  stock(ln){ const k=/kuutio|cube/.test(ln.name)?'kasvisliemikuutio':/fondi/.test(ln.name)?'kasvisfondi':/jauhe|powder/.test(ln.name)?'kasvisliemijauhe':'kasvisliemi';
+  stock(ln){ const k=/kuutio|cube|tärning/.test(ln.name)?'kasvisliemikuutio':/fondi/.test(ln.name)?'kasvisfondi':/jauhe|powder/.test(ln.name)?'kasvisliemijauhe':'kasvisliemi';
     const part={kasvisliemikuutio:'kasvisliemikuutio',kasvisfondi:'kasvisfondia',kasvisliemijauhe:'kasvisliemijauhetta',kasvisliemi:'kasvislientä'}[k];
     return {label:k,parts:[ORIG(part)]}; },
   mayo(){ return {label:'aquafabamajoneesi',parts:[ORIG('vegaanista majoneesia')]}; },
@@ -902,7 +1038,7 @@ const RULES={
   shrimp(){ return {label:'sienipala',parts:[ORIG('kuningasosterivinokasta paloina')]}; },
   caviar(){ return {label:'merilevämäti',parts:[ORIG('merilevämätiä')]}; },
   eggpasta(ln){ return {label:'pasta',parts:[ORIG('munatonta pastaa')]}; },
-  certified(ln){ return {label:null,parts:[ORIG('vegaaniseksi merkittyä '+partitive(ln.name))]}; },
+  certified(ln){ return {label:null,parts:[ORIG((ln.lang==='sv'?'veganskt märkt ':'vegaaniseksi merkittyä ')+partitive(ln.name))]}; },
 };
 let ctx_gel=false;
 function partitive(name){ return name; }
@@ -956,7 +1092,7 @@ const BUTTER_CTX_NEXT=new Set(['ja','sekä','sokeri','sokerin','kattilaan','pann
 /* =====================================================================
    RESEPTIN JÄSENNYS JA MUUNNOS
    ===================================================================== */
-const UNIT_RE='(g|kg|dl|l|ml|cl|rkl|tl|mm|kpl|prk|pkt|ps|pss|tlk|rs|nippu|ruukku|lehteä|lehti|viipaletta|viipale|kuppi|kuppia|cup|cups|tbsp|tsp|oz|lb|annos|annosta|pala|palaa|kynttä|kynsi|purkki|pussi|paketti|rasia|tölkki)';
+const UNIT_RE='(g|kg|dl|l|ml|cl|rkl|tl|mm|kpl|prk|pkt|ps|pss|tlk|rs|nippu|ruukku|lehteä|lehti|viipaletta|viipale|kuppi|kuppia|cup|cups|tbsp|tsp|oz|lb|annos|annosta|pala|palaa|kynttä|kynsi|purkki|pussi|paketti|rasia|tölkki|msk|tsk|krm|st|förp|paket|burk|påse|klyfta|klyftor|nypa|skivor|skiva|blad|kopp|koppar|portion|portioner)';
 const FRAC={'½':.5,'¼':.25,'¾':.75,'⅓':1/3,'⅔':2/3,'⅛':.125};
 function parseNum(s){
   if(!s) return null; s=s.trim();
@@ -966,8 +1102,8 @@ function parseNum(s){
   return isNaN(t)?null:t;
 }
 const LINE_RE=new RegExp('^((?:\\d+(?:[.,]\\d+)?(?:\\s*[½¼¾⅓⅔])?|\\d+\\s*\\/\\s*\\d+|[½¼¾⅓⅔⅛])(?:\\s*[-–]\\s*(?:\\d+(?:[.,]\\d+)?|[½¼¾]))?)?\\s*(?:'+UNIT_RE+'\\.?(?=\\s|$))?\\s*(.*)$','i');
-function normUnit(u){ if(!u) return ''; u=u.toLowerCase(); return ({purkki:'prk',pussi:'ps',paketti:'pkt',rasia:'rs',tölkki:'tlk',kuppia:'kuppi'})[u]||u; }
-const STEP_HDR=/^(valmistus|valmistusohje|ohje|ohjeet|tee näin|työvaiheet|instructions|method|directions|steps)\s*:?\s*$/i;
+function normUnit(u){ if(!u) return ''; u=u.toLowerCase(); return ({purkki:'prk',pussi:'ps',paketti:'pkt',rasia:'rs',tölkki:'tlk',kuppia:'kuppi',paket:'pkt',burk:'prk',påse:'ps',st:'kpl',koppar:'kopp',blad:'lehti',klyftor:'kynsi',klyfta:'kynsi'})[u]||u; }
+const STEP_HDR=/^(valmistus|valmistusohje|ohje|ohjeet|tee näin|työvaiheet|instructions|method|directions|steps|gör så här|så här gör du|gör så|instruktioner|tillagning|tillvägagångssätt|beskrivning)\s*:?\s*$/i;
 function parseRecipe(text){
   const lines=text.replace(/\r/g,'').split('\n').map(s=>s.trim());
   let title='', servings=null, mode='ing', section='';
@@ -975,7 +1111,7 @@ function parseRecipe(text){
   let firstContent=true;
   for(const raw of lines){
     if(!raw) continue;
-    const sv=raw.match(/^(\d+)\s*(annosta|annokselle|annos|hengelle|henkilölle|henkeä|servings|portions|kpl|palaa)\b/i)||raw.match(/^(?:annoksia|annokset|servings)\s*:?\s*(\d+)/i);
+    const sv=raw.match(/^(\d+)\s*(annosta|annokselle|annos|hengelle|henkilölle|henkeä|servings|portions|kpl|palaa|portioner|portion|port|personer|bitar|st)\b/i)||raw.match(/^(?:annoksia|annokset|servings|portioner)\s*:?\s*(\d+)/i);
     if(sv&&raw.length<40){ servings=parseInt(sv[1]); firstContent=false; continue; }
     if(STEP_HDR.test(raw)){ mode='steps'; continue; }
     if(/^.{1,40}:$/.test(raw)&&mode==='ing'){ section=raw.replace(/:$/,'').trim(); ing.push({type:'h',text:section}); firstContent=false; continue; }
@@ -1000,18 +1136,18 @@ function parseRecipe(text){
 function recipeCtx(r){
   const all=(r.title+' '+r.steps.join(' ')+' '+r.ing.map(i=>i.name||i.text).join(' ')).toLowerCase();
   const t=(r.title).toLowerCase();
-  const bakeWords=/(kakku|piirakka|piiras|muffin|leivonnai|pulla|keksi|pikkuleip|sämpylä|leipä|torttu|brownie|pannukakku|lettu|letut|vohveli|räiskäle|cake|cookie|bread|scone|uunissa|uuniin|°c|astetta|leivinpaperi|vuoka|vuokaan)/;
-  const baking=bakeWords.test(all)&&!/(lasagne|laatikko|gratiini|kiusaus|pizza)/.test(t);
+  const bakeWords=/(kakku|piirakka|piiras|muffin|leivonnai|pulla|keksi|pikkuleip|sämpylä|leipä|torttu|brownie|pannukakku|lettu|letut|vohveli|räiskäle|cake|cookie|bread|scone|uunissa|uuniin|°c|astetta|leivinpaperi|vuoka|vuokaan|kaka|kakor|tårta|paj|bulle|bullar|bröd|pannkak|våffl|ugn|grader|bakplåtspapper|grädda|baka|formen)/;
+  const baking=bakeWords.test(all)&&!/(lasagne|laatikko|gratiini|kiusaus|pizza|gratäng|låda|pytt)/.test(t);
   return {
     baking,
-    cakey:/(kakku|piirakka|piiras|muffin|brownie|cupcake|cake|kuppikakku|sokerikakku|mokkapal|pikkuleip)/.test(all),
-    omelet:/(munakas|munakokkeli|kokkeli|frittata|omeletti|omelet|quiche|tortilla espanola|piiras.*muna)/.test(t),
-    meringue:/(marenki|pavlova|meringue|mousse|vaahtokarkki|macaron)/.test(all),
-    patty:/(pihvi|pyörykk|mureke|lihapull|kasvispull|burger|kotlet|kroketti)/.test(all),
-    frying:/(paista pannulla|pannulla|kuullota|ruskista|paista|fry|sauté)/.test(all),
-    sauce:/(kastike|sauce|keitto|soup|muhennos|kastikkeen)/.test(all),
-    sauceSet:/(kastike|kreemi|vanukas|custard)/.test(all),
-    whipSteps:/(vaahdo|vatkaa|vispaa|whip)/.test(r.steps.join(' ').toLowerCase()),
+    cakey:/(kakku|piirakka|piiras|muffin|brownie|cupcake|cake|kuppikakku|sokerikakku|mokkapal|pikkuleip|kaka|tårta|paj|sockerkaka|kladdkaka|mjuk kaka)/.test(all),
+    omelet:/(munakas|munakokkeli|kokkeli|frittata|omeletti|omelet|quiche|tortilla espanola|piiras.*muna|omelett|äggröra|äggstanning)/.test(t),
+    meringue:/(marenki|pavlova|meringue|mousse|vaahtokarkki|macaron|maräng|marängsviss)/.test(all),
+    patty:/(pihvi|pyörykk|mureke|lihapull|kasvispull|burger|kotlet|kroketti|köttbullar|biffar|järpar|frikadeller|burgare|bullar av)/.test(all),
+    frying:/(paista pannulla|pannulla|kuullota|ruskista|paista|fry|sauté|stek|fräs|bryn)/.test(all),
+    sauce:/(kastike|sauce|keitto|soup|muhennos|kastikkeen|sås|soppa|gryta)/.test(all),
+    sauceSet:/(kastike|kreemi|vanukas|custard|sås|kräm|vaniljsås|pudding)/.test(all),
+    whipSteps:/(vaahdo|vatkaa|vispaa|whip|vispa|vispad|fluffig|skum)/.test(r.steps.join(' ').toLowerCase()),
     eggRoles:new Set(),
   };
 }
@@ -1020,7 +1156,11 @@ function saveGaps(g){ try{ localStorage.setItem('vegan.gaps',JSON.stringify(g.sl
 function logGap(type,term){ const g=loadGaps(); if(g.some(x=>x.term===term&&x.type===type)) return; g.push({type,term,ts:Date.now()}); saveGaps(g); }
 
 function convertRecipe(text){
-  const r=parseRecipe(text);
+  const lang=detectLang(text);
+  return withLang(lang,()=>convertRecipeCore(text,lang));
+}
+function convertRecipeCore(text,lang){
+  const r=parseRecipe(text); r.lang=lang; for(const x of r.ing) if(x.type==='i') x.lang=lang;
   const ctx=recipeCtx(r);
   ctx_gel=false;
   const out=[]; const preSteps=[]; let changed=false; const usedKeys=new Map(); const notes=[];
@@ -1058,6 +1198,7 @@ function convertRecipe(text){
   const newSteps=[];
   for(const st of r.steps){
     let s=st, mod=false;
+    if(lang==='sv'){ newSteps.push(svStep(s,{usedKeys,sectionNames,gel,combo,minceUsed,omeletUsed})); if(omeletUsed&&/(stek|grädda|låt stelna)/i.test(s)) omeletUsed=false; continue; }
     if(gel&&/liota|liotettu|turvota/i.test(s)&&/liivat/i.test(s)){
       s=(s.match(/[^.!]+[.!]?/g)||[s]).map(x=>x.trim()).filter(x=>!(/liivat/i.test(x)&&/liota|liotettu|turvota/i.test(x))).join(' ');
       s=(s+' Kiehauta agar-agarjauhe noin 1 dl:ssa reseptin nestettä 2 minuuttia sekoittaen ja sekoita lämpimänä muuhun seokseen. Agar hyytyy jo huoneenlämmössä.').trim();
@@ -1100,8 +1241,56 @@ function convertRecipe(text){
     if(omeletUsed&&/(paista|kypsennä|hyydy)/i.test(s)){ html+=' <mark>Paista miedolla lämmöllä 3–4 minuuttia pidempään, kunnes seos on hyytynyt.</mark>'; omeletUsed=false; mod=true; }
     newSteps.push({html,mod});
   }
-  return {r,out,preSteps,newSteps,changed,combo,ctx};
+  return {r,out,preSteps,newSteps,changed,combo,ctx,lang};
 }
+
+/* Ruotsinkielinen ohjeteksti: korvikkeen nimi samassa muodossa (epämääräinen / määräinen) */
+const SV_SRC={
+  egg:{i:['ägg'],d:['ägget','äggen']}, yolk:{i:['äggula','äggulor','gula','gulor'],d:['äggulan','äggulorna','gulan','gulorna']}, white:{i:['äggvita','äggvitor'],d:['äggvitan','äggvitorna','vitorna']},
+  milk:{i:['mjölk'],d:['mjölken']}, cream:{i:['grädde','vispgrädde','matlagningsgrädde'],d:['grädden','vispgrädden','matlagningsgrädden']},
+  sourcream:{i:['gräddfil','crème fraiche','creme fraiche','smetana'],d:['gräddfilen']}, yogurt:{i:['yoghurt'],d:['yoghurten']}, quark:{i:['kvarg'],d:['kvargen']},
+  freshcheese:{i:['färskost'],d:['färskosten']}, cheese:{i:['ost'],d:['osten']}, parmesan:{i:['parmesan','parmesanost'],d:['parmesanen','parmesanosten']}, feta:{i:['fetaost','feta'],d:['fetaosten']},
+  butter:{i:['smör'],d:['smöret']}, honey:{i:['honung'],d:['honungen']}, gelatin:{i:['gelatin','gelatinblad'],d:['gelatinet','gelatinbladen']},
+  mince:{i:['köttfärs','färs','nötfärs','blandfärs'],d:['köttfärsen','färsen','nötfärsen','blandfärsen']}, chicken:{i:['kyckling','kycklingfilé','kycklingfiléer'],d:['kycklingen','kycklingfiléerna']},
+  fish:{i:['fisk','lax','torsk'],d:['fisken','laxen','torsken']}, tuna:{i:['tonfisk'],d:['tonfisken']}, bacon:{i:['bacon'],d:['baconet']}, stock:{i:['buljong','fond'],d:['buljongen','fonden']}, mayo:{i:['majonnäs'],d:['majonnäsen']}
+};
+const SV_FORM_INDEX=new Map(); for(const k in SV_SRC){ for(const w of SV_SRC[k].i) SV_FORM_INDEX.set(w,{key:k,def:false}); for(const w of SV_SRC[k].d) SV_FORM_INDEX.set(w,{key:k,def:true}); }
+const LABEL_SV={aquafaba:['aquafaba','aquafaban'],margariini:['margarin','margarinet'],rypsiöljy:['rapsolja','rapsoljan'],kaurajuoma:['havredryck','havredrycken'],soijajuoma:['sojadryck','sojadrycken'],kasvikerma:['vispbar växtgrädde','den vispbara växtgrädden'],kaurakerma:['havregrädde','havregrädden'],kaurafraiche:['havrefraiche','havrefraichen'],soijajogurtti:['sojayoghurt','sojayoghurten'],kaurajogurtti:['havreyoghurt','havreyoghurten'],soijarahka:['sojakvarg','sojakvargen'],kasvituorejuusto:['växtbaserad färskost','den växtbaserade färskosten'],tofumurska:['tofu','tofun'],kasvijuusto:['växtbaserad ost','den växtbaserade osten'],ravintohiivaseos:['jästflingeblandning','jästflingeblandningen'],tofu:['tofu','tofun'],'agar-agarjauhe':['agar-agar','agar-agaren'],kasvisjauheliha:['växtfärs','växtfärsen'],kasviproteiini:['havre- eller bondbönsstrimlor','strimlorna'],seitan:['seitan','seitanen'],savutofu:['rökt tofu','den rökta tofun'],kasvismakkara:['vegokorv','vegokorven'],kikhernemurska:['kikärtsröra','kikärtsröran'],kaprismurska:['kaprisröra','kaprisröran'],soijakastike:['sojasås','sojasåsen'],sieniosterikastike:['vegansk ostronsås','den veganska ostronsåsen'],kasvisliemi:['grönsaksbuljong','grönsaksbuljongen'],kasvisliemikuutio:['grönsaksbuljongtärning','grönsaksbuljongtärningen'],kasvisfondi:['grönsaksfond','grönsaksfonden'],kasvisliemijauhe:['grönsaksbuljongpulver','grönsaksbuljongpulvret'],aquafabamajoneesi:['vegansk majonnäs','den veganska majonnäsen'],'tärkkelysseos':['majsstärkelseblandning','majsstärkelseblandningen'],pellavaseos:['linfröblandning','linfröblandningen'],tofuseos:['tofublandning','tofublandningen'],suklaa:['mjölkfri choklad','den mjölkfria chokladen'],vaahterasiirappi:['lönnsirap','lönnsirapen'],kookosöljy:['kokosolja','kokosoljan'],sienipala:['kungsmusslingbitar','kungsmusslingbitarna'],kookoskinuski:['mjölkfri kola','den mjölkfria kolan'],kasvijäätelö:['växtbaserad glass','den växtbaserade glassen'],'kookoskondensoitu maito':['kondenserad kokosmjölk','den kondenserade kokosmjölken'],herneproteiini:['ärtprotein','ärtproteinet'],dekstroosi:['dextros','dextrosen'],punajuuriväri:['rödbetsfärg','rödbetsfärgen'],karnaubavaha:['karnaubavax','karnaubavaxet'],merilevämäti:['sjögräsrom','sjögräsrommen'],pasta:['äggfri pasta','den äggfria pastan'],soijamaitojauhe:['sojamjölkspulver','sojamjölkspulvret']};
+function svStep(s,o){
+  let mod=false;
+  if(o.gel&&/(blötlägg|lägg .* i kallt vatten|kallt vatten)/i.test(s)&&/gelatin/i.test(s)){
+    s=(s.match(/[^.!]+[.!]?/g)||[s]).map(x=>x.trim()).filter(x=>!(/gelatin/i.test(x)&&/(blötlägg|kallt vatten)/i.test(x))).join(' ');
+    s=(s+' Koka upp agar-agarpulvret i ca 1 dl av receptets vätska i 2 minuter under omrörning och blanda i resten medan det är varmt. Agar stelnar redan i rumstemperatur.').trim(); mod=true;
+  }
+  const words=[...s.matchAll(/[A-Za-zÅÄÖåäöÉé'-]+/g)];
+  let result='', last=0;
+  for(const mt of words){
+    const w=mt[0], lw=w.toLowerCase(); let hit=SV_FORM_INDEX.get(lw), suffix='';
+    if(!hit){ const cm=lw.match(/^(smör|ägg|mjölk|grädd|ost)(blandning\w*|smet\w*|sås\w*|kräm\w*)$/); if(cm){ hit={key:{smör:'butter',ägg:'egg',mjölk:'milk',grädd:'cream',ost:'cheese'}[cm[1]],def:false}; suffix=cm[2]; } }
+    if(!hit||!o.usedKeys.has(hit.key)) continue;
+    const cands=o.usedKeys.get(hit.key); let best=cands[0];
+    if(cands.length>1){ let bs=-1; const low=s.toLowerCase(); for(const c of cands){ const sc=(o.sectionNames.get(c)||[]).filter(n=>n&&low.includes(n)).length; if(sc>bs){ bs=sc; best=c; } } }
+    const L=LABEL_SV[best.res.label]; if(!L) continue;
+    let r= suffix ? L[0].split(' ').pop()+suffix : (hit.def?L[1]:L[0]);
+    if(/^[A-ZÅÄÖ]/.test(w)) r=cap(r);
+    result+=esc(s.slice(last,mt.index))+'<mark>'+esc(r)+'</mark>'; last=mt.index+w.length; mod=true;
+  }
+  let html=result? result+esc(s.slice(last)) : esc(s);
+  if(o.combo&&/(grädda|baka|ugn)/i.test(s)){
+    const rangeRe=/(\d+)(\s*[-–]\s*)(\d+)(\s*)(min\w*)/i, singleRe=/(^|[^\d–-])(\d+)(\s*)(min\w*)/i;
+    if(rangeRe.test(html)){ html=html.replace(rangeRe,(m,a,d,b,sp,u)=>`<mark>${+a+5}${d}${+b+5}</mark>${sp}${u}`); mod=true; }
+    else if(singleRe.test(html)){ html=html.replace(singleRe,(m,pre,a,sp,u)=>`${pre}<mark>${+a+5}</mark>${sp}${u}`); mod=true; }
+  }
+  if(o.minceUsed&&/<mark>växtfärs/i.test(html)) html+=' <mark>Växtfärs blir klar snabbt: 5–6 minuter räcker.</mark>';
+  if(o.omeletUsed&&/(stek|grädda|låt stelna)/i.test(s)){ html+=' <mark>Stek på låg värme 3–4 minuter längre tills smeten har stelnat.</mark>'; mod=true; }
+  return {html,mod};
+}
+/* Korvikkeiden nimet, valmisteluvaiheet ja perustelut ruotsiksi */
+const SV_TX={'kaurajuomaa':'havredryck','rypsiöljyä':'rapsolja','vaaleaa siirappia':'ljus sirap','silkkitofua':'silkestofu','kikhernejauhoja':'kikärtsmjöl','ripaus kala namak -suolaa (kananmunan maku)':'en nypa kala namak (svavelsalt, äggsmak)','maissitärkkelystä':'majsstärkelse','aquafabaa (kikherneiden keitinlientä)':'aquafaba (spadet från kokta kikärtor)','leivinjauhetta':'bakpulver','pellavarouhetta':'krossade linfrön','vettä':'vatten','kaurakermaa':'havregrädde','soijajuomaa':'sojadryck','soijamaitojauhetta':'sojamjölkspulver','sitruunamehua':'citronsaft','vispautuvaa kasvikermaa':'vispbar växtgrädde','kaurakermaa (ruoanvalmistukseen)':'havregrädde (för matlagning)','kaurafraichea':'havrefraiche','maustamatonta soijajogurttia':'naturell sojayoghurt','maustamatonta kaurajogurttia':'naturell havreyoghurt','soijarahkaa':'sojakvarg','kasvipohjaista tuorejuustoa':'växtbaserad färskost','kiinteää tofua murennettuna':'fast tofu, smulad','suolaa':'salt','kasvipohjaista juustoa (raaste)':'växtbaserad ost (riven)','ravintohiivahiutaleita':'näringsjästflingor','jauhettua cashewpähkinää':'malda cashewnötter','ripaus suolaa':'en nypa salt','kiinteää tofua kuutioina':'fast tofu i tärningar','oliiviöljyä':'olivolja','paistettavaa kiinteää tofua viipaleina':'fast tofu för stekning, i skivor','kookoskermaa (kiinteä osa)':'kokosgrädde (den fasta delen)','maidotonta margariinia':'mjölkfritt margarin','kookosöljyä (hajuton)':'kokosolja (luktfri)','vaahterasiirappia':'lönnsirap','agar-agarjauhetta':'agar-agarpulver','kasvisjauhelihaa (soija- tai kaurapohjainen)':'växtfärs (soja- eller havrebaserad)','kaura- tai härkäpapusuikaleita':'havre- eller bondbönsstrimlor','seitania paloina':'seitan i bitar','savutofua ohuina suikaleina':'rökt tofu i tunna strimlor','rypsiöljyä paistamiseen':'rapsolja till stekning','kasvismakkaraa tai kasvisnakkeja':'vegokorv','kiinteää tofua':'fast tofu','nori-arkki murskattuna':'noriark, smulat','soijakastiketta':'sojasås','keitettyjä kikherneitä':'kokta kikärtor','kapriksia hienonnettuna':'kapris, finhackad','ripaus merilevähiutaleita':'en nypa sjögräsflingor','sieniosterikastiketta (vegaaninen)':'vegansk ostronsås (svampbaserad)','omenaviinietikkaa':'äppelcidervinäger','kasvisliemikuutio':'grönsaksbuljongtärning','kasvisfondia':'grönsaksfond','kasvisliemijauhetta':'grönsaksbuljongpulver','kasvislientä':'grönsaksbuljong','vegaanista majoneesia':'vegansk majonnäs','maidotonta suklaata':'mjölkfri choklad','maidotonta tummaa suklaata':'mjölkfri mörk choklad','kookoksesta tehtyä kondensoitua maitoa':'kondenserad kokosmjölk','kasvipohjaista jäätelöä':'växtbaserad glass','maidotonta kookoskinuskia':'mjölkfri kokoskola','herneproteiinia':'ärtprotein','dekstroosia':'dextros','punajuuriväriä':'rödbetsfärg','karnaubavahaa':'karnaubavax','kuningasosterivinokasta paloina':'kungsmussling i bitar','merilevämätiä':'sjögräsrom','munatonta pastaa':'äggfri pasta',
+'Soseuta silkkitofu ja kikhernejauho sauvasekoittimella tasaiseksi.':'Mixa silkestofu och kikärtsmjöl slätt med stavmixer.','Sekoita maissitärkkelys tasaiseksi kaurajuomaan.':'Rör ut majsstärkelsen slätt i havredrycken.','Vatkaa aquafaba ja ¼ tl viinihappoa kovaksi vaahdoksi, noin 8–10 minuuttia.':'Vispa aquafaban med ¼ tsk vinsten till ett hårt skum, cirka 8–10 minuter.','Sekoita pellavarouhe ja vesi ja anna turvota 10 minuuttia.':'Blanda krossade linfrön och vatten och låt svälla i 10 minuter.','Sekoita sitruunamehu soijajuomaan ja anna seistä 5 minuuttia.':'Rör ner citronsaften i sojadrycken och låt stå i 5 minuter.','Marinoi tofukuutiot sitruunamehussa, suolassa ja oliiviöljyssä vähintään 30 minuuttia.':'Marinera tofutärningarna i citronsaft, salt och olivolja i minst 30 minuter.','Marinoi tofu soijakastikkeessa, sitruunamehussa ja murskatussa norissa vähintään 20 minuuttia.':'Marinera tofun i sojasås, citronsaft och smulat nori i minst 20 minuter.','Murskaa kikherneet haarukalla ja sekoita joukkoon murskattu nori.':'Mosa kikärtorna med en gaffel och blanda i smulat nori.',
+'Voitelu: kiilto ja väri':'Pensling: glans och färg','Munaruoka: hyytyvä rakenne':'Äggrätt: stelnande konsistens','Täyte: hyydytys':'Fyllning: stabilisering','Vaahdotus':'Vispning','Leivonta: kohotus ja kosteus':'Bakning: jäsning och fukt','Sidonta':'Bindning','Leivonta: sidonta ja rasva':'Bakning: bindning och fett','Kastike tai kreemi: suurustus':'Sås eller kräm: redning','Leivonta: soijan proteiini tukee rakennetta':'Bakning: sojaprotein stöder strukturen','Hapan maitotuote':'Syrad mjölkprodukt','Suolainen, mureneva':'Salt och smulig','Paistaminen: öljyssä on enemmän rasvaa kuin voissa':'Stekning: olja innehåller mer fett än smör','Leivonta: kiinteä rasva':'Bakning: fast fett','Hyydytys':'Stelning','Kalan maku merilevästä':'Fisksmak från sjögräs',
+'Yhdistelmäsääntö: kananmuna + maitotuotteet leivonnaisessa. Etikka reagoi leivinjauheen kanssa ja korvaa munan kohottavan vaikutuksen.':'Kombinationsregel: ägg + mejeriprodukter i bakverk. Vinägern reagerar med bakpulvret och ersätter äggets jäsande effekt.'};
+const svt=t=>SV_TX[t]||t;
 
 /* =====================================================================
    NÄKYMÄ: RESEPTI
@@ -1117,11 +1306,12 @@ function fmtNum(x){
   if(!w) return fr||'0';
   return fr? w+' '+fr : String(w);
 }
+let UNITS_SV=false;
 function fmtVol(ml){
   if(ml>=1000) return fmtNum(Math.round(ml/100)/10)+' l';
   if(ml>=100){ const d=Math.round(ml/50)/2; return fmtNum(d)+' dl'; }
-  if(ml>=14){ const r=Math.round(ml/7.5)/2; return fmtNum(r)+' rkl'; }
-  const t=Math.max(.25,Math.round(ml/1.25)/4); return fmtNum(t)+' tl';
+  if(ml>=14){ const r=Math.round(ml/7.5)/2; return fmtNum(r)+(UNITS_SV?' msk':' rkl'); }
+  const t=Math.max(.25,Math.round(ml/1.25)/4); return fmtNum(t)+(UNITS_SV?' tsk':' tl');
 }
 function fmtG(g){ if(g<10) return (Math.round(g*2)/2).toString().replace('.',',')+' g'; if(g<100) return Math.round(g)+' g'; return Math.round(g/5)*5+' g'; }
 function fmtPart(p,ln,f){
@@ -1137,17 +1327,18 @@ let recipeState=null;
 function renderRecipe(){
   const el=$('#recipeOut'); const s=recipeState; if(!s) return;
   const {conv,servings,base}=s; const f= base? servings/base : servings;
+  const SV=conv.lang==='sv'; UNITS_SV=SV; const tx=t=>SV?svt(t):t;
   const r=conv.r;
   const lis=[];
   for(const it of conv.out){
     if(it.type==='h'){ lis.push(`<li class="sh">${esc(it.text)}</li>`); continue; }
     if(it.type==='keep'){ const ln=it.ln; const q=ln.q!=null?fmtNum(ln.q*f)+(ln.qMax!=null?'–'+fmtNum(ln.qMax*f):''):''; lis.push(`<li><span class="amt">${esc((q+' '+ln.unitRaw).trim())}</span><span class="nm">${esc(ln.nameRaw)}${ln.note?' <span class="why">('+esc(ln.note)+')</span>':''}</span></li>`); continue; }
     if(it.type==='removed'){ lis.push(`<li class="sub removed"><span class="nm"><b>Poistettu: ${esc(it.ln.raw)}</b><span class="why">Korvaussääntö puuttuu, kirjattu ylläpidolle.</span></span></li>`); continue; }
-    const ln=it.ln; const parts=(it.type==='add'?it.parts:it.res.parts).map(p=>{ const [a,n]=fmtPart(p,ln||{},f); return `<div><span class="amt">${esc(a)}</span><span>${esc(n)}</span></div>`; }).join('');
-    const why= it.type==='add'? it.why : (it.res.why||'');
+    const ln=it.ln; const parts=(it.type==='add'?it.parts:it.res.parts).map(p=>{ const [a,n]=fmtPart(p,ln||{},f); return `<div><span class="amt">${esc(a)}</span><span>${esc(tx(n))}</span></div>`; }).join('');
+    const why= tx(it.type==='add'? it.why : (it.res.why||''));
     lis.push(`<li class="sub"><span class="nm"><span class="leaf">${ICON.leaf}${it.type==='add'?'Lisätty':'Korvattu'}</span><span class="parts">${parts}</span>${ln?`<span class="was">${esc(ln.raw)}</span>`:''}${why?`<span class="why">${esc(why)}</span>`:''}</span></li>`);
   }
-  const steps=[...conv.preSteps.map(p=>`<li class="pre"><div>${esc(p)}</div></li>`), ...conv.newSteps.map(st=>`<li class="${st.mod?'mod':''}"><div>${st.html}</div></li>`)].join('');
+  const steps=[...conv.preSteps.map(p=>`<li class="pre"><div>${esc(tx(p))}</div></li>`), ...conv.newSteps.map(st=>`<li class="${st.mod?'mod':''}"><div>${st.html}</div></li>`)].join('');
   el.innerHTML=`
     <div class="rhead">${r.title?`<h2 class="rtitle">${esc(r.title)}</h2>`:''}</div>
     ${conv.changed?`<div class="banner brand">${ICON.leaf}<span>Vegaaninen versio</span></div>`:`<div class="banner ok">${ICON.ok}<span>Resepti on jo vegaaninen</span></div>`}
@@ -1214,7 +1405,7 @@ const STANDALONE=!window.claude;
       otsikon, sisällön ja lopetusmerkkien perusteella.
    ===================================================================== */
 const OCR_PROMPT=n=>`Kuvissa (${n} kpl, kuvausjärjestyksessä) on elintarvikkeen pakkaus. Ainesosaluettelo voi jatkua kuvasta toiseen alaspäin tai sivusuunnassa, ja kuvat voivat olla osittain päällekkäin. Pakkaus voi olla kaareva, kiiltävä tai kirjava, ja teksti voi olla millä tahansa fontilla, värillä tai taustalla.
-Tehtävä: poimi VAIN ainesosaluettelo (tavallisesti otsikon Ainesosat, Ainekset, Raaka-aineet tai Ingredients jälkeen) ja jätä pois kaikki muu pakkauksen teksti: tuotenimi, markkinointi, ravintosisältö, säilytys- ja valmistusohjeet, valmistajan ja maahantuojan tiedot, osoitteet, päiväykset ja viivakoodit. Jos luettelo on usealla kielellä, palauta vain suomenkielinen, muuten englanninkielinen. Yhdistä osat yhdeksi luetteloksi ja poista toistuvat kohdat. Kopioi teksti sanatarkasti sulkuineen, E-koodeineen ja prosentteineen; älä korjaa, tiivistä tai arvioi. Allergeenimerkinnät (voi sisältää…) saa jättää mukaan.
+Tehtävä: poimi VAIN ainesosaluettelo (tavallisesti otsikon Ainesosat, Ainekset, Raaka-aineet, Ingredienser tai Ingredients jälkeen) ja jätä pois kaikki muu pakkauksen teksti: tuotenimi, markkinointi, ravintosisältö, säilytys- ja valmistusohjeet, valmistajan ja maahantuojan tiedot, osoitteet, päiväykset ja viivakoodit. Jos luettelo on usealla kielellä, palauta vain suomenkielinen; jos suomenkielistä ei ole, ruotsinkielinen; muuten englanninkielinen. Yhdistä osat yhdeksi luetteloksi ja poista toistuvat kohdat. Kopioi teksti sanatarkasti sulkuineen, E-koodeineen ja prosentteineen; älä korjaa, tiivistä tai arvioi. Allergeenimerkinnät (voi sisältää…) saa jättää mukaan.
 Palauta myös tuotteen nimi, jos se näkyy, ja viivakoodin numerot, jos ne näkyvät.
 Vastaa pelkkänä JSON-oliona: {"name": string|null, "ingredients": string|null, "ean": string|null}`;
 let tessP=null;
@@ -1223,7 +1414,7 @@ let workerP=null, ocrProgress=null;
 function getWorker(){
   if(!workerP) workerP=(async()=>{
     const T=await loadTess();
-    const w=await T.createWorker('fin+eng',1,{logger:m=>{ if(ocrProgress&&m&&typeof m.progress==='number') ocrProgress(m.status,m.progress); }});
+    const w=await T.createWorker('fin+swe+eng',1,{logger:m=>{ if(ocrProgress&&m&&typeof m.progress==='number') ocrProgress(m.status,m.progress); }});
     await w.setParameters({preserve_interword_spaces:'1',user_defined_dpi:'300'});
     return w;
   })().catch(e=>{ workerP=null; throw {code:'unavailable'}; });
@@ -1273,12 +1464,13 @@ function collectLines(data){
 }
 const HDR_FI=/(ainesosat|ainesosa|ainekset|raaka-?aineet|ainesosaluettelo|koostumus)\s*[:;.]?/i;
 const HDR_EN=/\b(ingredients?|ingr\.)\s*[:;.]?/i;
-const HDR_OTHER=/\b(ingredienser|zutaten|ingrédients|ingredientes|ingrediënten|ingredienti|składniki|koostisosad|sastāvdaļas|sudedamosios dalys|состав|ingrediencie|složení|összetevők)\b\s*[:;.]?/i;
-const STOP_RE=/(ravintosisältö|ravintoarvo|ravintoaine|ravintoarvot|näringsvärde|näringsinnehåll|nutrition|ernährung|valeur nutritive|\benergia\b|\benergi\b|\benergy\b|\bkj\b|\bkcal\b|säilytys|säilytä|säilytetään|förvar|store in|storage|keep refrigerated|parasta ennen|viimeinen käyttöpäivä|bäst före|sista förbrukningsdag|best before|use by|\bvalmistaja|tillverkare|manufacturer|produced by|maahantuoja|importör|valmistuttaja|markkinoija|marknadsförs|pakattu|packad|packed in|nettopaino|nettovikt|net weight|\bwww\.|https?:|\.fi\b|\.com\b|kuluttajapalvelu|asiakaspalvelu|konsumentservice|valmistusmaa|alkuperämaa|ursprungsland|country of origin|made in|käyttöohje|bruksanvisning|valmistusohje|tillagning|100 g sisältää|100 g:ssa|per 100|annos sisältää|portion innehåller|lajittelu|kierrätä|pantillinen|pant\b)/i;
+const HDR_SV=/\b(ingredienser|ingrediens|innehåll|beståndsdelar)\s*[:;.]?/i;
+const HDR_OTHER=/\b(zutaten|ingrédients|ingredientes|ingrediënten|ingredienti|składniki|koostisosad|sastāvdaļas|sudedamosios dalys|состав|ingrediencie|složení|összetevők)\b\s*[:;.]?/i;
+const STOP_RE=/(ravintosisältö|ravintoarvo|ravintoaine|ravintoarvot|näringsvärde|näringsinnehåll|nutrition|ernährung|valeur nutritive|\benergia\b|\benergi\b|\benergy\b|\bkj\b|\bkcal\b|säilytys|säilytä|säilytetään|förvar|store in|storage|keep refrigerated|parasta ennen|viimeinen käyttöpäivä|bäst före|sista förbrukningsdag|best before|use by|\bvalmistaja|tillverkare|manufacturer|produced by|maahantuoja|importör|valmistuttaja|markkinoija|marknadsförs|pakattu|packad|packed in|nettopaino|nettovikt|net weight|\bwww\.|https?:|\.fi\b|\.com\b|kuluttajapalvelu|asiakaspalvelu|konsumentservice|valmistusmaa|alkuperämaa|ursprungsland|country of origin|made in|käyttöohje|bruksanvisning|valmistusohje|tillagning|100 g sisältää|100 g:ssa|per 100|annos sisältää|portion innehåller|lajittelu|kierrätä|pantillinen|pant\b|kundtjänst|konsumentkontakt|minst hållbar|förpackningsdatum|näringsdeklaration|tillverkad|förpackad|sortera|återvinn)/i;
 function wordsOf(t){ return t.toLowerCase().split(/[^a-zåäöéüß0-9-]+/).filter(w=>w.length>1); }
 function lineIngScore(t){
   const s=t.toLowerCase(); const ws=wordsOf(s); if(!ws.length) return -1;
-  let known=0; for(const w of ws){ if(/^e\d{3}/.test(w)||MAP.has(w)||lookupVariants(w)) known++; }
+  let known=0; for(const w of ws){ if(/^e\d{3}/.test(w)||MAP.has(w)||SVMAP.has(w)||lookupVariants(w)||withLang('sv',()=>lookupVariants(w))) known++; }
   const commas=(s.match(/[,;]/g)||[]).length, ecodes=(s.match(/\be\s?-?\d{3}/g)||[]).length, pcts=(s.match(/\d\s?%/g)||[]).length;
   let sc=known/ws.length*2 + Math.min(commas,6)*0.35 + ecodes*0.5 + pcts*0.25 + (/[()]/.test(s)?0.2:0);
   if(STOP_RE.test(s)) sc-=3;
@@ -1296,17 +1488,17 @@ function joinLines(lines){
   }
   return out;
 }
-function findHeader(lines,re){ for(let i=0;i<lines.length;i++){ const m=lines[i].text.match(re); if(m) return {i,col:m.index+m[0].length,lang:re===HDR_FI?'fi':re===HDR_EN?'en':'xx'}; } return null; }
+function findHeader(lines,re){ for(let i=0;i<lines.length;i++){ const m=lines[i].text.match(re); if(m) return {i,col:m.index+m[0].length,lang:re===HDR_FI?'fi':re===HDR_SV?'sv':re===HDR_EN?'en':'xx'}; } return null; }
 function extractIngredients(lines){
   if(!lines.length) return '';
-  const hdr=findHeader(lines,HDR_FI)||findHeader(lines,HDR_EN);
+  const hdr=findHeader(lines,HDR_FI)||findHeader(lines,HDR_SV)||findHeader(lines,HDR_EN);
   let picked=[];
   if(hdr){
     const first=lines[hdr.i].text.slice(hdr.col).trim(); if(first) picked.push(first);
     for(let i=hdr.i+1;i<lines.length;i++){
       const t=lines[i].text, low=t.toLowerCase();
-      const otherHdr=(hdr.lang==='fi'&&(HDR_OTHER.test(low)||HDR_EN.test(low)))||(hdr.lang==='en'&&HDR_OTHER.test(low));
-      const stopIdx=Math.min(...[low.search(STOP_RE),otherHdr?low.search(hdr.lang==='fi'?new RegExp(HDR_OTHER.source+'|'+HDR_EN.source,'i'):HDR_OTHER):-1].filter(v=>v>=0).concat([Infinity]));
+      const others=[HDR_OTHER].concat(hdr.lang==='fi'?[HDR_SV,HDR_EN]:hdr.lang==='sv'?[HDR_FI,HDR_EN]:[HDR_FI,HDR_SV]);
+      const stopIdx=Math.min(...[low.search(STOP_RE),...others.map(r=>low.search(r))].filter(v=>v>=0).concat([Infinity]));
       if(stopIdx!==Infinity){ if(stopIdx>3) picked.push(t.slice(0,stopIdx)); break; }
       const joined=picked.join(' ');
       const open=/[,(\-:;&]\s*$/.test(joined)||((joined.match(/\(/g)||[]).length>(joined.match(/\)/g)||[]).length);
@@ -1374,7 +1566,7 @@ async function ocrPhoto(file,onStep){
     const {data}=await w.recognize(c,{rotateAuto:true},{text:true,blocks:true});
     const lines=collectLines(data);
     const ing=lines.reduce((a,l)=>a+Math.max(0,lineIngScore(l.text))*(l.conf/100),0);
-    const score=ing+(data.confidence||0)/25+(findHeader(lines,HDR_FI)||findHeader(lines,HDR_EN)?2:0);
+    const score=ing+(data.confidence||0)/25+(findHeader(lines,HDR_FI)||findHeader(lines,HDR_SV)||findHeader(lines,HDR_EN)?2:0);
     if(!best||score>best.score) best={lines,score};
     if((data.confidence||0)>=78&&ing>2) break;
   }
@@ -1471,11 +1663,11 @@ function verdictBadge(v){ return `<span class="badge ${v}">${ICON[v]}</span>`; }
 async function fetchOFF(ean){
   try{
     const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),7000);
-    const r=await fetch('https://world.openfoodfacts.org/api/v2/product/'+ean+'.json?fields=product_name,product_name_fi,brands,ingredients_text_fi,ingredients_text,ingredients_text_en',{signal:ctl.signal});
+    const r=await fetch('https://world.openfoodfacts.org/api/v2/product/'+ean+'.json?fields=product_name,product_name_fi,product_name_sv,brands,ingredients_text_fi,ingredients_text_sv,ingredients_text,ingredients_text_en',{signal:ctl.signal});
     clearTimeout(t); if(!r.ok) return null; const j=await r.json(); if(j.status!==1||!j.product) return null;
-    const p=j.product; const ing=(p.ingredients_text_fi||p.ingredients_text||p.ingredients_text_en||'').replace(/_/g,'').trim();
+    const p=j.product; const ing=(p.ingredients_text_fi||p.ingredients_text_sv||p.ingredients_text||p.ingredients_text_en||'').replace(/_/g,'').trim();
     const brand=(p.brands||'').split(',')[0].trim();
-    return {name:[p.product_name_fi||p.product_name,brand].filter(Boolean).join(' · '),ingredients:ing,src:'off'};
+    return {name:[p.product_name_fi||p.product_name_sv||p.product_name,brand].filter(Boolean).join(' · '),ingredients:ing,src:'off'};
   }catch{ return null; }
 }
 async function showProduct(ean){
