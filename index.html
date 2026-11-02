@@ -148,7 +148,7 @@ textarea.input{min-height:132px;display:block}
 .banner.brand{background:var(--brand-soft);color:var(--fg)}
 .banner.brand svg{color:var(--brand)}
 .banner.warn{background:var(--warn-soft);color:var(--warn-ink)}
-.rlist li.unk .why{color:var(--warn-ink)}
+.rlist li.unk .why{display:block;color:var(--warn-ink);font-size:14px;margin-top:2px}
 .stepper{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface);border-radius:999px;padding:5px 5px 5px 18px}
 .stepper .lbl{font-weight:700}
 .stepper .ctl{display:flex;align-items:center;gap:4px}
@@ -2062,7 +2062,18 @@ $('#convertBtn').onclick=()=>{
 // --- Viivakoodi
 const products=()=>store.get('vegan.products',{});
 function saveProduct(ean,data){ const p=products(); p[ean]={...data,ts:Date.now()}; store.set('vegan.products',p); renderRecent(); }
-function validEan(s){ s=String(s||'').replace(/\D/g,''); if(![8,12,13,14].includes(s.length)) return null; const d=s.split('').map(Number); const chk=d.pop(); let sum=0; d.reverse().forEach((x,i)=>sum+=x*(i%2===0?3:1)); return (10-sum%10)%10===chk? s : null; }
+function eanCheck(d){ const x=d.split('').map(Number); const chk=x.pop(); let sum=0; x.reverse().forEach((v,i)=>sum+=v*(i%2===0?3:1)); return (10-sum%10)%10===chk; }
+function upcEtoA(e){ // 8-numeroinen UPC-E → 12-numeroinen UPC-A
+  if(!/^[01]\d{7}$/.test(e)) return null; const ns=e[0], d=e.slice(1,7), c=e[7], l=d[5]; let m;
+  if('012'.includes(l)) m=d.slice(0,2)+l+'0000'+d.slice(2,5);
+  else if(l==='3') m=d.slice(0,3)+'00000'+d.slice(3,5);
+  else if(l==='4') m=d.slice(0,4)+'00000'+d[4];
+  else m=d.slice(0,5)+'0000'+l;
+  const a=ns+m+c; return eanCheck(a)? a : null; }
+function validEan(s){ s=String(s||'').replace(/\D/g,''); if(![8,12,13,14].includes(s.length)) return null;
+  if(eanCheck(s)) return s;
+  if(s.length===8){ const a=upcEtoA(s); if(a) return '0'+a; }
+  return null; }
 function loadImage(file){ return new Promise((res,rej)=>{ const url=URL.createObjectURL(file); const img=new Image(); img.onload=()=>{ res(img); setTimeout(()=>URL.revokeObjectURL(url),1000); }; img.onerror=rej; img.src=url; }); }
 function zxingDecode(canvas){
   if(!window.ZXing) return null;
@@ -2092,32 +2103,57 @@ async function decodeBarcode(file){
   return null;
 }
 function verdictBadge(v){ return `<span class="badge ${v}">${ICON[v]}</span>`; }
-async function fetchOFF(ean){
+/* Tuotehaku Open Food Factsista ja sisarpalveluista. Niistä haetaan vain nimi ja ainesosaluettelo;
+   vegaanisuus arvioidaan aina sovelluksen omalla tietokannalla. */
+const OFF_HOSTS=[['world.openfoodfacts.org','Open Food Facts'],['world.openbeautyfacts.org','Open Beauty Facts'],['world.openproductsfacts.org','Open Products Facts'],['world.openpetfoodfacts.org','Open Pet Food Facts']];
+async function fetchOne(host,code){
+  const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),8000);
   try{
-    const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),7000);
-    const r=await fetch('https://world.openfoodfacts.org/api/v2/product/'+ean+'.json?fields=product_name,product_name_fi,product_name_sv,brands,ingredients_text_fi,ingredients_text_sv,ingredients_text,ingredients_text_en',{signal:ctl.signal});
-    clearTimeout(t); if(!r.ok) return null; const j=await r.json(); if(j.status!==1||!j.product) return null;
-    const p=j.product; const ing=(p.ingredients_text_fi||p.ingredients_text_sv||p.ingredients_text||p.ingredients_text_en||'').replace(/_/g,'').trim();
-    const brand=(p.brands||'').split(',')[0].trim();
-    return {name:[p.product_name_fi||p.product_name_sv||p.product_name,brand].filter(Boolean).join(' · '),ingredients:ing,src:'off'};
-  }catch{ return null; }
+    const r=await fetch('https://'+host+'/api/v2/product/'+code+'.json?fields=product_name,product_name_fi,product_name_sv,product_name_en,brands,lang,ingredients_text_fi,ingredients_text_sv,ingredients_text_en,ingredients_text,last_modified_t',{signal:ctl.signal});
+    clearTimeout(t); if(!r.ok) return {status:r.status===404?'notfound':'error'};
+    const j=await r.json(); if(j.status!==1||!j.product) return {status:'notfound'}; return {status:'ok',p:j.product};
+  }catch(e){ clearTimeout(t); return {status:'neterror'}; }
 }
+async function fetchOFF(ean){
+  const codes=[ean]; if(ean.length===12) codes.push('0'+ean); if(ean.length===8){ const a=upcEtoA(ean); if(a) codes.push('0'+a,a); } if(ean.length===13&&ean[0]==='0') codes.push(ean.slice(1));
+  const tries=[]; for(const [h,label] of OFF_HOSTS) for(const c of codes) tries.push(fetchOne(h,c).then(r=>({...r,label})));
+  const res=await Promise.all(tries);
+  const hits=res.filter(r=>r.status==='ok');
+  if(!hits.length) return {status: res.every(r=>r.status==='neterror')? 'offline' : 'notfound'};
+  const withIng=hits.find(r=>r.p.ingredients_text_fi||r.p.ingredients_text_sv||r.p.ingredients_text_en||r.p.ingredients_text)||hits[0];
+  const p=withIng.p;
+  const pick=p.ingredients_text_fi?['fi',p.ingredients_text_fi]:p.ingredients_text_sv?['sv',p.ingredients_text_sv]:p.ingredients_text_en?['en',p.ingredients_text_en]:p.ingredients_text?[p.lang||'?',p.ingredients_text]:[null,''];
+  const brand=(p.brands||'').split(',')[0].trim();
+  return {status:'ok',name:[p.product_name_fi||p.product_name_sv||p.product_name_en||p.product_name,brand].filter(Boolean).join(' · '),
+    ingredients:(pick[1]||'').replace(/_/g,'').trim(),ingLang:pick[0],src:'off',srcLabel:withIng.label,fetched:Date.now()};
+}
+const LANG_NAMES={de:'saksa',fr:'ranska',it:'italia',es:'espanja',nl:'hollanti',pl:'puola',da:'tanska',no:'norja',nb:'norja',et:'viro',lv:'latvia',lt:'liettua',pt:'portugali',cs:'tsekki',hu:'unkari',ru:'venäjä'};
+const REFRESH_MS=90*24*3600*1000;
 async function showProduct(ean){
-  let p=products()[ean]; const out=$('#scanOut');
+  let p=products()[ean]; const out=$('#scanOut'); let netState='';
   if(!(p&&p.ingredients)){
     out.innerHTML='<div class="status"><span class="spin"></span>Haetaan tuotetta…</div>';
-    const off=await fetchOFF(ean);
-    if(off&&off.ingredients){ saveProduct(ean,off); p=products()[ean]; }
-    else if(off&&off.name){ p={name:off.name}; }
+    const off=await fetchOFF(ean); netState=off.status;
+    if(off.status==='ok'&&off.ingredients){ saveProduct(ean,off); p=products()[ean]; }
+    else if(off.status==='ok'&&off.name){ p={name:off.name}; }
+  } else if(p.src==='off'&&Date.now()-(p.fetched||p.ts||0)>REFRESH_MS){
+    // vanhentunut: haetaan taustalla uudelleen ja näytetään uusi luettelo, jos se on muuttunut
+    fetchOFF(ean).then(off=>{ if(off.status==='ok'&&off.ingredients){ const changed=off.ingredients!==p.ingredients; saveProduct(ean,off); if(changed&&$('#eanInput').value===ean) showProduct(ean); } });
   }
   if(p&&p.ingredients){
     const a=analyze(p.ingredients);
-    out.innerHTML=`<div class="card"><div><h2>${esc(p.name||'Tuote')}</h2><div class="meta">${esc(ean)}</div></div><div class="view" id="prodRes"></div>${p.src==='off'?'<div class="src">Tuotetiedot: Open Food Facts (ODbL). Vegaanisuus arvioitu Veganin omalla tietokannalla.</div>':''}</div>`;
+    const when=p.fetched? new Date(p.fetched).toLocaleDateString('fi-FI') : null;
+    const foreign=p.ingLang&&!['fi','sv','en'].includes(p.ingLang);
+    out.innerHTML=`<div class="card"><div><h2>${esc(p.name||'Tuote')}</h2><div class="meta">${esc(ean)}</div></div>${foreign?`<div class="err">Ainesosaluettelo on vain kielellä ${esc(LANG_NAMES[p.ingLang]||p.ingLang)}. Kuvaa pakkauksen suomen-, ruotsin- tai englanninkielinen luettelo.</div>`:''}<div class="view" id="prodRes"></div>${p.src==='off'?`<div class="src">Ainesosat: ${esc(p.srcLabel||'Open Food Facts')} (ODbL)${when?', haettu '+esc(when):''}. Vegaanisuus arvioitu Veganin omalla tietokannalla.</div>`:''}</div>`;
     renderAnalysis($('#prodRes'),a,'p');
-    saveProduct(ean,{name:p.name,ingredients:p.ingredients,src:p.src});
-    return;
+    saveProduct(ean,{...p});
+    if(!foreign) return;
   }
-  out.innerHTML=`<div class="card"><div><h2>${p&&p.name?esc(p.name):'Tuotetta ei löytynyt'}</h2>${p&&p.name?'<div class="meta">Ainesosaluettelo puuttuu</div>':''}<div class="meta">${esc(ean)}</div></div>
+  const foreignCase=!!(p&&p.ingredients);
+  const head= netState==='offline'&&!(p&&p.name) ? 'Ei verkkoyhteyttä' : foreignCase ? 'Kuvaa ainesosaluettelo' : (p&&p.name?esc(p.name):'Tuotetta ei löytynyt');
+  const sub2= netState==='offline'&&!(p&&p.name) ? '<div class="meta">Tuotetietoja ei voitu hakea. Kuvaa ainesosaluettelo tai yritä myöhemmin uudelleen.</div>' : (!foreignCase&&p&&p.name?'<div class="meta">Ainesosaluettelo puuttuu</div>':'');
+  if(!foreignCase) out.innerHTML='';
+  out.insertAdjacentHTML('beforeend',`<div class="card"><div><h2>${head}</h2>${sub2}<div class="meta">${esc(ean)}</div></div>
     <div class="row"><label class="btn filebtn" id="labelBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 0 1 2-2h1.5l1.4-2h6.2l1.4 2H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><circle cx="12" cy="12.5" r="3.5"/></svg>Kuvaa ainesosaluettelo<input type="file" accept="image/*" multiple id="labelInput"></label>
     <label class="btn ghost filebtn" id="labelAdd" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Lisää kuva<input type="file" accept="image/*" multiple id="labelAddInput"></label></div>
     <div class="thumbs" id="labelThumbs" hidden></div>
@@ -2125,7 +2161,7 @@ async function showProduct(ean){
     <div class="field"><textarea class="input" id="pIng" aria-label="Ainesosat"></textarea></div>
     <div id="labelStatus"></div>
     <div class="view" id="pPreview"></div>
-    <button class="btn ghost block" id="pSave">Tallenna</button></div>`;
+    <button class="btn ghost block" id="pSave">Tallenna</button></div>`);
   getSample().then(s=>{ if(!s&&!STANDALONE) $('#labelBtn').hidden=true; });
   const pIng=$('#pIng');
   const preview=()=>{ const t=pIng.value.trim(); if(t){ renderAnalysis($('#pPreview'),analyze(t),'pp'); saveProduct(ean,{name:$('#pName').value.trim(),ingredients:t}); } else $('#pPreview').innerHTML=''; };
@@ -2167,7 +2203,7 @@ $('#barcodeInput').addEventListener('change',async e=>{
   try{ const ean=await decodeBarcode(file); if(ean){ $('#eanInput').value=ean; showProduct(ean); } else out.innerHTML='<div class="err">Viivakoodia ei tunnistettu. Kuvaa viivakoodi suoraan edestä tai kirjoita numerot.</div>'; }
   catch{ out.innerHTML='<div class="err">Kuvaa ei voitu avata. Yritä uudelleen.</div>'; }
 });
-function lookupEan(){ const v=validEan($('#eanInput').value); if(!v){ $('#scanOut').innerHTML='<div class="err">Tarkista numero: viivakoodissa on 8, 12 tai 13 numeroa.</div>'; return; } showProduct(v); }
+function lookupEan(){ const v=validEan($('#eanInput').value); if(!v){ $('#scanOut').innerHTML='<div class="err">Tarkista numero: viivakoodissa on 8, 12, 13 tai 14 numeroa, ja viimeinen numero on tarkistenumero.</div>'; return; } showProduct(v); }
 $('#eanBtn').onclick=lookupEan;
 $('#eanInput').addEventListener('keydown',e=>{ if(e.key==='Enter') lookupEan(); });
 function productItems(limit){

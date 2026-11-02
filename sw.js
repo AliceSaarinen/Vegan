@@ -1,5 +1,6 @@
 // Vegan – offline-välimuisti
-const CACHE = 'vegan-v4';
+// Sovellus avautuu heti välimuistista ja päivittyy taustalla (stale-while-revalidate).
+const CACHE = 'vegan-v5';
 const CORE = ['./', './index.html', './manifest.webmanifest', './off-taxonomy.json', './inci.json', './icons/icon-192.png', './icons/apple-touch-icon.png',
   'https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting())); });
@@ -8,12 +9,16 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  if (url.hostname.endsWith('openfoodfacts.org')) return; // tuotehaku aina verkosta
-  // Sovellus itse: verkko ensin, jotta päivitykset tulevat heti; muuten välimuistista
+  if (/open(food|beauty|products|petfood)facts\.org$/.test(url.hostname)) return; // tuotehaku aina verkosta
   if (url.origin === location.origin) {
-    e.respondWith(fetch(req).then(r => { const c = r.clone(); caches.open(CACHE).then(ca => ca.put(req, c)); return r; }).catch(() => caches.match(req).then(r => r || caches.match('./index.html'))));
+    e.respondWith(caches.open(CACHE).then(async ca => {
+      const hit = await ca.match(req, { ignoreSearch: true });
+      const net = fetch(req).then(r => { if (r.ok) ca.put(req, r.clone()); return r; }).catch(() => null);
+      if (hit) { e.waitUntil(net); return hit; }
+      return (await net) || (await ca.match('./index.html')) || Response.error();
+    }));
     return;
   }
-  // Kirjastot, fontit ja OCR-kielitiedostot: välimuisti ensin
+  // Kirjastot ja OCR-kielitiedostot: välimuisti ensin
   e.respondWith(caches.match(req).then(hit => hit || fetch(req).then(r => { if (r.ok || r.type === 'opaque') { const c = r.clone(); caches.open(CACHE).then(ca => ca.put(req, c)); } return r; })));
 });
