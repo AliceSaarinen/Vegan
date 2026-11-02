@@ -93,6 +93,13 @@ textarea.input{min-height:132px;display:block}
 .verdict .pct{font-variant-numeric:tabular-nums}
 .culprits{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .culprits span{background:rgba(255,255,255,.22);border-radius:999px;padding:4px 11px;font-weight:700;font-size:14.5px}
+.verdict.review{background:var(--warn-soft);color:var(--warn-ink)}
+.review{margin-top:12px;background:var(--surface,#f1f4f9);border-radius:var(--r-md,14px);padding:14px 16px;font-size:16px;line-height:1.6}
+.review p{margin:0}
+.review .unc{font:inherit;border:0;background:var(--warn-soft);color:var(--warn-ink);font-weight:800;border-radius:6px;padding:0 4px;text-decoration:underline dotted;cursor:pointer}
+.review .unc.on{background:var(--warn);color:#fff}
+.review .choices{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.review .opt{font:inherit;font-weight:700;border:1.5px solid var(--line,#d9dfe8);background:var(--bg,#fff);color:var(--fg,#0b2150);border-radius:999px;padding:8px 14px;min-height:44px;cursor:pointer}
 .culprits.marks span{background:transparent;border:1.5px solid rgba(255,255,255,.55);font-weight:600}
 
 .disclosure{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;border:0;background:var(--surface);border-radius:var(--r-md);padding:14px 16px;font-weight:800;font-size:16px;text-align:left}
@@ -847,7 +854,7 @@ function classifyWordCore(w,useNeutral){
   const he=mget(head); if(he.cls==='A'&&!mw.slice(-head.length).includes('#')) return he;
   if(he.cls==='A') return null;
   const pre=w.slice(0,-head.length).replace(/-$/,'');
-  if(pre.length<=2||PRE_MOD.has(pre)) return he;
+  if(PRE_MOD.has(pre)) return he;
   const pe=lookupVariants(pre)||((pre.endsWith('n')||pre.endsWith('s'))&&pre.length>3?lookupVariants(pre.slice(0,-1)):null)||(pre.length>=4?classifyWordNoNeutral(pre):null);
   return pe? worst([he,pe]) : null;
 }
@@ -997,7 +1004,7 @@ async function loadOffTaxonomy(){
     const mk=idx=>{ let e=made[idx]; if(!e){ const [name,cls,nameSv]=d.entries[idx]; e=made[idx]={name,nameSv,cls,terms:[],source:'Open Food Facts',off:true,rk:''}; if(cls==='U') Object.assign(e,offUncertain(name)); e.id=ENTRIES.length; ENTRIES.push(e); } else if(!e.nameSv) e.nameSv=d.entries[idx][2]; return e; };
     for(const [term,idx] of Object.entries(d.terms_sv||{})){ if(SVMAP.has(term)) continue; SVMAP.set(term,mk(idx)); }
     rebuildSingles();
-    FUZZ=null; FUZZ_SV=null; offLoaded=true; return true;
+    FUZZ=null; FUZZ_SV=null; WORDSET=null; offLoaded=true; return true;
   }catch{ return false; }
 }
 /* Kosmetiikan INCI-nimet (inci.json, rakennettu tools/build-inci.js:llä omilla säännöillä) */
@@ -1012,7 +1019,7 @@ async function loadInci(){
     for(const t of d.A){ const e={name:cap(t),cls:'A',source:'Eläinperäinen (kosmetiikan ainesosa)',rk:'',terms:[t],inci:true}; e.id=ENTRIES.length; ENTRIES.push(e); put(t,e); }
     for(const [t,p,o] of d.U){ const e={name:cap(t),cls:'U',p:{default:p},origins:d.origins[o],rk:'',terms:[t],inci:true}; e.id=ENTRIES.length; ENTRIES.push(e); put(t,e); }
     for(const t of d.V) put(t,INCI_V);
-    rebuildSingles(); FUZZ=null; FUZZ_SV=null; inciLoaded=true; return true;
+    rebuildSingles(); FUZZ=null; FUZZ_SV=null; WORDSET=null; inciLoaded=true; return true;
   }catch{ return false; }
 }
 let FUZZ=null, FUZZ_SV=null;
@@ -1061,6 +1068,130 @@ function fuzzyClassify(label){
   return {entry:e,term:hits.find(h=>h.entry===e).term};
 }
 
+
+/* =====================================================================
+   TEKSTINTUNNISTUKSEN KORJAUS
+   Tunnistettu teksti käydään läpi ennen vegaanisuustarkistusta:
+   1) E-koodit korjataan (E47l → E471), 2) tuntemattomat sanat korjataan sanakirjaan
+   tunnistukselle tyypillisillä sekaannuksilla (rn↔m, l↔1, 0↔o, ä↔a …),
+   3) jos korjaus ei ole yksiselitteinen tai sanan tunnistusvarmuus on matala ja
+   vaihtoehto muuttaisi tuloksen, sana merkitään vahvistettavaksi. Vihreää tulosta
+   ei näytetä ennen kuin kaikki merkityt sanat on vahvistettu.
+   ===================================================================== */
+let WORDSET=null, WORDS_BY_LEN=null, MASKS_BY_LEN=null; const CAND_CACHE=new Map();
+const LETTER_BIT=(()=>{ const m={}; 'abcdefghijklmnopqrstuvwxyz'.split('').forEach((c,i)=>m[c]=i); m['ä']=0; m['å']=0; m['ö']=14; m['é']=4; m['ü']=20; m['1']=11; m['0']=14; m['5']=18; m['|']=11; return m; })();
+function letterMask(w){ let m=0; for(const c of w){ const b=LETTER_BIT[c]; if(b!=null) m|=1<<b; } return m; }
+function popc(x){ x=x-((x>>>1)&0x55555555); x=(x&0x33333333)+((x>>>2)&0x33333333); return (((x+(x>>>4))&0x0F0F0F0F)*0x01010101)>>>24; }
+function buildWordset(){
+  WORDSET=new Set(); WORDS_BY_LEN=new Map(); MASKS_BY_LEN=new Map(); CAND_CACHE.clear();
+  const add=w=>{ if(w.length<2||w.length>30||/\d/.test(w)) return; if(WORDSET.has(w)) return; WORDSET.add(w); const L=w.length; if(!WORDS_BY_LEN.has(L)){ WORDS_BY_LEN.set(L,[]); MASKS_BY_LEN.set(L,[]); } WORDS_BY_LEN.get(L).push(w); MASKS_BY_LEN.get(L).push(letterMask(w)); };
+  for(const m of [MAP,SVMAP]) for(const k of m.keys()) for(const w of k.split(/[\s\/(),.;:]+/)) add(w.replace(/^-+|-+$/g,''));
+  for(const w of MOD_WORDS) add(w); for(const w of NOCLASS) for(const x of w.split(' ')) add(x);
+  for(const w of ['ainesosat','ainekset','ingredienser','ingredients','sisältää','innehåller','contains','voi','saattaa','may','contain','kan','innehålla','spår','av','pieniä','määriä','traces','of','muita','pähkinöitä','maitoa','kananmunaa','soijaa','seesaminsiemeniä','vehnää','gluteenia','sinappia','selleriä','kalaa','äyriäisiä','sulfiitteja','rikkidioksidia','mjölk','ägg','nötter','sesam','milk','egg','nuts','vähintään','min','sekä','ja','och','and','or','tai','eller','with','med']) add(w);
+}
+// Tunnistukselle tyypilliset merkkisekaannukset (kustannus 0–1, pienempi = todennäköisempi)
+const OCR_SUB=(()=>{ const m=new Map(); const put=(a,b,c)=>{ m.set(a+'|'+b,c); m.set(b+'|'+a,c); };
+  for(const [a,b] of [['a','ä'],['o','ö'],['a','å'],['e','é'],['u','ü']]) put(a,b,0.2);
+  for(const [a,b] of [['l','1'],['l','i'],['i','1'],['l','|'],['i','|'],['o','0'],['s','5'],['b','8'],['g','9'],['z','2'],['t','f'],['c','e'],['u','v'],['n','h'],['h','b'],['e','o'],['a','o'],['c','o'],['r','t'],['i','j'],['y','v'],['q','g'],['k','x'],['ä','å'],['ö','ä'],['m','n'],['i','t'],['l','t'],['f','l'],['a','s'],['e','a'],['ü','ii']]) put(a,b,0.35);
+  return m; })();
+const OCR_MULTI=[['rn','m',0.3],['cl','d',0.35],['ii','u',0.35],['li','h',0.4],['vv','w',0.3],['nn','m',0.45],['ri','n',0.4],['in','m',0.45],['ni','m',0.45],['iu','in',0.4],['lI','h',0.4],['ll','u',0.45],['1i','h',0.4],['tl','d',0.45]];
+function ocrDist(a,b,max){
+  if(Math.abs(a.length-b.length)>2) return 99;
+  const n=a.length, m=b.length; const D=[];
+  for(let i=0;i<=n;i++){ D.push(new Float32Array(m+1)); D[i][0]=i*0.9; }
+  for(let j=0;j<=m;j++) D[0][j]=j*0.9;
+  for(let i=1;i<=n;i++){ let rowMin=99;
+    for(let j=1;j<=m;j++){
+      const ca=a[i-1], cb=b[j-1];
+      let c=Math.min(D[i-1][j]+0.9, D[i][j-1]+0.9, D[i-1][j-1]+(ca===cb?0:(OCR_SUB.get(ca+'|'+cb)??1)));
+      for(const [x,y,w] of OCR_MULTI){
+        if(i>=x.length&&j>=y.length&&a.slice(i-x.length,i)===x&&b.slice(j-y.length,j)===y) c=Math.min(c,D[i-x.length][j-y.length]+w);
+        if(i>=y.length&&j>=x.length&&a.slice(i-y.length,i)===y&&b.slice(j-x.length,j)===x) c=Math.min(c,D[i-y.length][j-x.length]+w);
+      }
+      D[i][j]=c; if(c<rowMin) rowMin=c;
+    }
+    if(rowMin>max) return 99;
+  }
+  return D[n][m];
+}
+function wordKnown(w){
+  if(!WORDSET) buildWordset();
+  if(WORDSET.has(w)||/^\d+([.,]\d+)?%?$/.test(w)||/^e\d{3,4}[a-f]?$/.test(w)) return true;
+  if(isModifier(w)) return true;
+  // vain sanakirjan sanat ja niiden taivutukset; yhdyssanapäättely ei riitä, koska vääristynyt sana voi näyttää yhdyssanalta
+  return !!(lookupVariants(w)||withLang('sv',()=>lookupVariants(w)));
+}
+function wordClass(w){ const e=classifyTerm(w)||withLang('sv',()=>classifyTerm(w)); return e? (e.cls==='A'?'A':'nA') : '?'; }
+function ocrCandidates(w,limit){
+  if(!WORDSET) buildWordset();
+  const ck=w+'|'+(limit||6); if(CAND_CACHE.has(ck)) return CAND_CACHE.get(ck);
+  const max=Math.max(0.95,Math.min(1.8,w.length*0.22)); const out=[]; const mw=letterMask(w);
+  for(let L=w.length-2;L<=w.length+2;L++){ const ws=WORDS_BY_LEN.get(L)||[], ms=MASKS_BY_LEN.get(L)||[];
+    for(let i=0;i<ws.length;i++){ const k=ws[i]; if(k===w) continue; const mk=ms[i]; if(popc(mk&~mw)>3||popc(mw&~mk)>3) continue; const d=ocrDist(w,k,max); if(d<=max) out.push({w:k,d}); } }
+  out.sort((a,b)=>a.d-b.d||b.w.length-a.w.length);
+  const res=out.slice(0,limit||6); CAND_CACHE.set(ck,res); return res;
+}
+const ECODE_RE=/\b([EeЕ€])\s?-?([0-9OoIlSsZzBbg|]{3})([0-9OoIlSsZzBbg|]?)\s?(\(?[a-fA-F]\)?|i{1,3}\b)?(?=[\s,.;)\]]|$)/g;
+function fixEcodes(text,fixes){
+  const map={O:'0',o:'0',I:'1',l:'1','|':'1',S:'5',s:'5',Z:'2',z:'2',B:'8',b:'8',g:'9'};
+  return text.replace(ECODE_RE,(m,e,a,b,suf)=>{
+    const raw=a+b; if(!/\d/.test(raw)) return m;
+    const digits=raw.split('').map(c=>map[c]||c).join('');
+    for(const d of [digits, digits.slice(0,3)]){ if(MAP.has('e'+d)){ const out='E'+d+(d.length===digits.length?(suf||''):''); if(out.replace(/\s/g,'')!==m.replace(/\s/g,'')) fixes.push({from:m.trim(),to:out}); return (d.length===digits.length?out:'E'+d+raw.slice(d.length).split('').map(c=>map[c]||c).join('')+(suf||'')); } }
+    return m;
+  });
+}
+/* info: {conf: Map(sana → varmuus 0–100), alts: Map(sana → muiden kierrosten lukemat)}; ilman tietoja oletetaan hyvä varmuus */
+function ocrCorrect(text,info){
+  info=info||{}; const conf=info.conf||new Map(), alts=info.alts||new Map();
+  const fixes=[]; text=fixEcodes(text,fixes);
+  const toks=[...text.matchAll(/[\p{L}\d|][\p{L}\d'’|-]*/gu)];
+  const edits=[]; const spans=[];
+  for(const m of toks){
+    const raw=m[0]; const w=raw.toLowerCase().replace(/[’']/g,"'").replace(/^-+|-+$/g,'');
+    if(w.length<3||/^\d+([.,]\d+)?$/.test(w)||/^e\d/.test(w)) continue;
+    const c=conf.has(w)? conf.get(w) : 90;
+    const others=[...(alts.get(w)||[])].filter(x=>x!==w);
+    const known=wordKnown(w);
+    // Tunnistuskierrokset lukivat sanan eri tavoin: jos lukemat johtavat eri tulokseen, kysytään
+    if(others.length){
+      const opts=[w,...others].filter((x,i,a)=>a.indexOf(x)===i);
+      const knownOpts=opts.filter(wordKnown);
+      const classes=new Set(knownOpts.map(wordClass));
+      if(knownOpts.length>1&&classes.size>1){ spans.push({start:m.index,end:m.index+raw.length,word:raw,cands:knownOpts}); continue; }
+      if(!known&&knownOpts.length===1){ edits.push({start:m.index,end:m.index+raw.length,to:matchCase(raw,knownOpts[0])}); fixes.push({from:raw,to:knownOpts[0]}); continue; }
+    }
+    if(known){
+      if(c>=60) continue;
+      // tunnettu sana, mutta epävarmasti luettu: kysytään vain, jos lähellä on sana, joka muuttaisi tuloksen
+      const near=ocrCandidates(w,4).filter(x=>x.d<=0.6&&wordKnown(x.w));
+      const cw=wordClass(w); const diff=near.filter(x=>wordClass(x.w)!==cw);
+      if(diff.length) spans.push({start:m.index,end:m.index+raw.length,word:raw,cands:[w,...diff.map(x=>x.w)].slice(0,4)});
+      continue;
+    }
+    // tuntematon sana: korjaus sanakirjaan
+    const cands=ocrCandidates(w,6); if(!cands.length) continue;
+    // yhdyssanana tulkittava sana, jolle ei ole lähellä olevaa sanakirjan sanaa, jätetään ennalleen
+    const own=classifyWord(w); if(own&&cands[0].d>0.7) continue;
+    if(own&&cands.some(x=>x.d<=0.7&&wordClass(x.w)!==(own.cls==='A'?'A':'nA'))){ spans.push({start:m.index,end:m.index+raw.length,word:raw,cands:[w,...cands.filter(x=>x.d<=0.7).map(x=>x.w)].slice(0,4)}); continue; }
+    const best=cands[0]; const close=cands.filter(x=>x.d<=best.d+0.45);
+    const classes=new Set(close.map(x=>wordClass(x.w)));
+    const anyAnimal=close.some(x=>wordClass(x.w)==='A');
+    const unique=close.length===1||classes.size===1&&!anyAnimal||close.every(x=>x.w===best.w);
+    if(unique&&best.d<=(info.strict?0.5:Math.max(0.6,w.length*0.12))&&c>=30){ edits.push({start:m.index,end:m.index+raw.length,to:matchCase(raw,best.w)}); fixes.push({from:raw,to:best.w}); }
+    else spans.push({start:m.index,end:m.index+raw.length,word:raw,cands:close.map(x=>x.w).slice(0,4)});
+  }
+  // sovelletaan korjaukset ja siirretään vahvistettavien kohtien sijainnit
+  let out='', last=0, shift=0; const sp=spans.map(x=>({...x}));
+  for(const e of edits.sort((a,b)=>a.start-b.start)){
+    out+=text.slice(last,e.start)+e.to; const delta=e.to.length-(e.end-e.start);
+    for(const x of sp) if(x.start>=e.end){ x.start+=delta; x.end+=delta; }
+    last=e.end;
+  }
+  out+=text.slice(last);
+  return {text:out, spans:sp.sort((a,b)=>a.start-b.start), fixes};
+}
+function matchCase(src,w){ if(src===src.toUpperCase()&&src.length>1) return w.toUpperCase(); if(src[0]===src[0].toUpperCase()) return cap(w); return w; }
 /* =====================================================================
    AINESOSALUETTELON JÄSENNYS
    ===================================================================== */
@@ -1247,6 +1378,41 @@ function verdictHTML(a){
   return `<div class="verdict ${a.verdict}" role="status"><div class="word">${ICON[a.verdict]}${WORD[a.verdict]}</div>${sub}${chips?`<div class="culprits">${chips}</div>`:''}${marks?`<div class="culprits marks">${marks}</div>`:''}</div>`;
 }
 let openState=false;
+/* Vahvistettavat sanat: korostetaan tekstissä, napautus näyttää vaihtoehdot. Lopullinen tulos vasta, kun kaikki on vahvistettu
+   (paitsi jos luettelossa on jo varmasti eläinperäinen ainesosa). */
+function makeReview(input,outEl,key,after){
+  let rv=null;
+  function render(){
+    const v=input.value; if(rv&&rv.text!==v) rv=null;
+    const a=analyze(v); renderAnalysis(outEl,a,key);
+    if(rv&&rv.spans.length) decorate(a);
+    after&&after(v,a,rv?rv.spans.length:0);
+  }
+  function decorate(a){
+    const n=rv.spans.length;
+    if(a.verdict!=='bad'){ const vd=outEl.querySelector('.verdict'); const box=`<div class="verdict review" role="status"><div class="word">${ICON.warn}Tarkista ${n} ${n===1?'kohta':'kohtaa'}</div></div>`; if(vd) vd.outerHTML=box; else outEl.insertAdjacentHTML('afterbegin',box); }
+    let html='', last=0; rv.spans.forEach((sp,i)=>{ html+=esc(rv.text.slice(last,sp.start))+`<button type="button" class="unc" data-i="${i}">${esc(rv.text.slice(sp.start,sp.end))}</button>`; last=sp.end; });
+    html+=esc(rv.text.slice(last));
+    const vd=outEl.querySelector('.verdict');
+    vd.insertAdjacentHTML('afterend',`<div class="review"><p>${html}</p><div class="choices" hidden></div></div>`);
+    const ch=outEl.querySelector('.review .choices');
+    outEl.querySelectorAll('.review .unc').forEach(b=>b.onclick=()=>{
+      const i=+b.dataset.i, sp=rv.spans[i]; const orig=rv.text.slice(sp.start,sp.end);
+      const opts=[...new Set([...sp.cands.map(c=>matchCase(orig,c)),orig])];
+      outEl.querySelectorAll('.review .unc').forEach(x=>x.classList.toggle('on',x===b));
+      ch.innerHTML=opts.map(o=>`<button type="button" class="opt" data-v="${esc(o)}">${esc(o)}</button>`).join('');
+      ch.hidden=false;
+      ch.querySelectorAll('.opt').forEach(o=>o.onclick=()=>pick(i,o.dataset.v));
+    });
+  }
+  function pick(i,choice){
+    const sp=rv.spans[i]; const v=input.value;
+    const nv=v.slice(0,sp.start)+choice+v.slice(sp.end); const d=choice.length-(sp.end-sp.start);
+    rv.spans.splice(i,1); for(const x of rv.spans) if(x.start>=sp.end){ x.start+=d; x.end+=d; }
+    input.value=nv; rv.text=nv; if(!rv.spans.length) rv=null; render();
+  }
+  return {render, apply(text,info){ const r=ocrCorrect(text,info); input.value=r.text; rv=r.spans.length?{text:r.text,spans:r.spans}:null; render(); }, pending:()=>rv?rv.spans.length:0};
+}
 function renderAnalysis(el,a,key){
   if(a.verdict==='none'){ el.innerHTML=''; return; }
   const order=[...a.animals,...a.uncertain,...a.items.filter(i=>i.entry&&i.entry.cls==='V')];
@@ -1816,11 +1982,18 @@ Paista 200 asteessa 25–30 minuuttia.`;
 const ingInput=$('#ingInput');
 ingInput.value=store.get('vegan.ingDraft',SAMPLE_ING);
 let ingT=null;
-function runCheck(){ const a=analyze(ingInput.value); renderAnalysis($('#checkOut'),a,'c'); store.set('vegan.ingDraft',ingInput.value); }
-ingInput.addEventListener('input',()=>{ clearTimeout(ingT); ingT=setTimeout(runCheck,120); });
+const ingReview=makeReview(ingInput,$('#checkOut'),'c',v=>store.set('vegan.ingDraft',v));
+function runCheck(){ ingReview.render(); }
+// Liitetty tai iPhonen "Skannaa teksti" -toiminnolla syötetty teksti kulkee saman korjauksen läpi
+ingInput.addEventListener('input',e=>{
+  clearTimeout(ingT);
+  const bulk=/^(insertFromPaste|insertFromDrop|insertReplacementText|insertFromYank)$/.test(e.inputType||'')||(e.data&&e.data.length>=25);
+  if(bulk){ ingReview.apply(ingInput.value,{strict:e.inputType==='insertFromPaste'}); return; }
+  ingT=setTimeout(runCheck,120);
+});
 $('#clearIng').onclick=()=>{ ingInput.value=''; runCheck(); if(window.ingFlowRef) window.ingFlowRef.reset(); ingInput.focus(); };
 runCheck();
-loadOffTaxonomy().then(ok=>{ if(ok){ runCheck(); renderRecent(); } return loadInci(); }).then(ok=>{ if(ok){ runCheck(); renderRecent(); } });
+loadOffTaxonomy().then(ok=>{ if(ok){ runCheck(); renderRecent(); } return loadInci(); }).then(ok=>{ if(ok){ runCheck(); renderRecent(); } }).finally(()=>importFromUrl());
 
 // --- Claude (kuvan lukeminen)
 let samplePromise=null;
@@ -1890,7 +2063,7 @@ function prepCanvas(img,mode){
 }
 function collectLines(data){
   const out=[];
-  if(data&&data.blocks) for(const b of data.blocks) for(const p of (b.paragraphs||[])){ let first=true; for(const l of (p.lines||[])){ const t=(l.text||'').replace(/\s+/g,' ').trim(); if(t) out.push({text:t,conf:l.confidence||0,pb:first}); first=false; } }
+  if(data&&data.blocks) for(const b of data.blocks) for(const p of (b.paragraphs||[])){ let first=true; for(const l of (p.lines||[])){ const t=(l.text||'').replace(/\s+/g,' ').trim(); if(t) out.push({text:t,conf:l.confidence||0,pb:first,words:(l.words||[]).map(w=>({t:(w.text||'').trim(),c:w.confidence||0,h:w.bbox?w.bbox.y1-w.bbox.y0:0})).filter(w=>w.t)}); first=false; } }
   if(!out.length&&data&&data.text) for(const t of data.text.split('\n')){ const tt=t.trim(); if(tt) out.push({text:tt,conf:data.confidence||50,pb:false}); }
   return out.filter(l=>!(l.conf<35&&(l.text.match(/[a-zåäö]/gi)||[]).length<4));
 }
@@ -1989,35 +2162,75 @@ function mergeTwo(A,B){
   return A.concat(B);
 }
 function mergePhotos(list){ let acc=[]; for(const l of list) acc=acc.length?mergeTwo(acc,l):l.slice(); return acc; }
+/* Kuvan laatu ennen tunnistusta: epätarkkuus (Laplace-varianssi) ja heijastukset (ylivalottuneet alueet) */
+function imageQuality(img){
+  const long=Math.max(img.width,img.height), sc=Math.min(1,900/long);
+  const w=Math.max(1,Math.round(img.width*sc)), h=Math.max(1,Math.round(img.height*sc));
+  const c=document.createElement('canvas'); c.width=w; c.height=h; const x=c.getContext('2d',{willReadFrequently:true}); x.drawImage(img,0,0,w,h);
+  const d=x.getImageData(0,0,w,h).data; const g=new Float32Array(w*h);
+  let blown=0; for(let i=0,j=0;i<g.length;i++,j+=4){ g[i]=d[j]*0.299+d[j+1]*0.587+d[j+2]*0.114; if(d[j]>=250&&d[j+1]>=250&&d[j+2]>=250) blown++; }
+  // reunojen terävyys: Laplacen varianssi vain alueilla, joilla on rakennetta (teksti), ei tasaisella taustalla
+  let s1=0,s2=0,n=0;
+  for(let y=1;y<h-1;y++) for(let xx=1;xx<w-1;xx++){ const i=y*w+xx; const L=4*g[i]-g[i-1]-g[i+1]-g[i-w]-g[i+w]; const a=Math.abs(L); if(a<4) continue; s1+=L; s2+=L*L; n++; }
+  const lapVar= n>w*h*0.01 ? s2/n-(s1/n)**2 : 0;
+  return {sharp:lapVar, glare:blown/(w*h), textRatio:n/(w*h)};
+}
+/* Kahden tunnistuskierroksen rivit kohdistetaan toisiinsa ja eroavat sanat kirjataan vaihtoehdoiksi */
+function tokWords(t){ return (t.toLowerCase().match(/[\p{L}\d][\p{L}\d'-]*/gu)||[]); }
+function voteAlts(base,other,alts){
+  for(const bl of base){
+    let best=null,bs=0.55; for(const ol of other){ const v=bigramSim(bl.text,ol.text); if(v>bs){ bs=v; best=ol; } }
+    if(!best) continue;
+    const A=tokWords(bl.text), B=tokWords(best.text); const n=A.length, m=B.length;
+    const D=[...Array(n+1)].map(()=>new Array(m+1).fill(0)); for(let i=0;i<=n;i++) D[i][0]=i; for(let j=0;j<=m;j++) D[0][j]=j;
+    for(let i=1;i<=n;i++) for(let j=1;j<=m;j++) D[i][j]=Math.min(D[i-1][j]+1,D[i][j-1]+1,D[i-1][j-1]+(A[i-1]===B[j-1]?0:1));
+    let i=n,j=m; while(i>0&&j>0){ if(D[i][j]===D[i-1][j-1]+(A[i-1]===B[j-1]?0:1)){ if(A[i-1]!==B[j-1]&&A[i-1].length>=3&&B[j-1].length>=3){ if(!alts.has(A[i-1])) alts.set(A[i-1],new Set()); alts.get(A[i-1]).add(B[j-1]); } i--; j--; } else if(D[i][j]===D[i-1][j]+1) i--; else j--; }
+  }
+}
 async function ocrPhoto(file,onStep){
-  const img=await loadImage(file); const w=await getWorker();
-  let best=null;
-  for(const mode of ['adaptive','gray']){
+  const img=await loadImage(file);
+  const q=imageQuality(img);
+  if(q.textRatio>0.002&&q.sharp<35) return {lines:[],quality:q,blurry:true};
+  const w=await getWorker();
+  const passes=[];
+  for(const [mode,psm] of [['adaptive','3'],['gray','3'],['adaptive','6']]){
     onStep&&onStep(mode);
+    await w.setParameters({tessedit_pageseg_mode:psm});
     const c=prepCanvas(img,mode);
     const {data}=await w.recognize(c,{rotateAuto:true},{text:true,blocks:true});
     const lines=collectLines(data);
     const ing=lines.reduce((a,l)=>a+Math.max(0,lineIngScore(l.text))*(l.conf/100),0);
     const score=ing+(data.confidence||0)/25+(findHeader(lines,HDR_FI)||findHeader(lines,HDR_SV)||findHeader(lines,HDR_EN)?2:0);
-    if(!best||score>best.score) best={lines,score};
-    if((data.confidence||0)>=78&&ing>2) break;
+    passes.push({lines,score,conf:data.confidence||0});
+    // kolmas kierros vain, jos kaksi ensimmäistä ovat selvästi eri mieltä
+    if(passes.length===2){ const t1=passes[0].lines.map(l=>l.text).join(' '), t2=passes[1].lines.map(l=>l.text).join(' '); if(bigramSim(t1,t2)>0.93) break; }
   }
-  return best?best.lines:[];
+  await w.setParameters({tessedit_pageseg_mode:'3'});
+  passes.sort((a,b)=>b.score-a.score);
+  const base=passes[0];
+  const conf=new Map(), alts=new Map();
+  for(const l of base.lines) for(const wd of l.words||[]){ for(const t of tokWords(wd.t)){ conf.set(t,Math.min(conf.has(t)?conf.get(t):100,wd.c)); } }
+  for(const o of passes.slice(1)) voteAlts(base.lines,o.lines,alts);
+  // sana, jonka kaikki kierrokset lukivat samoin, on varmempi
+  for(const [t,c] of conf) if(!alts.has(t)&&passes.length>1&&passes.slice(1).every(p=>p.lines.some(l=>tokWords(l.text).includes(t)))) conf.set(t,Math.max(c,75));
+  const hs=base.lines.flatMap(l=>(l.words||[]).map(x=>x.h)).filter(Boolean).sort((a,b)=>a-b);
+  q.textHeight=hs.length?hs[Math.floor(hs.length/2)]:0; q.meanConf=base.conf;
+  return {lines:base.lines,conf,alts,quality:q};
 }
 /* Kuvausvirta: yksi tai useampi kuva → ainesosaluettelo */
 function makePhotoFlow({mainInput,addInput,addBtn,thumbs,status,onText,onName}){
-  const st={files:[],lines:[]};
+  const st={files:[],lines:[],conf:new Map(),alts:new Map(),notes:[]};
   const setStatus=h=>{ status.innerHTML=h; };
   const busy=t=>setStatus(`<div class="status"><span class="spin"></span><span>${esc(t)}</span></div>`);
   function renderThumbs(){
     thumbs.innerHTML=st.files.map((f,i)=>`<span class="thumb"><img alt="Kuva ${i+1}" src="${URL.createObjectURL(f)}"></span>`).join('')+(st.files.length?`<button class="thumbclear" type="button" aria-label="Poista kuvat">×</button>`:'');
     thumbs.hidden=!st.files.length; addBtn.hidden=!st.files.length;
-    const cl=thumbs.querySelector('.thumbclear'); if(cl) cl.onclick=()=>{ st.files=[]; st.lines=[]; renderThumbs(); setStatus(''); };
+    const cl=thumbs.querySelector('.thumbclear'); if(cl) cl.onclick=()=>{ st.files=[]; st.lines=[]; st.conf=new Map(); st.alts=new Map(); renderThumbs(); setStatus(''); };
   }
   async function handle(files,reset){
     files=[...files].filter(f=>/^image\//.test(f.type)||/\.(jpe?g|png|heic|heif|webp)$/i.test(f.name));
     if(!files.length) return;
-    if(reset){ st.files=[]; st.lines=[]; }
+    if(reset){ st.files=[]; st.lines=[]; st.conf=new Map(); st.alts=new Map(); }
     st.files.push(...files); renderThumbs();
     try{
       const s=await getSample();
@@ -2031,22 +2244,30 @@ function makePhotoFlow({mainInput,addInput,addBtn,thumbs,status,onText,onName}){
       if(!STANDALONE) throw {code:'unavailable'};
       busy('Valmistellaan tekstintunnistusta…');
       ocrProgress=(stt,p)=>{ if(/recogniz/.test(stt)) busy('Luetaan kuvaa '+cur+'/'+st.files.length+' · '+Math.round(p*100)+' %'); else if(/load/.test(stt)) busy('Ladataan kielitiedostoa · '+Math.round(p*100)+' %'); };
-      let cur=st.lines.length;
-      for(const f of files){ cur++; st.lines.push(await ocrPhoto(f)); }
+      let cur=st.lines.length; const notes=[];
+      for(const f of files){ cur++; const r=await ocrPhoto(f);
+        if(r.blurry){ notes.push('Kuva '+cur+' on epätarkka. Ota uusi kuva ja tarkenna tekstiin.'); continue; }
+        st.lines.push(r.lines); for(const [k,v] of r.conf) st.conf.set(k,Math.min(st.conf.has(k)?st.conf.get(k):100,v)); for(const [k,v] of r.alts){ if(!st.alts.has(k)) st.alts.set(k,new Set()); for(const x of v) st.alts.get(k).add(x); }
+        if(r.quality.glare>0.06) notes.push('Kuvassa '+cur+' on heijastus. Kallista pakkausta tai valoa, jos osa tekstistä jäi lukematta.');
+        else if(r.quality.meanConf<55&&r.quality.textHeight&&r.quality.textHeight<14) notes.push('Teksti on kuvassa '+cur+' pientä. Ota kuva lähempää.');
+      }
       ocrProgress=null;
       const merged=mergePhotos(st.lines);
       const text=extractIngredients(merged);
-      if(text&&text.length>3){ setStatus(''); onText(text); }
-      else setStatus('<div class="err">Kuvista ei löytynyt ainesosaluetteloa. Lisää kuva, jossa luettelo näkyy suoraan edestä.</div>');
+      const noteHtml=notes.length?`<div class="err">${notes.map(esc).join('<br>')}</div>`:'';
+      if(text&&text.length>3){ setStatus(noteHtml); onText(text,{conf:st.conf,alts:st.alts}); }
+      else setStatus(noteHtml||'<div class="err">Kuvista ei löytynyt ainesosaluetteloa. Lisää kuva, jossa luettelo näkyy suoraan edestä.</div>');
     }catch(err){ ocrProgress=null; const t=errText(err); setStatus(t?`<div class="err">${esc(t)}</div>`:''); }
   }
   mainInput.addEventListener('change',e=>{ const f=e.target.files; const arr=[...f]; e.target.value=''; handle(arr,true); });
   addInput.addEventListener('change',e=>{ const arr=[...e.target.files]; e.target.value=''; handle(arr,false); });
-  return {reset(){ st.files=[]; st.lines=[]; renderThumbs(); setStatus(''); }};
+  return {reset(){ st.files=[]; st.lines=[]; st.conf=new Map(); st.alts=new Map(); renderThumbs(); setStatus(''); }};
 }
 function errText(e){ const c=e&&e.code; if(c==='not_granted'||c==='sampling_disabled'||c==='unavailable') return 'Kuvan lukeminen ei ole käytettävissä. Kirjoita tai liitä ainesosat tekstinä.'; if(c==='rate_limited') return 'Liian monta pyyntöä. Yritä hetken päästä uudelleen.'; if(c==='image_rejected') return 'Kuvaa ei voitu lukea. Ota uusi kuva lähempää.'; if(c==='cancelled') return ''; return 'Ainesosaluetteloa ei saatu luettua.'; }
 getSample().then(s=>{ if(s||STANDALONE){ $('#ocrBtn').hidden=false; } });
-const ingFlow=window.ingFlowRef=makePhotoFlow({mainInput:$('#ocrInput'),addInput:$('#ocrAddInput'),addBtn:$('#ocrAdd'),thumbs:$('#ocrThumbs'),status:$('#ocrStatus'),onText:t=>{ ingInput.value=t; runCheck(); }});
+const ingFlow=window.ingFlowRef=makePhotoFlow({mainInput:$('#ocrInput'),addInput:$('#ocrAddInput'),addBtn:$('#ocrAdd'),thumbs:$('#ocrThumbs'),status:$('#ocrStatus'),onText:(t,info)=>ingReview.apply(t,info||{})});
+// Pikakomento: …/Vegan/?t=<teksti> (iPhonen oma tekstintunnistus)
+function importFromUrl(){ try{ const q=new URLSearchParams(location.search).get('t'); if(q){ go('ainesosat'); const lines=q.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map(t=>({text:t,conf:90,pb:false})); const txt=extractIngredients(lines)||q; ingReview.apply(txt,{}); history.replaceState(null,'',location.pathname+'#ainesosat'); } }catch{} }
 
 // --- Reseptimuunnos (yksi napautus)
 const recipeInput=$('#recipeInput');
@@ -2164,9 +2385,10 @@ async function showProduct(ean){
     <button class="btn ghost block" id="pSave">Tallenna</button></div>`);
   getSample().then(s=>{ if(!s&&!STANDALONE) $('#labelBtn').hidden=true; });
   const pIng=$('#pIng');
-  const preview=()=>{ const t=pIng.value.trim(); if(t){ renderAnalysis($('#pPreview'),analyze(t),'pp'); saveProduct(ean,{name:$('#pName').value.trim(),ingredients:t}); } else $('#pPreview').innerHTML=''; };
-  pIng.addEventListener('input',()=>{ clearTimeout(pIng._t); pIng._t=setTimeout(preview,150); });
-  makePhotoFlow({mainInput:$('#labelInput'),addInput:$('#labelAddInput'),addBtn:$('#labelAdd'),thumbs:$('#labelThumbs'),status:$('#labelStatus'),onText:t=>{ pIng.value=t; preview(); },onName:n=>{ if(!$('#pName').value.trim()) $('#pName').value=n; }});
+  const pRev=makeReview(pIng,$('#pPreview'),'pp',(v,a,pending)=>{ const t=v.trim(); if(t) saveProduct(ean,{name:$('#pName').value.trim(),ingredients:t,review:pending}); else $('#pPreview').innerHTML=''; });
+  const preview=()=>pRev.render();
+  pIng.addEventListener('input',e=>{ clearTimeout(pIng._t); if(/^(insertFromPaste|insertReplacementText)$/.test(e.inputType||'')||(e.data&&e.data.length>=25)){ pRev.apply(pIng.value,{strict:e.inputType==='insertFromPaste'}); return; } pIng._t=setTimeout(preview,150); });
+  makePhotoFlow({mainInput:$('#labelInput'),addInput:$('#labelAddInput'),addBtn:$('#labelAdd'),thumbs:$('#labelThumbs'),status:$('#labelStatus'),onText:(t,info)=>pRev.apply(t,info||{}),onName:n=>{ if(!$('#pName').value.trim()) $('#pName').value=n; }});
   $('#pSave').onclick=()=>{ const ing=$('#pIng').value.trim(); if(!ing){ $('#pIng').focus(); return; } saveProduct(ean,{name:$('#pName').value.trim(),ingredients:ing}); showProduct(ean); };
 }
 let liveFailed=false, camStream=null, camTimer=null;
@@ -2208,7 +2430,7 @@ $('#eanBtn').onclick=lookupEan;
 $('#eanInput').addEventListener('keydown',e=>{ if(e.key==='Enter') lookupEan(); });
 function productItems(limit){
   const p=products(); return Object.entries(p).sort((a,b)=>b[1].ts-a[1].ts).slice(0,limit).map(([ean,d])=>{
-    const a=analyze(d.ingredients||''); const v=a.verdict==='none'?'warn':a.verdict;
+    const a=analyze(d.ingredients||''); const v=a.verdict==='none'?'warn':(d.review&&a.verdict!=='bad')?'warn':a.verdict;
     const when=new Date(d.ts).toLocaleDateString('fi-FI',{day:'numeric',month:'numeric'});
     return `<li><button class="pitem" data-ean="${esc(ean)}">${verdictBadge(v)}<span class="tx"><b>${esc(d.name||ean)}</b><span>${WORD[v]} · ${when}</span></span></button></li>`;
   }).join('');
