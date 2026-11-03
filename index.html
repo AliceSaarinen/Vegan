@@ -383,6 +383,8 @@ body.noscroll{overflow:hidden}
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
     <div class="grab"></div>
     <div class="sheet-h"><h2 id="sheetTitle">Tallennetut tiedot</h2><button class="iconbtn" id="sheetClose" aria-label="Sulje"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="label" id="demoCount" hidden></div>
+    <ul class="plist" id="demoList" hidden></ul>
     <div class="label" id="prodCount"></div>
     <ul class="plist" id="allProducts"></ul>
     <div class="label" id="gapCount"></div>
@@ -480,7 +482,7 @@ olut;beer;ale;stout;lager;porter;oluet;olutta;tumma olut;vaalea olut|0.85|Kirkas
 siideri;cider;siideriä;lonkero|0.85|Kirkastusaineet voivat olla eläinperäisiä|certified
 suklaa;chocolate;tumma suklaa;dark chocolate;suklaata;suklaarouhe;chocolate chips;suklaanappi;suklaanapit;taloussuklaa;leivontasuklaa;suklaakuorrute;chocolate coating;kuorrute;coating;suklaamassa|0.7|Kaakao; voi sisältää maitoa tai voirasvaa|choc
 juoksete;juoksute;rennet;juoksutin;juoksutinentsyymi;animal rennet;vasikanjuoksute|0.3|Vasikan vatsa (perinteinen); mikrobinen (vegaaninen)|
-entsyymi;entsyymit;enzymes;enzyme;entsyymivalmiste|0.85|Mikrobit tai kasvit; joskus eläinperäiset|
+entsyymi;entsyymit;entsyymejä;entsyymeitä;enzymer;enzymes;enzyme;entsyymivalmiste|0.85|Mikrobit tai kasvit; joskus eläinperäiset|
 liemikuutio;liemijauhe;liemi;stock cube;bouillon;bouillon cube;fondi;liemitiiviste;stock;liemivalmiste;lientä;liemeen;liemikuutiota|0.55|Kasvikset tai liha, kana tai kala|stock
 keksi;keksit;keksimurska;biscuit;biscuits;cookie;cookies;keksiä;digestive;digestivekeksi;kaurakeksi;keksimuru|0.5|Usein voita, maitoa tai kananmunaa|certified
 karamelli;caramel;karamellipala;karamellipalat;karamellimassa|0.65|Sokeri; voi sisältää kermaa tai voita|certified
@@ -507,6 +509,7 @@ sieni;sienet;mushroom;mushrooms;sieniä;herkkusieni;herkkusienet;herkkusieniä;c
 maitohappo;lactic acid;maitohappobakteeri;maitohappobakteerit;lactic acid bacteria;maitohappobakteeriviljelmä;maitohappokäymisellä;merilevä;seaweed;nori;norilevä;kombu;wakame;spirulina;spirulinauute;klorella;agar;agar-agar;agaragar;pektiini;pectin;karrageeni;carrageenan;ksantaanikumi;xanthan gum;ksantaani;guarkumi;guar gum;johanneksenleipäpuujauhe;locust bean gum;carob bean gum;karobi;carob;arabikumi;gum arabic;akaasiakumi;selluloosa;cellulose;metyyliselluloosa;kuitu;fibre;fiber;ravintokuitu;dietary fibre;inuliini;inulin;sikurijuuri;chicory root;sikurijuurikuitu;sokerijuurikaskuitu;kaurakuitu;oat fibre;psyllium;psylliumkuitu;stevia;steviolglykosidit;steviol glycosides;erytritoli;erythritol;ksylitoli;xylitol;sorbitoli;sorbitol;maltitoli;maltitol;isomalti;isomalt;sukraloosi;sucralose;aspartaami;aspartame;asesulfaami k;acesulfame k;asesulfaami-k;kofeiini;caffeine;kahvi;coffee;pikakahvi;instant coffee;kahviuute;tee;tea;vihreä tee;green tea;teeuute;matcha;
 kalsiumkarbonaatti;calcium carbonate;kalsium;calcium;rauta;iron;rautapyrofosfaatti;sinkki;zinc;magnesium;kalium;potassium;jodi;iodine;kaliumjodidi;b12-vitamiini;vitamin b12;kobalamiini;syanokobalamiini;cyanocobalamin;b-vitamiinit;b6-vitamiini;riboflaviini;riboflavin;tiamiini;thiamin;thiamine;niasiini;niacin;foolihappo;folic acid;foolaatti;folate;biotiini;biotin;pantoteenihappo;e-vitamiini;vitamin e;tokoferoli;tocopherol;tokoferolit;tocopherols;tokoferolipitoinen uute;d2-vitamiini;vitamin d2;ergokalsiferoli;ergocalciferol;k-vitamiini;beetakaroteeni;beta-carotene;sokeriväri;caramel colour;caramel color;punajuuriväri;beetroot red;punajuurijauhe;mustaporkkanatiiviste;black carrot concentrate;kurkumauute;paprikauute;paprika extract;väritiivisteet;kasvitiivisteet;colouring foods;hedelmä- ja kasvitiivisteet;lakritsiuute;liquorice extract;lakritsijuuriuute;anis;anise;tähtianis;ammoniumkloridi;ammonium chloride;salmiakki;kaliumkloridi;potassium chloride;natriumkloridi;sodium chloride;glukonodeltalaktoni;natriumsitraatti;sodium citrate;kaliumsorbaatti;potassium sorbate;natriumbentsoaatti;sodium benzoate;natriumnitriitti;sodium nitrite;natriumglutamaatti;monosodium glutamate;msg;mononatriumglutamaatti;vaniljauutetta;viherjauhe;hiilihappo;carbon dioxide;typpi;nitrogen;happi;
 kasvisnakki;kasvismakkara;vegaaninen;vegaaniset;vegan;kasvipohjainen;plant-based;maidoton;dairy-free;maitotuotteeton;munaton;egg-free;vehnäproteiini;wheat protein;riisiproteiini;rice protein;perunaproteiini;potato protein;mykoproteiini;mycoprotein;sienirihmasto;
+b1;b2;b3;b5;b6;b7;b9;b12;d2;b3-vitamiini;b5-vitamiini;b7-vitamiini;b9-vitamiini;d2-vitamiini;vitamin d2;ergokalsiferoli;ergocalciferol;saccharomyces cerevisiae;rypäle;rypäleet;viinirypäle;viinirypäleet;rypäleitä;grape;grapes;druva;druvor;sulfiitti;sulfiittia;sulfiitit;sulfiitteja;sulfite;sulfites;sulfit;sulfiter;hiivan ravintoaine;yeast nutrient;dmdc;dimetyylidikarbonaatti;dimethyl dicarbonate;fosfonaatit;phosphonates;fosfonater;polykarboksylaatti;polykarboksylaatit;polykarboksylaatteja;polycarboxylates;polykarboxylater;anioniset tensidit;anionisia tensidejä;ionittomat tensidit;ionittomia tensidejä;nonioniset tensidit;amfoteeriset tensidit;anionic surfactants;non-ionic surfactants;nonionic surfactants;anjoniska tensider;nonjoniska tensider;happipohjaiset valkaisuaineet;happipohjaisia valkaisuaineita;oxygen-based bleaching agents;syrebaserade blekmedel;optiset kirkasteet;optisia kirkasteita;optical brighteners;optiska blekmedel;dimethyl phenethyl acetate;sodium potassium aluminum silicate
 `;
 
 /* E-koodit: EU:ssa hyväksytyt lisäaineet. Oletus: vegaaninen (kasvi-, mineraali- tai synteettinen). */
@@ -607,6 +610,7 @@ glukosamiini;glucosamine;glukosamin|0.4|Äyriäisten kuori (yleisin); käyminen|
 lesitiini (kosmetiikka);hydrogenated lecithin;lysolecithin|0.9|Soija tai auringonkukka (yleisin); kananmuna|
 ceramidit;ceramide;ceramide np;ceramide ap;ceramide eop;ceramides;keramidit;ceramider|0.9|Synteettinen tai kasvit (yleisin); eläinkudos|
 entsyymit (pesuaine);subtilisin;subtilisiini;protease (pesuaine);amylase (pesuaine);cellulase;sellulaasi;mannanase|0.95|Mikrobikäyminen|
+ppg-15 stearyl ether;ppg-11 stearyl ether|0.9;kosmetiikka=0.92|Steariinialkoholista: kasviöljyt (yleisin) tai eläinrasva (tali)|
 saippua;soap;tvål;saippuaa;sodium soap;natriumsaippua;kaliumsaippua;potassium soap;mäntysuopa;suopa;såpa|0.6;koti=0.7|Kasviöljyt tai eläinrasva (tali)|
 mokka (kahvi);mokka;mocha;mocka|0.9;tekstiili=0.03|Kahvi; vaatteissa ja kengissä mokkanahka|
 nahkiainen;nahkiaisia|0|Kala (nahkiainen)|
@@ -1340,7 +1344,16 @@ function cleanText(t){
     .replace(/(^|[\s.])(innehåll|beståndsdelar)\s*:/gi,'$1')
     .replace(/(valmistettu|pakattu|tuotettu|tillverkad|förpackad|produced|made|manufactured|packed)\b[^.]*?\b(jossa|joissa|missä|där|som även|which also|that also|where)\b[^.]*(\.|$)/gi,'')
     .replace(/(valmistettu|pakattu)[^.]*(tehtaassa|laitoksessa|tiloissa)[^.]*\.?/gi,'')
+    .replace(/(vitamiinit?|vitaminer|vitamins?)\s*[(\[]([^()\[\]]*)[)\]]/gi,(m,w,inner)=>w+' ('+inner.split(',').map(x=>/^\s*[A-K]\d{0,2}\s*$/i.test(x)? ' '+x.trim().toUpperCase()+'-vitamiini' : x).join(',')+')')
+    .replace(/\b(E ?\d{3})(i{1,3}|iv|vi?)\b/gi,'$1')
+    .replace(/\b(E ?\d{3,4}[a-d]?)\s+(?=[a-zåäö]{3})/gi,'$1, ')
+    .replace(/(^|[(\[,]\s*)(?:mm\.|bl\.\s?a\.|incl\.|inkl\.|including|esim\.)\s*/gi,'$1')
+    .replace(/\s+(?:mm\.|bl\.\s?a\.|incl\.|inkl\.|including)\s+/gi,', ')
+    .replace(/[<>≤≥]\s*(?=\d)/g,'')
+    .replace(/\b\d+([.,]\d+)?\s*[–-]\s*\d+([.,]\d+)?\s*%/g,'')
     .replace(/\b\d+([.,]\d+)?\s*%/g,'')
+    .replace(/(^|[(\[,]\s*)(?:EU ja muu kuin EU|EU och icke-EU|EU and non-EU|muu kuin EU|icke-EU|non-EU|EU)(?=\s*[,)\]])/gi,'$1')
+    .replace(/,\s*(?:inaktiivinen|inaktiivisena|inactive|inaktiv)(?=\s*[,)\]])/gi,'')
     .replace(/\b(min\.|vähintään|at least)\b/gi,'')
     .replace(/\.\s*(?=[A-ZÅÄÖ])/g,', ');
 }
@@ -1389,17 +1402,35 @@ function pFor(e,group){ return e.p ? (e.p[group]!=null?e.p[group]:e.p.default) :
    (sama valmistaja käyttää yleensä samaa raaka-ainelinjaa), joten pienin todennäköisyys painaa
    täysin ja muut neliöjuuren verran. */
 function combineP(ps){ if(!ps.length) return null; const s=[...ps].sort((a,b)=>a-b); return s.slice(1).reduce((a,p)=>a*Math.sqrt(p),s[0]); }
-function analyze(text){
+function analyze(text,name){
   const lang=detectLang(text);
-  return withLang(lang,()=>{ const r=analyzeCore(text); r.lang=lang; return r; });
+  return withLang(lang,()=>{ const r=analyzeCore(text,name); r.lang=lang; return r; });
 }
 function fuzzyEntry(f){
   if(f.entry.cls!=='V') return f.entry;
   // Kirjoitusvirheeksi tulkittu vegaaninen sana ei riitä vihreään tulokseen.
   return {name:f.entry.name,nameSv:f.entry.nameSv,cls:'U',p:{default:0.9},origins:'Luettu epävarmasti; lähin vastine '+f.entry.name,terms:[],fuzzyOf:f.entry};
 }
-function analyzeCore(text){
+/* Valmistajan vegaanimerkintä omana lauseenaan (esim. Pirkka: "… Vegaaninen.") tai sertifikaatti (V-Label).
+   Merkintä poistetaan ainesosista ja se antaa vihreän tuloksen vain, jos luettelossa ei ole eläinperäistä ainetta. */
+const VEGAN_CLAIM=/(^|[.•·;\n])\s*(?:pakkausmerkintä\s*:\s*)?(?:v-label(?:\s+international)?(?:\s+vegan)?|vegan society|certified vegan|sertifioitu vegaaninen|vegaanimerkki|vegaaninen(?:\s+tuote)?|sopii vegaaneille|vegansk|vegan|suitable for vegans|lämpar sig för veganer)\s*(?=[.•·;\n]|$)/gim;
+/* Valmistuksen apuaineet: viinin, oluen ja siiderin kirkastusaineet eivät näy ainesosaluettelossa,
+   joten näille tuotteille ei näytetä vihreää ilman vegaanimerkintää. Tunnistus tuotteen nimestä tai luettelosta. */
+const AID_RULES=[
+  [/(viini|wine|\bvin\b|\bvino\b|sherry|portviini|samppanja|champagne|\bcava\b|prosecco|kuohuviini|ros[ée]viini|vermutti|vermouth)/i,0.6,'Viinin kirkastuksessa voidaan käyttää liivatetta, kalaliimaa, kaseiinia tai munanvalkuaista. Ne eivät näy ainesosaluettelossa.'],
+  [/(\bolut|oluet|\bbeer\b|\böl\b|\blager\b|\bale\b|\bstout\b|\bipa\b|siideri|\bcider\b|\bcidre\b)/i,0.85,'Oluen ja siiderin kirkastuksessa voidaan käyttää kalaliimaa. Se ei näy ainesosaluettelossa.'],
+];
+function processingAid(text,name){
+  for(const r of AID_RULES) if(name&&r[0].test(name)) return r;
+  const t=(text||'').toLowerCase();
+  if(/(rypäle|druv|grape)/.test(t)&&/(sulfi|rikkidioksidi|svaveldioxid|sulphite|sulfite|hiiva|jäst|yeast|käymis|jäsnings|ferment)/.test(t)) return AID_RULES[0];
+  if(/(ohramallas|mallas|malt|humala|humle|hops)/.test(t)&&/(hiiva|jäst|yeast)/.test(t)&&/\b(vesi|vatten|water)\b/.test(t)) return AID_RULES[1];
+  return null;
+}
+function analyzeCore(text,name){
   const items=[];
+  VEGAN_CLAIM.lastIndex=0; const claim=VEGAN_CLAIM.test(text||''); VEGAN_CLAIM.lastIndex=0;
+  text=(text||'').replace(VEGAN_CLAIM,'$1');
   const cleaned=balanceParens(cleanText(focusIngredients(text||'')));
   const tops=splitTop(cleaned).map(parseItem);
   const walk=(it,depth)=>{
@@ -1426,13 +1457,16 @@ function analyzeCore(text){
   let verdict='ok', prob=null;
   if(!uniq.length) verdict='none';
   else if(animals.length) verdict='bad';
+  else if(claim) verdict='ok';
   else if(uncertain.length||unknown.length){
     verdict='warn';
     if(uncertain.length) prob=combineP(uncertain.map(i=>pFor(i.entry,group)));
   }
   const marks=[];
+  const aid=!claim&&verdict!=='bad'&&verdict!=='none'? processingAid(text,name) : null;
+  if(aid){ if(verdict==='ok'){ verdict='warn'; prob=aid[1]; } else if(prob!=null&&!unknown.length) prob*=aid[1]; marks.push(aid[2]); }
   if(/(leaping bunny|cruelty[- ]free|not tested on animals|ei testattu eläimillä|eläinkokeeton|ej testad på djur|djurförsöksfri)/i.test(text||'')) marks.push('Ei eläinkokeita (pakkausmerkintä)');
-  if(/(vegan society|certified vegan|v-label|sertifioitu vegaaninen|vegaanimerkki|veganskt certifierad)/i.test(text||'')) marks.push('Vegaanimerkintä pakkauksessa');
+  if(claim||/(veganskt certifierad)/i.test(text||'')) marks.push('Vegaanimerkintä pakkauksessa');
   return {items:uniq, animals, uncertain, unknown, verdict, prob, group, marks};
 }
 
@@ -2612,7 +2646,13 @@ async function fetchOFF(ean){
 }
 const LANG_NAMES={de:'saksa',fr:'ranska',it:'italia',es:'espanja',nl:'hollanti',pl:'puola',da:'tanska',no:'norja',nb:'norja',et:'viro',lv:'latvia',lt:'liettua',pt:'portugali',cs:'tsekki',hu:'unkari',ru:'venäjä'};
 const REFRESH_MS=90*24*3600*1000;
+/* Demotila: demo.json sisältää käsin pakkauksesta tarkistetut tuotteet viivakoodeineen. Ne ohittavat
+   kaikki muut lähteet, joten demotuote antaa aina saman tuloksen myös ilman verkkoa.
+   Tuotannossa tämän korvaisi kaupan oma tuotetietokanta. */
+let DEMO={}; const demoP=fetch('demo.json').then(r=>r.ok?r.json():{}).then(j=>{ DEMO=j&&j.products||{}; }).catch(()=>{});
 async function showProduct(ean){
+  await demoP;
+  if(DEMO[ean]){ const d=DEMO[ean], cur=products()[ean]; if(!cur||cur.src!=='demo'||cur.ingredients!==d.ingredients||cur.name!==d.name) saveProduct(ean,{name:d.name,ingredients:d.ingredients,src:'demo'}); }
   let p=products()[ean]; const out=$('#scanOut'); let netState='';
   if(!(p&&p.ingredients)){
     out.innerHTML='<div class="status"><span class="spin"></span>Haetaan tuotetta…</div>';
@@ -2627,7 +2667,7 @@ async function showProduct(ean){
     const a=analyze(p.ingredients);
     const when=p.fetched? new Date(p.fetched).toLocaleDateString('fi-FI') : null;
     const foreign=p.ingLang&&!['fi','sv','en'].includes(p.ingLang);
-    out.innerHTML=`<div class="card"><div><h2>${esc(p.name||'Tuote')}</h2><div class="meta">${esc(ean)}</div></div>${foreign?`<div class="err">Ainesosaluettelo on vain kielellä ${esc(LANG_NAMES[p.ingLang]||p.ingLang)}. Kuvaa pakkauksen suomen-, ruotsin- tai englanninkielinen luettelo.</div>`:''}<div class="view" id="prodRes"></div>${p.src==='off'?`<div class="src">Ainesosat: ${esc(p.srcLabel||'Open Food Facts')} (ODbL)${when?', haettu '+esc(when):''}. Vegaanisuus arvioitu Veganin omalla tietokannalla.</div>`:''}</div>`;
+    out.innerHTML=`<div class="card"><div><h2>${esc(p.name||'Tuote')}</h2><div class="meta">${esc(ean)}</div></div>${foreign?`<div class="err">Ainesosaluettelo on vain kielellä ${esc(LANG_NAMES[p.ingLang]||p.ingLang)}. Kuvaa pakkauksen suomen-, ruotsin- tai englanninkielinen luettelo.</div>`:''}<div class="view" id="prodRes"></div>${p.src==='demo'&&DEMO[ean]?`<div class="src">${DEMO[ean].note?esc(DEMO[ean].note)+' ':''}Ainesosat: ${DEMO[ean].source==='pakkaus'?'tarkistettu pakkauksesta':'K-Ruoka-verkkokauppa'}.</div>`:''}${p.src==='off'?`<div class="src">Ainesosat: ${esc(p.srcLabel||'Open Food Facts')} (ODbL)${when?', haettu '+esc(when):''}. Vegaanisuus arvioitu Veganin omalla tietokannalla.</div>`:''}</div>`;
     renderAnalysis($('#prodRes'),a,'p');
     saveProduct(ean,{...p});
     if(!foreign) return;
@@ -2692,7 +2732,7 @@ $('#eanBtn').onclick=lookupEan;
 $('#eanInput').addEventListener('keydown',e=>{ if(e.key==='Enter') lookupEan(); });
 function productItems(limit){
   const p=products(); return Object.entries(p).sort((a,b)=>b[1].ts-a[1].ts).slice(0,limit).map(([ean,d])=>{
-    const a=analyze(d.ingredients||''); const v=a.verdict==='none'?'warn':(d.review&&a.verdict!=='bad')?'warn':a.verdict;
+    const a=analyze(d.ingredients||'',d.name); const v=a.verdict==='none'?'warn':(d.review&&a.verdict!=='bad')?'warn':a.verdict;
     const when=new Date(d.ts).toLocaleDateString('fi-FI',{day:'numeric',month:'numeric'});
     return `<li class="pli" data-ean="${esc(ean)}"><div class="pli-del" aria-hidden="true">Poista</div><div class="pli-front"><button class="pitem" data-ean="${esc(ean)}">${verdictBadge(v)}<span class="tx"><b>${esc(d.name||ean)}</b><span>${WORD[v]} · ${when}</span></span></button><button class="pdel" type="button" aria-label="Poista ${esc(d.name||ean)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></li>`;
   }).join('');
@@ -2741,7 +2781,17 @@ function bindPItems(root){
 renderRecent();
 
 // --- Valikko: tallennetut tuotteet ja puuttuvat säännöt
+function demoItems(){
+  const CAT={ruoka:'Ruoka',kosmetiikka:'Kosmetiikka ja hygienia',pesuaine:'Pesuaineet'};
+  const ORD={ruoka:0,kosmetiikka:1,pesuaine:2}; return Object.entries(DEMO).sort((a,b)=>(ORD[a[1].category]??9)-(ORD[b[1].category]??9)||a[1].name.localeCompare(b[1].name,'fi')).map(([ean,d])=>{
+    const a=analyze(d.ingredients,d.name); const v=a.verdict==='none'?'warn':a.verdict;
+    return `<li class="pli"><div class="pli-front"><button class="pitem demo" data-ean="${esc(ean)}">${verdictBadge(v)}<span class="tx"><b>${esc(d.name)}</b><span>${WORD[v]}${v==='warn'&&a.prob!=null?' · '+pct(a.prob)+' vegaaninen':''} · ${esc(CAT[d.category]||'')}</span></span></button></div></li>`;
+  }).join('');
+}
 function openSheet(){
+  const dn=Object.keys(DEMO).length; $('#demoCount').hidden=$('#demoList').hidden=!dn;
+  if(dn){ $('#demoCount').textContent='Demotuotteet ('+dn+')'; $('#demoList').innerHTML=demoItems();
+    $('#demoList').querySelectorAll('.pitem').forEach(b=>b.onclick=()=>{ closeSheet(); go('skannaa'); $('#eanInput').value=b.dataset.ean; showProduct(b.dataset.ean); window.scrollTo({top:0}); }); }
   const n=Object.keys(products()).length; $('#prodCount').textContent='Tuotteet ('+n+')';
   $('#allProducts').innerHTML=productItems(500)||'<li class="empty">Ei tallennettuja tuotteita.</li>'; bindPItems($('#allProducts'));
   const g=loadGaps(); $('#gapCount').textContent='Puuttuvat korvaussäännöt ja tuntemattomat ainesosat ('+g.length+')';

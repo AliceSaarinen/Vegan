@@ -254,3 +254,15 @@ bad | sodium tallowate, aqua
 !ok | saippua
 !ok | entsyymit, vesi
 ok | vesi, natriumlaureettisulfaatti, natriumkloridi, sitruunahappo
+
+## --- Valmistuksen apuaineet (kirkastus): viini ei saa olla vihreä ilman vegaanimerkintää
+!ok | rypäleet, säilöntäaine: sulfiitti
+!ok | rypäleet, tiivistetty rypäleen puristemehu, säilöntäaineet (kaliumsorbaatti, rikkidioksidi)
+!ok | vesi, ohramallas, humala, hiiva
+ok | rypäleet, säilöntäaine: sulfiitti. Vegaaninen.
+
+## --- Vegaanimerkintä ja vitamiinilyhenteet
+ok | vatten, MANDEL (3 %, icke-EU), salt, kalcium, stabiliseringsmedel (E418, E410), emulgeringsmedel (E322), vitaminer (D, B12, riboflavin). Vegansk.
+!ok | vatten, MANDEL (3 %, icke-EU), salt, kalcium, stabiliseringsmedel (E418, E410), vitaminer (D, B12, riboflavin).
+bad | sokeri, liivate, aromit. Vegaaninen.
+ok | Ravintohiiva (Saccharomyces cerevisiae, inaktiivinen), tiamiini (B1), riboflaviini (B2), B12-vitamiini (syanokobalamiini)

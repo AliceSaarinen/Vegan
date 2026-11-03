@@ -1,0 +1,240 @@
+{
+ "about": "Demotuotteet K-Supermarket Veikkolasta. Ainesosat on kirjattu käsin pakkauksesta (source: pakkaus) tai tarkistettu K-Ruoka-verkkokaupasta (source: K-Ruoka-verkkokauppa). Avain on viivakoodi. expected = oikea tulos (ok/bad/warn), jota testit vertaavat sovelluksen omaan analyysiin. Tulos 'warn' tarkoittaa Epävarma: luettelossa on aine, jonka alkuperä voi olla kasvi- tai eläinperäinen (esim. glyseriini, aromi), ja sovellus näyttää todennäköisyyden.",
+ "products": {
+  "64016641": {
+   "name": "Malaco MintMint täytelakritsi",
+   "category": "ruoka",
+   "expected": "bad",
+   "ingredients": "sokeri, glukoosisiirappi, VEHNÄJAUHO, melassi, kokonaan kovetettu kookosrasva, kosteudensäilyttäjät (sorbitoli, glyseroli), liivate, lakritsiuute, glukoosi-fruktoosisiirappi, väri (E153), suola, aromit, kasviöljyt (kookos, rapsi).",
+   "source": "pakkaus"
+  },
+  "5709364100702": {
+   "name": "Karen Volf gluteenittomat piparkakut 165 g",
+   "category": "ruoka",
+   "expected": "bad",
+   "ingredients": "Gluteeniton jauhosekoitus [vehnätärkkelys, kaurajauho, oligofruktoosi, sakeutusaine (E412), B3-vitamiini, rauta, B1-vitamiini, B6-vitamiini, B2-vitamiini], maissijauho, sokeri, kasviöljy (rapsiöljy, täysin kovetettu rapsiöljy, kookosöljy), sokerisiirappi, perunatärkkelys, mausteita (kaneli, neilikka, muskottikukka, inkivääri), kokomunajauhe, stabilointiaine (E415), pellavansiemenjauhe, suola, nostatusaine (E500ii). Saattaa sisältää jäämiä maidosta, manteleista, hasselpähkinöistä ja maapähkinöistä.",
+   "source": "pakkaus"
+  },
+  "6408430401468": {
+   "name": "Valio PROfeel kerrosrahka vanilja & omenapaistos 175 g",
+   "category": "ruoka",
+   "expected": "bad",
+   "ingredients": "pastöroitu rasvaton maito, vesi, sokeri, omena 3,0 %, muunnettu tärkkelys, sakeuttamisaine (johanneksenleipäpuujauhe), aromit, vaniljauute, kaneli, happamuudensäätöaine (natriumsitraatit), hapate, laktaasientsyymi.",
+   "source": "pakkaus"
+  },
+  "6416453014398": {
+   "name": "Fazer Lontoo Rae 180 g",
+   "category": "ruoka",
+   "expected": "bad",
+   "ingredients": "sokeri, kaakaovoi, täysmaitojauhe, kaakaomassa, kirnumaitojauhe, glukoosisiirappi, kokonaan kovetettu kasvirasva (kookos), lakritsiuute, perunatärkkelys, emulgointiaine (lesitiini mm. soija), aromit, pintakäsittelyaineet (E901, E904), ammoniumkloridi (salmiakki), auringonkukkaöljy, väri (E153), suola.",
+   "source": "pakkaus",
+   "note": "Maidon lisäksi lakritsirakeiden pinnassa mehiläisvaha (E901) ja sellakka (E904)."
+  },
+  "8008343880138": {
+   "name": "Rummo Linguine N°13 gluteeniton",
+   "category": "ruoka",
+   "expected": "ok",
+   "ingredients": "täysjyväriisi (36 %), keltainen maissi (32,5 %), valkoinen maissi (20 %), riisi (8 %), perunatärkkelys (3 %), emulgointiaine: rasvahappojen mono- ja diglyseridit (kasviperäinen). Saattaa sisältää pieniä määriä soijaa.",
+   "source": "pakkaus",
+   "note": "Suomenkielisessä tekstissä ei lue 'kasviperäinen'; tieto on pakkauksen espanjan- ja portugalinkielisestä tekstistä."
+  },
+  "6430055213423": {
+   "name": "Foodin ravintohiivahiutale 100 g",
+   "category": "ruoka",
+   "expected": "ok",
+   "ingredients": "Ravintohiiva 99 % (Saccharomyces cerevisiae, inaktiivinen), tiamiini (B1), riboflaviini (B2), niasiini (B3), pantoteenihappo (B5), pyridoksiini (B6), biotiini (B7), folaatti (B9), B12-vitamiini (syanokobalamiini), sinkki (sinkkisulfaatti). Pakattu tehtaassa, jossa käsitellään pähkinöitä, manteleita, seesaminsiemeniä, maitoproteiinia ja gluteenitonta kauraa.",
+   "source": "pakkaus"
+  },
+  "6410400037164": {
+   "name": "Pirkka cocktailkurkku 330 g / 190 g",
+   "category": "ruoka",
+   "expected": "warn",
+   "ingredients": "kurkku (EU ja muu kuin EU), vesi, etikka, sokeri, suola, SINAPINSIEMEN, paprika, tilli, sipuli, kiinteyttämisaine (E509), aromi. Saattaa sisältää pieniä määriä selleriä ja sulfiittia.",
+   "source": "pakkaus"
+  },
+  "6412000016341": {
+   "name": "Saarioinen puolukkasurvos 500 g",
+   "category": "ruoka",
+   "expected": "ok",
+   "ingredients": "Puolukka, sokeri, vesi, sakeuttamisaine (E 440), säilöntäaine (E 202).",
+   "source": "pakkaus"
+  },
+  "5411188138099": {
+   "name": "Alpro No Sugars Natural 400 g",
+   "category": "ruoka",
+   "expected": "warn",
+   "ingredients": "vesi, kuoritut soijapavut (10,7 %), kalsium (trikalsiumsitraatti), stabilointiaine (pektiinit), happamuudensäätöaineet (natriumsitraatit, sitruunahappo), luontainen aromi, merisuola, hapettumisenestoaineet (tokoferoliuute, askorbiinihapon rasvahappoesterit), vitamiinit (B6, B12, D2), hapatteet (S. thermophilus, L. bulgaricus). Kasvipohjainen tuote.",
+   "source": "pakkaus"
+  },
+  "8719200235434": {
+   "name": "Becel Gold rasvalevite 75 %",
+   "category": "ruoka",
+   "expected": "ok",
+   "ingredients": "Kasviöljyt (rypsi, auringonkukka), vesi, kookosrasva, suola (0,9 %), emulgointiaineet (lesitiini), luontainen aromi, vitamiinit (A, B1, D). Pakkausmerkintä: V-Label Vegan.",
+   "source": "pakkaus",
+   "note": "Pakkauksessa V-Label Vegan -merkki."
+  },
+  "8711327586956": {
+   "name": "Ingman Creamy Kuningatar 850 ml",
+   "category": "ruoka",
+   "expected": "bad",
+   "ingredients": "Rasvaton MAITO, sokeri, KERMA (15 %), rypälesokeri, glukoosisiirappi, rasvaton MAITOJAUHE, MANTELI (2 %), MAITORASVA, vesi, vadelma (1 %), mustikka (1 %), stabilointiaineet (guarkumi, pektiini, tarakumi, johanneksenleipäpuujauhe, karrageeni), emulgointiaine (rasvahappojen mono- ja diglyseridit [kasviperäinen]), happamuudensäätöaine (sitruunahappo), luontainen vanilja-aromi, jauhettu vaniljatanko, väri (karotenoidit), luontainen aromi. Saattaa sisältää VEHNÄÄ, HASSELPÄHKINÖITÄ, SAKSANPÄHKINÖITÄ, CASHEWPÄHKINÖITÄ, PEKAANIPÄHKINÖITÄ ja PISTAASIPÄHKINÖITÄ.",
+   "source": "pakkaus"
+  },
+  "6410405133182": {
+   "name": "Pirkka Amerikan suklaacookie 150 g",
+   "category": "ruoka",
+   "expected": "bad",
+   "ingredients": "tumma suklaa (29 %, EU) [sokeri, kaakaomassa, glukoosisiirappi, kaakaovoi, emulgointiaine (E322 soijalesitiini)], vehnäjauho, sokeri, kasviöljyt (palmu, auringonkukka), maitosuklaa (11 %, EU) [sokeri, täysmaitojauhe, kaakaovoi, kaakaomassa, glukoosisiirappi, rasvaton maitojauhe, emulgointiaine (E322 soijalesitiini), luontainen aromi], karamellivalmiste [glukoosisiirappi, sokeri, auringonkukkaöljy, täysmaitojauhe, kananmunanvalkuaisjauhe, karamellisoitu sokeri, luontainen aromi], voi, kananmuna, glukoosi-fruktoosisiirappi, rasvaton maitojauhe, vehnätärkkelys, nostatusaineet (E500, E450), karamellisoitu sokeri. Saattaa sisältää pieniä määriä pähkinää.",
+   "source": "pakkaus"
+  },
+  "6408430039517": {
+   "name": "Valio Oltermanni 17 % kermajuusto 900 g",
+   "category": "ruoka",
+   "expected": "bad",
+   "ingredients": "pastöroitu maito, suola, hapate.",
+   "source": "pakkaus"
+  },
+  "6420256016237": {
+   "name": "Malaco Aakkoset Choco 280 g",
+   "category": "ruoka",
+   "expected": "bad",
+   "ingredients": "sokeria, glukoosisiirappia, muunnettua tärkkelystä, liivatetta, kaakaovoita, täysmaitojauhetta, kasvirasvoja (palmu, shea), kaakaomassaa, rasvatonta maitojauhetta, herajauhetta (maidosta), inverttisokerisiirappia, happoa (sitruunahappoa), lakritsiuutetta, ammoniumkloridia (=salmiakkia), happamuudensäätöainetta (trinatriumsitraattia), emulgointiaineita (soijalesitiiniä, E476), aromeja (mm. vanilliinia), kasviöljyjä (kookos, rapsi), suolaa, pintakäsittelyaineita (arabikumia, karnaubavahaa, sellakkaa), värejä (E153, E120, E141, E160a), sakeuttamisainetta (pektiini).",
+   "source": "pakkaus",
+   "note": "Viisi eläinperäistä ainetta: liivate, maito, hera, sellakka ja karmiini (E120)."
+  },
+  "6410405374158": {
+   "name": "Pirkka mantelijuoma makeuttamaton 1 l",
+   "category": "ruoka",
+   "expected": "ok",
+   "ingredients": "vatten, MANDEL (3 %, icke-EU), salt, kalcium, stabiliseringsmedel (E418, E410), emulgeringsmedel (E322), vitaminer (D, B12, riboflavin). Vegansk.",
+   "source": "pakkaus",
+   "note": "Ruotsinkielinen luettelo. D-vitamiinin alkuperää ei kerrota, mutta pakkauksessa lukee 'Vegansk'."
+  },
+  "6410405362711": {
+   "name": "Pirkka Karuselli makeissekoitus 300 g",
+   "category": "ruoka",
+   "expected": "bad",
+   "ingredients": "sokeri, glukoosisiirappi, muunnettu perunatärkkelys, VEHNÄtärkkelys, happamuudensäätöaineet (E270, E325), ammoniumkloridi (salmiakki), lakritsiuute, aromit, pintakäsittelyaine (E903), värit (E153, E120, E141, E100, E132, E160a).",
+   "source": "K-Ruoka-verkkokauppa",
+   "note": "Karmiini (E120) on ainoa eläinperäinen aine."
+  },
+  "5600221679266": {
+   "name": "2U Duas Uvas Red punaviini 8 % 0,75 l",
+   "category": "ruoka",
+   "expected": "warn",
+   "ingredients": "rypäleet, säilöntäaineet: SULFIITTIA; alkoholin käymisaineet: hiiva, hiivan ravintoaine, makeutusaineet: tiivistetty mehu, stabilisaattorit: arabikumi, dmdc mikrobiologinen stabilointi",
+   "source": "K-Ruoka-verkkokauppa",
+   "allowUnknown": true
+  },
+  "4251232284348": {
+   "name": "Catrice All Matt Plus Shine Control Powder 001",
+   "category": "kosmetiikka",
+   "expected": "ok",
+   "ingredients": "TALC, ZINC STEARATE, ETHYLHEXYL PALMITATE, DIMETHYLIMIDAZOLIDINONE RICE STARCH, TOCOPHERYL ACETATE, PHENYL TRIMETHICONE, OCTYLDODECYL STEAROYL STEARATE, GLYCERYL CAPRYLATE, P-ANISIC ACID, SODIUM POTASSIUM ALUMINUM SILICATE, SILICA, PARFUM (FRAGRANCE), CI 77492 (IRON OXIDES), CI 77891 (TITANIUM DIOXIDE). Vegan.",
+   "source": "pakkaus",
+   "note": "Pakkauksessa lukee 'Vegan'."
+  },
+  "8718951843554": {
+   "name": "Palmolive Spiced Vanilla Latte suihkusaippua 250 ml",
+   "category": "kosmetiikka",
+   "expected": "warn",
+   "ingredients": "Aqua, Sodium Laureth Sulfate, Cocamidopropyl Betaine, Sodium Chloride, Parfum, Citric Acid, Sodium Benzoate, Coco-Glucoside, Glycol Distearate, Hydrogenated Castor Oil, Benzophenone-4, Dipropylene Glycol, Glyceryl Oleate, Glyceryl Stearate, Trisodium Ethylenediamine Disuccinate, Hydroxymethoxyphenyl Decanone, CI 15985.",
+   "source": "K-Ruoka-verkkokauppa",
+   "note": "Nimen 'Latte' ei tarkoita maitoa."
+  },
+  "6410405169310": {
+   "name": "Pirkka ihokarvanajogeeli Fruity 200 ml",
+   "category": "kosmetiikka",
+   "expected": "warn",
+   "ingredients": "Aqua, Palmitic Acid, Triethanolamine, Oleth-20, Isopentane, Sorbitol, Laureth-23, Isobutane, Cocamide MIPA, Hydrogenated Polyisobutene, Hydroxyethylcellulose, Aloe Barbadensis Leaf Juice Powder, Parfum, Sodium Sulfate, Phenoxyethanol, Hexyl Cinnamal, Limonene, CI 16255, CI 42051, CI 45100.",
+   "source": "pakkaus"
+  },
+  "6432100052018": {
+   "name": "Aqualan L perusvoide 200 g",
+   "category": "kosmetiikka",
+   "expected": "warn",
+   "ingredients": "AQUA, CAPRYLIC/CAPRIC TRIGLYCERIDE, ISOPROPYL PALMITATE, GLYCERYL STEARATE, GLYCERIN, CETYL ALCOHOL, PEG-30 STEARATE, CETEARETH-20, ETHYLHEXYLGLYCERIN, PHENOXYETHANOL",
+   "source": "pakkaus"
+  },
+  "5601068050461": {
+   "name": "Pepsodent 2-Teho hammastahna",
+   "category": "kosmetiikka",
+   "expected": "warn",
+   "ingredients": "Aqua, Hydrogenated Starch Hydrolysate, Hydrated Silica, Tetrapotassium Pyrophosphate, Kaolin, Sodium Lauryl Sulfate, Aroma, Cellulose Gum, Benzyl Alcohol, Sodium Fluoride, Sodium Saccharin, Anethole, Citrus Limon Peel Oil, Eucalyptus Globulus Oil, Limonene, Menthol.",
+   "source": "K-Ruoka-verkkokauppa"
+  },
+  "6412600859874": {
+   "name": "Lumene Nordic Berry Volume -ripsiväri Dark Brown",
+   "category": "kosmetiikka",
+   "expected": "warn",
+   "ingredients": "[?], ETHYLHEXYLGLYCERIN, PECTIN, XANTHAN GUM, DISODIUM EDTA, HECTORITE, PROPANEDIOL, HYDROLYZED VEGETABLE PROTEIN, GLYCERIN, PEG-8, TOCOPHEROL, ASCORBYL PALMITATE, ASCORBIC ACID, CITRIC ACID, POTASSIUM SORBATE, HELIANTHUS ANNUUS (SUNFLOWER) SEED OIL, ROSMARINUS OFFICINALIS (ROSEMARY) LEAF EXTRACT, CI 77491, CI 77492, CI 77499 (IRON OXIDES)",
+   "source": "pakkaus",
+   "note": "Luettelon alku puuttuu (tarran alla). Ripsiväreissä on usein mehiläisvahaa listan alussa.",
+   "partial": true
+  },
+  "7319470801035": {
+   "name": "Nivea Creme 75 ml",
+   "category": "kosmetiikka",
+   "expected": "bad",
+   "ingredients": "Aqua, Paraffinum Liquidum, Cera Microcristallina, Glycerin, Lanolin Alcohol, Paraffin, Panthenol, Magnesium Sulfate, Decyl Oleate, Octyldodecanol, Aluminum Stearates, Citric Acid, Magnesium Stearate, Limonene, Geraniol, Hydroxycitronellal, Linalool, Citronellol, Benzyl Benzoate, Cinnamyl Alcohol, Parfum.",
+   "source": "pakkaus",
+   "note": "Lanoliinialkoholi tulee lampaanvillasta."
+  },
+  "7310610010911": {
+   "name": "L300 Anti-Age Night Cream Hyaluronic Renewal 50 ml",
+   "category": "kosmetiikka",
+   "expected": "warn",
+   "ingredients": "Aqua, Canola Oil, Glycerin, Octyldodecyl Myristate, Caprylic/Capric Triglyceride, Diethylhexyl Carbonate, Hydrogenated Coco-Glycerides, Polyglyceryl-3 Dicitrate/Stearate, Butyrospermum Parkii Butter, Caprylyl Methicone, Cetearyl Alcohol, Glyceryl Stearates, Sodium Hyaluronate, Hydrolyzed Hyaluronic Acid, Potassium Hydrolyzed Polygamma-Glutamate, Tocopheryl Acetate, Panthenol, Sodium PCA, Ceramide NP, Cholesterol, Ceramide NS, Ceramide AP, Ceramide EOP, Ceramide EOS, Caprooyl Phytosphingosine, Caprooyl Sphingosine, Hydroxyethyl Acrylate/Sodium Acryloyldimethyl Taurate Copolymer, Polyacrylate Crosspolymer-6, Dimethicone, PEG-100 Stearate, Bis-PEG/PPG-16/16 PEG/PPG-16/16 Dimethicone, Xanthan Gum, Phenoxyethanol, Benzoic Acid, Dehydroacetic Acid, Ethylhexylglycerin, Ceteareth-25, Sorbitan Isostearate, Polysorbate 60, Tocopherol, Cetyl Alcohol, Behenic Acid, Ascorbyl Palmitate, Pentaerythrityl Tetra-di-t-butyl Hydroxyhydrocinnamate, Pantolactone, Citric Acid.",
+   "source": "pakkaus",
+   "note": "Kolesteroli valmistetaan kosmetiikassa usein lanoliinista."
+  },
+  "42449218": {
+   "name": "Nivea Dry Fresh antiperspirantti 50 ml",
+   "category": "kosmetiikka",
+   "expected": "warn",
+   "ingredients": "Aqua, Aluminum Chlorohydrate, PPG-15 Stearyl Ether, Steareth-2, Steareth-21, Aluminum Sesquichlorohydrate, Parfum, Trisodium EDTA, Persea Gratissima Oil, Benzyl Salicylate, Benzyl Alcohol, Tetramethyl Acetyloctahydronaphthalenes, Pentaerythrityl Tetra-di-t-butyl Hydroxyhydrocinnamate, Citronellol, Hexadecanolactone, Magnesium Aluminum Silicate, Geranyl Acetate, Terpineol, Alpha-Isomethyl Ionone, Dimethyl Phenethyl Acetate, Tocopherol",
+   "source": "pakkaus",
+   "note": "Ainoa 8-numeroinen viivakoodi (EAN-8)."
+  },
+  "4006000172903": {
+   "name": "Nivea Men Hydrocare Shaving Gel 200 ml",
+   "category": "kosmetiikka",
+   "expected": "warn",
+   "ingredients": "Aqua, Palmitic Acid, Triethanolamine, Oleth-20, Isopentane, Glycerin, Isopropyl Palmitate, Isobutane, Aloe Barbadensis Leaf Juice Powder, Panthenol, Hydroxyethylcellulose, Hydroxypropyl Methylcellulose, Laureth-2, Cetearyl Isononanoate, PEG-90 Glyceryl Isostearate, Disodium Phosphate, Sodium Phosphate, Citric Acid, Sodium Chloride, Sodium Sulfate, Pantolactone, Piroctone Olamine, BHT, Tetramethyl Acetyloctahydronaphthalenes, Parfum, CI 42053",
+   "source": "pakkaus",
+   "note": "Luettelo jatkuu kolmeen kuvaan purkin ympäri."
+  },
+  "3600542591270": {
+   "name": "Garnier Ambre Solaire Sensitive Advanced SPF50+ 150 ml",
+   "category": "kosmetiikka",
+   "expected": "warn",
+   "ingredients": "AQUA / WATER, ALCOHOL DENAT., ETHYLHEXYL SALICYLATE, ETHYLHEXYL TRIAZONE, BUTYL METHOXYDIBENZOYLMETHANE, BIS-ETHYLHEXYLOXYPHENOL METHOXYPHENYL TRIAZINE, ISOPROPYL PALMITATE, DIISOPROPYL ADIPATE, GLYCERIN, PROPANEDIOL, C12-22 ALKYL ACRYLATE/HYDROXYETHYLACRYLATE COPOLYMER, TOCOPHEROL, HYDROXYACETOPHENONE, PHENYLBENZIMIDAZOLE SULFONIC ACID, TRIETHANOLAMINE, SODIUM POLYACRYLATE, SODIUM BENZOATE, TRISODIUM ETHYLENEDIAMINE DISUCCINATE, DROMETRIZOLE TRISILOXANE, ALOE BARBADENSIS LEAF JUICE, CAPRYLYL GLYCOL, ACRYLATES/C10-30 ALKYL ACRYLATE CROSSPOLYMER, CERAMIDE NP, CITRIC ACID, POTASSIUM SORBATE.",
+   "source": "pakkaus",
+   "note": "Etiketti kuvattu ylösalaisin."
+  },
+  "4005900978264": {
+   "name": "Labello Original huulivoide 4,8 g",
+   "category": "kosmetiikka",
+   "expected": "bad",
+   "ingredients": "Helianthus Annuus Hybrid Oil, Cera Alba, Hydrogenated Rapeseed Oil, Butyrospermum Parkii Butter, Tocopherol, Ascorbyl Palmitate, Helianthus Annuus Seed Oil, Lecithin, Linalool, Citronellol…",
+   "source": "K-Ruoka-verkkokauppa",
+   "note": "Mehiläisvaha (Cera Alba). Luettelon loppu lyhennetty."
+  },
+  "8001090952226": {
+   "name": "Fairy Platinum Plus astianpesukapselit 40 kpl",
+   "category": "pesuaine",
+   "expected": "warn",
+   "ingredients": "15–30 % happipohjaiset valkaisuaineet, 5–15 % ionittomat tensidit, fosfonaatit, <5 % polykarboksylaatit, entsyymit, hajusteet, Citral, Citronellol, Citrus Aurantium Peel Oil, Citrus Limon Peel Oil, Geraniol, Geranyl Acetate, Limonene, Pinene, Terpineol.",
+   "source": "pakkaus"
+  },
+  "8710447328590": {
+   "name": "Bio Luvil Shining Classic pyykinpesuneste 920 ml",
+   "category": "pesuaine",
+   "expected": "warn",
+   "ingredients": "5–15 % anionisia tensidejä, <5 % ionittomia tensidejä, saippuaa, hajusteita, polykarboksylaatteja, optisia kirkasteita, entsyymejä, Citronellol, Tetramethyl acetyloctahydronaphthalenes, Benzisothiazolinone.",
+   "source": "pakkaus",
+   "note": "Saippua voi olla valmistettu kasvi- tai eläinrasvasta."
+  }
+ }
+}
