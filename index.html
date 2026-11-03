@@ -2817,7 +2817,10 @@ function go(t){
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{ go(b.dataset.tab); window.scrollTo({top:0}); });
 window.addEventListener('hashchange',()=>go(location.hash.slice(1)));
 go(location.hash.slice(1)||store.get('vegan.tab','ainesosat'));
-if(STANDALONE&&'serviceWorker' in navigator&&location.protocol==='https:'){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
+if(STANDALONE&&'serviceWorker' in navigator&&location.protocol==='https:'){ navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>{ document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') r.update().catch(()=>{}); }); }).catch(()=>{});
+  // Uusi versio otettu käyttöön: ladataan sivu kerran uudelleen, jotta päivitys näkyy heti.
+  let swReloaded=false; const hadCtrl=!!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{ if(hadCtrl&&!swReloaded){ swReloaded=true; location.reload(); } }); }
 </script>
 
 </body>
