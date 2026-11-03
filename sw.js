@@ -1,7 +1,7 @@
 // Vegan – offline-välimuisti
 // Sivu ja demotuotteet haetaan ensin verkosta (uusin versio heti), välimuistista vain ilman verkkoa.
 // Muut tiedostot: välimuisti ensin ja päivitys taustalla.
-const CACHE = 'vegan-v8';
+const CACHE = 'vegan-v9';
 const CORE = ['./', './index.html', './manifest.webmanifest', './off-taxonomy.json', './inci.json', './demo.json', './icons/icon-192.png', './icons/apple-touch-icon.png',
   'https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting())); });

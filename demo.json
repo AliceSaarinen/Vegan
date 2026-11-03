@@ -62,9 +62,10 @@
   "5411188138099": {
    "name": "Alpro No Sugars Natural 400 g",
    "category": "ruoka",
-   "expected": "warn",
-   "ingredients": "vesi, kuoritut soijapavut (10,7 %), kalsium (trikalsiumsitraatti), stabilointiaine (pektiinit), happamuudensäätöaineet (natriumsitraatit, sitruunahappo), luontainen aromi, merisuola, hapettumisenestoaineet (tokoferoliuute, askorbiinihapon rasvahappoesterit), vitamiinit (B6, B12, D2), hapatteet (S. thermophilus, L. bulgaricus). Kasvipohjainen tuote.",
-   "source": "pakkaus"
+   "expected": "ok",
+   "ingredients": "vesi, kuoritut soijapavut (10,7 %), kalsium (trikalsiumsitraatti), stabilointiaine (pektiinit), happamuudensäätöaineet (natriumsitraatit, sitruunahappo), luontainen aromi, merisuola, hapettumisenestoaineet (tokoferoliuute, askorbiinihapon rasvahappoesterit), vitamiinit (B6, B12, D2), hapatteet (S. thermophilus, L. bulgaricus). Kasvipohjainen tuote. Pakkausmerkintä: V-Label Vegan.",
+   "source": "pakkaus",
+   "note": "Pakkauksessa V-Label Vegan -merkki."
   },
   "8719200235434": {
    "name": "Becel Gold rasvalevite 75 %",
